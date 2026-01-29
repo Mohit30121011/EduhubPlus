@@ -36,19 +36,6 @@ const DashboardLayout = () => {
             />
 
             <main className="main-content flex-1 flex flex-col min-w-0 pb-16 lg:pb-0">
-                {/* Mobile Header */}
-                <div className="lg:hidden bg-white/80 backdrop-blur border-b border-gray-200 p-4 sticky top-0 z-30 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => setSidebarOpen(true)}
-                            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-                        >
-                            <Menu size={24} />
-                        </button>
-                        <span className="font-bold text-gray-800 text-lg">ICMS</span>
-                    </div>
-                </div>
-
                 <div className="w-full p-4 md:p-6 lg:p-8">
                     <Outlet />
                 </div>

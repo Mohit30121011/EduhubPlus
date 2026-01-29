@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, CalendarCheck, User } from 'lucide-react';
+import { LayoutDashboard, BookOpen, CalendarCheck, User, Menu } from 'lucide-react';
 
 const BottomNav = ({ onMenuClick }) => {
     const navItems = [
@@ -36,6 +36,15 @@ const BottomNav = ({ onMenuClick }) => {
                         )}
                     </NavLink>
                 ))}
+
+                {/* Menu Button to Open Sidebar */}
+                <button
+                    onClick={onMenuClick}
+                    className="flex flex-col items-center justify-center w-full h-full space-y-1 text-gray-400 hover:text-gray-600 active:text-primary-600"
+                >
+                    <Menu size={24} strokeWidth={2} />
+                    <span className="text-xs font-medium">Menu</span>
+                </button>
             </div>
         </div>
     );

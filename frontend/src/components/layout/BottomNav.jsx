@@ -1,12 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, CalendarCheck, Menu } from 'lucide-react';
+import { LayoutDashboard, BookOpen, CalendarCheck, User } from 'lucide-react';
 
 const BottomNav = ({ onMenuClick }) => {
     const navItems = [
         { href: '/dashboard', icon: LayoutDashboard, label: 'Home', end: true },
         { href: '/dashboard/academics', icon: BookOpen, label: 'Academics' },
         { href: '/dashboard/tasks', icon: CalendarCheck, label: 'Tasks' },
+        { href: '/dashboard/settings', icon: User, label: 'Profile' },
     ];
 
     return (
@@ -35,15 +36,6 @@ const BottomNav = ({ onMenuClick }) => {
                         )}
                     </NavLink>
                 ))}
-
-                {/* Menu Button to Open Drawer */}
-                <button
-                    onClick={onMenuClick}
-                    className="flex flex-col items-center justify-center w-full h-full space-y-1 text-gray-400 hover:text-gray-600 active:text-primary-600"
-                >
-                    <Menu size={24} />
-                    <span className="text-xs font-medium">Menu</span>
-                </button>
             </div>
         </div>
     );

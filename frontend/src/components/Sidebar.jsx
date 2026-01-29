@@ -45,7 +45,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             fixed inset-y-0 right-0 z-50 w-64 border-l border-gray-100 
             transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:left-0 lg:right-auto lg:border-r lg:border-l-0
             ${isOpen ? 'translate-x-0 shadow-2xl' : 'translate-x-full lg:translate-x-0'}
-            bg-white
+            bg-white pb-16 lg:pb-0
         `}>
             {/* Logo Section - Fixed */}
             <div className="p-6 pb-4 flex items-center justify-between gap-4 border-b border-gray-100 shrink-0">
@@ -98,8 +98,8 @@ const Sidebar = ({ isOpen, onClose }) => {
                                     to={link.href}
                                     onClick={() => onClose && onClose()}
                                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${active
-                                            ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-md'
-                                            : 'text-gray-600 hover:bg-primary-50 hover:text-primary-600'
+                                        ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-md'
+                                        : 'text-gray-600 hover:bg-primary-50 hover:text-primary-600'
                                         }`}
                                 >
                                     <ChevronRight size={16} strokeWidth={active ? 2.5 : 2} />
@@ -111,8 +111,8 @@ const Sidebar = ({ isOpen, onClose }) => {
                 </div>
             </div>
 
-            {/* Bottom Section: User Profile - Fixed */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100 bg-white/95 backdrop-blur-sm">
+            {/* Bottom Section: User Profile - Fixed above bottom nav on mobile */}
+            <div className="absolute bottom-16 lg:bottom-0 left-0 right-0 p-4 border-t border-gray-100 bg-white/95 backdrop-blur-sm">
                 <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-all cursor-pointer group">
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
                         {user?.name?.[0] || 'A'}

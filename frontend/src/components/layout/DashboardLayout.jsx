@@ -42,7 +42,7 @@ const DashboardLayout = () => {
             </main>
 
             {/* Bottom Navigation for Mobile */}
-            <BottomNav onMenuClick={() => setSidebarOpen(true)} />
+            <BottomNav onMenuClick={() => setSidebarOpen(!isSidebarOpen)} isMenuOpen={isSidebarOpen} />
         </div>
     );
 };

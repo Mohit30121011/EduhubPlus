@@ -42,9 +42,10 @@ const Sidebar = ({ isOpen, onClose }) => {
     return (
         <aside className={`
             sidebar flex flex-col justify-between shrink-0
-            fixed inset-y-0 left-0 z-50 w-64 border-r border-gray-100 
-            transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0
-            ${isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}
+            fixed inset-y-0 right-0 z-50 w-64 border-l border-gray-100 
+            transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:left-0 lg:right-auto lg:border-r lg:border-l-0
+            ${isOpen ? 'translate-x-0 shadow-2xl' : 'translate-x-full lg:translate-x-0'}
+            overflow-y-auto
         `}>
             <div>
                 {/* Logo Section */}

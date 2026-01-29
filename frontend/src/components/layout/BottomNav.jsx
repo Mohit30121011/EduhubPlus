@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, BookOpen, CalendarCheck, User, Menu } from 'lucide-react';
 
-const BottomNav = ({ onMenuClick }) => {
+const BottomNav = ({ onMenuClick, isMenuOpen }) => {
     const navItems = [
         { href: '/dashboard', icon: LayoutDashboard, label: 'Home', end: true },
         { href: '/dashboard/academics', icon: BookOpen, label: 'Academics' },
@@ -37,12 +37,13 @@ const BottomNav = ({ onMenuClick }) => {
                     </NavLink>
                 ))}
 
-                {/* Menu Button to Open Sidebar */}
+                {/* Menu Button to Toggle Sidebar */}
                 <button
                     onClick={onMenuClick}
-                    className="flex flex-col items-center justify-center w-full h-full space-y-1 text-gray-400 hover:text-gray-600 active:text-primary-600"
+                    className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors duration-200 ${isMenuOpen ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'
+                        }`}
                 >
-                    <Menu size={24} strokeWidth={2} />
+                    <Menu size={24} strokeWidth={isMenuOpen ? 2.5 : 2} className={isMenuOpen ? 'transform scale-110 transition-transform' : ''} />
                     <span className="text-xs font-medium">Menu</span>
                 </button>
             </div>

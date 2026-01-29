@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { loginUser, reset } from '../redux/features/authSlice';
-import { User, Lock, ChevronRight, Zap } from 'lucide-react';
+import { User, Lock, ChevronRight, Zap, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Login = () => {
@@ -12,6 +12,7 @@ const Login = () => {
     });
     // Simplified Role State
     const [activeTab, setActiveTab] = useState('STUDENT');
+    const [showPassword, setShowPassword] = useState(false);
 
     const { email, password } = formData;
 
@@ -104,7 +105,7 @@ const Login = () => {
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                     {/* Icon Accent Blue */}
-                                    <User className="h-6 w-6 text-gray-400 group-focus-within:text-blue-600 transition-colors duration-300" fill="currentColor" strokeWidth={0} />
+                                    <User className="h-6 w-6 text-gray-400 group-focus-within:text-blue-600 transition-colors duration-300" strokeWidth={2} />
                                 </div>
                                 <input
                                     type="email"
@@ -119,17 +120,24 @@ const Login = () => {
 
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <Lock className="h-6 w-6 text-gray-400 group-focus-within:text-blue-600 transition-colors duration-300" fill="currentColor" strokeWidth={0} />
+                                    <Lock className="h-6 w-6 text-gray-400 group-focus-within:text-blue-600 transition-colors duration-300" strokeWidth={2} />
                                 </div>
                                 <input
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     name="password"
                                     value={password}
                                     onChange={onChange}
-                                    className="block w-full pl-12 pr-4 py-4 bg-white border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500/30 rounded-2xl text-gray-900 placeholder-gray-400 focus:outline-none transition-all font-semibold shadow-sm text-lg"
+                                    className="block w-full pl-12 pr-12 py-4 bg-white border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500/30 rounded-2xl text-gray-900 placeholder-gray-400 focus:outline-none transition-all font-semibold shadow-sm text-lg"
                                     placeholder="Password"
                                     required
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-blue-600 transition-colors cursor-pointer"
+                                >
+                                    {showPassword ? <EyeOff size={24} strokeWidth={2} /> : <Eye size={24} strokeWidth={2} />}
+                                </button>
                             </div>
                         </div>
 

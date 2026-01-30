@@ -66,4 +66,26 @@ router.post('/logo', protect, uploadLogo.single('logo'), async (req, res) => {
     }
 });
 
+// @desc    Remove user avatar
+// @route   DELETE /api/upload/avatar
+// @access  Private
+router.delete('/avatar', protect, async (req, res) => {
+    try {
+        const user = await User.findByPk(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.avatar = null;
+        await user.save();
+
+        res.status(200).json({
+            message: 'Avatar removed successfully'
+        });
+    } catch (error) {
+        console.error('Avatar remove error:', error);
+        res.status(500).json({ message: 'Error removing avatar' });
+    }
+});
+
 module.exports = router;

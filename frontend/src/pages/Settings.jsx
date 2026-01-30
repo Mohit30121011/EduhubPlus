@@ -127,6 +127,26 @@ const SettingsPage = () => {
         }
     };
 
+    // Remove Avatar Handler
+    const handleRemoveAvatar = async () => {
+        if (!user?.avatar) return;
+
+        if (!confirm('Are you sure you want to remove your avatar?')) return;
+
+        try {
+            await axios.delete(`${API_URL}/upload/avatar`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            toast.success('Avatar removed!');
+            const updatedUser = { ...user, avatar: null };
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            window.location.reload();
+        } catch (error) {
+            console.error('Remove avatar error:', error);
+            toast.error('Failed to remove avatar');
+        }
+    };
+
     const handleSave = async () => {
         if (activeTab === 'campus') {
             await dispatch(updateSchoolProfile(schoolForm));
@@ -310,6 +330,14 @@ const SettingsPage = () => {
                                     >
                                         {uploadingAvatar ? 'Uploading...' : 'Change Avatar'}
                                     </button>
+                                    {user?.avatar && (
+                                        <button
+                                            onClick={handleRemoveAvatar}
+                                            className="mt-2 ml-2 text-xs font-bold text-red-600 bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100 transition-colors"
+                                        >
+                                            Remove
+                                        </button>
+                                    )}
                                 </div>
                             </div>
 

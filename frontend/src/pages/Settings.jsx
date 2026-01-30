@@ -13,7 +13,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const SettingsPage = () => {
     const dispatch = useDispatch();
-    const [activeTab, setActiveTab] = useState('campus');
+    const [activeTab, setActiveTab] = useState(() => localStorage.getItem('settingsTab') || 'campus');
     const [uploadingLogo, setUploadingLogo] = useState(false);
     const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
@@ -175,7 +175,10 @@ const SettingsPage = () => {
                             return (
                                 <button
                                     key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
+                                    onClick={() => {
+                                        setActiveTab(tab.id);
+                                        localStorage.setItem('settingsTab', tab.id);
+                                    }}
                                     className={`w-full text-left px-5 py-3.5 flex items-center gap-3 text-sm font-bold rounded-2xl transition-all ${activeTab === tab.id
                                         ? 'bg-blue-50 text-blue-700 shadow-sm'
                                         : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'

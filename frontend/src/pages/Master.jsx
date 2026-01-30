@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
-import { BookOpen, FolderPlus, Layers, Plus, ArrowRight, ArrowLeft, X, ChevronDown, Check, Sparkles, Trash2, AlertTriangle } from 'lucide-react';
+import { BookOpen, FolderPlus, Layers, Plus, ArrowRight, ArrowLeft, X, ChevronDown, Check, Sparkles, Trash2, AlertTriangle, Upload, Download, FileSpreadsheet } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllMasterData, createCourse, deleteCourse, createSubject, createDepartment, updateCourse, updateSubject, updateDepartment } from '../redux/features/masterSlice';
 import { toast } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 
 const CustomSelect = ({ label, options, value, onChange, placeholder, name }) => {
@@ -185,10 +188,254 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title, message }) => (
         )}
     </AnimatePresence>
 );
+
+// Import Modal Component
+const ImportModal = ({ isOpen, onClose, category, token, onSuccess }) => {
+    const [step, setStep] = useState(1); // 1: Upload, 2: Preview
+    const [previewData, setPreviewData] = useState([]);
+    const [columns, setColumns] = useState([]);
+    const [uploading, setUploading] = useState(false);
+    const [saving, setSaving] = useState(false);
+
+    const handleDownloadTemplate = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/import/template/${category}`, {
+                headers: { Authorization: `Bearer ${token}` },
+                responseType: 'blob'
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${category}_template.xlsx`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            toast.success('Template downloaded!');
+        } catch (error) {
+            toast.error('Failed to download template');
+        }
+    };
+
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        setUploading(true);
+        try {
+            const response = await axios.post(`${API_URL}/import/parse/${category}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setPreviewData(response.data.data);
+            setColumns(response.data.columns);
+            setStep(2);
+            toast.success(`${response.data.data.length} rows parsed!`);
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to parse file');
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleCellChange = (rowIndex, column, value) => {
+        const updated = [...previewData];
+        updated[rowIndex][column] = value;
+        setPreviewData(updated);
+    };
+
+    const handleDeleteRow = (index) => {
+        setPreviewData(previewData.filter((_, i) => i !== index));
+    };
+
+    const handleSave = async () => {
+        if (previewData.length === 0) {
+            toast.error('No data to save');
+            return;
+        }
+
+        setSaving(true);
+        try {
+            const response = await axios.post(`${API_URL}/import/bulk/${category}`,
+                { data: previewData },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            toast.success(response.data.message);
+            onSuccess();
+            onClose();
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to import data');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const resetModal = () => {
+        setStep(1);
+        setPreviewData([]);
+        setColumns([]);
+    };
+
+    useEffect(() => {
+        if (!isOpen) resetModal();
+    }, [isOpen]);
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={onClose}
+                className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm"
+            />
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="relative bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[80vh] overflow-hidden"
+            >
+                {/* Header */}
+                <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-blue-50 to-indigo-50">
+                    <div className="flex items-center gap-3">
+                        <div className="p-3 bg-blue-100 rounded-xl">
+                            <FileSpreadsheet className="text-blue-600" size={24} />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-gray-900">Import {category.charAt(0).toUpperCase() + category.slice(1)}s</h2>
+                            <p className="text-sm text-gray-500">Step {step} of 2</p>
+                        </div>
+                    </div>
+                    <button onClick={onClose} className="p-2 hover:bg-white/80 rounded-xl transition-colors">
+                        <X size={20} className="text-gray-500" />
+                    </button>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 overflow-y-auto max-h-[60vh]">
+                    {step === 1 && (
+                        <div className="text-center py-8 space-y-6">
+                            <div className="w-20 h-20 mx-auto bg-blue-50 rounded-2xl flex items-center justify-center">
+                                <Upload size={36} className="text-blue-500" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-800 mb-2">Upload Excel File</h3>
+                                <p className="text-gray-500 text-sm max-w-md mx-auto">
+                                    Download the template, fill in your data, then upload the completed file.
+                                </p>
+                            </div>
+
+                            <div className="flex justify-center gap-4">
+                                <button
+                                    onClick={handleDownloadTemplate}
+                                    className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold flex items-center gap-2 transition-colors"
+                                >
+                                    <Download size={18} /> Download Template
+                                </button>
+                                <label className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold flex items-center gap-2 cursor-pointer transition-colors">
+                                    <Upload size={18} /> {uploading ? 'Uploading...' : 'Upload Excel'}
+                                    <input type="file" hidden accept=".xlsx,.xls" onChange={handleFileUpload} disabled={uploading} />
+                                </label>
+                            </div>
+                        </div>
+                    )}
+
+                    {step === 2 && (
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-500 font-medium">
+                                    {previewData.length} rows to import
+                                </span>
+                                <button
+                                    onClick={() => setStep(1)}
+                                    className="text-sm text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1"
+                                >
+                                    <ArrowLeft size={14} /> Choose Different File
+                                </button>
+                            </div>
+
+                            <div className="border border-gray-200 rounded-xl overflow-hidden">
+                                <table className="w-full text-sm">
+                                    <thead className="bg-gray-50">
+                                        <tr>
+                                            {columns.map(col => (
+                                                <th key={col} className="px-4 py-3 text-left font-bold text-gray-600 uppercase tracking-wider text-xs">
+                                                    {col}
+                                                </th>
+                                            ))}
+                                            <th className="px-4 py-3 text-right font-bold text-gray-600 uppercase tracking-wider text-xs">
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {previewData.map((row, rowIndex) => (
+                                            <tr key={rowIndex} className="hover:bg-gray-50">
+                                                {columns.map(col => (
+                                                    <td key={col} className="px-4 py-2">
+                                                        <input
+                                                            type="text"
+                                                            value={row[col] || ''}
+                                                            onChange={(e) => handleCellChange(rowIndex, col, e.target.value)}
+                                                            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all"
+                                                        />
+                                                    </td>
+                                                ))}
+                                                <td className="px-4 py-2 text-right">
+                                                    <button
+                                                        onClick={() => handleDeleteRow(rowIndex)}
+                                                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Footer */}
+                {step === 2 && (
+                    <div className="p-6 border-t border-gray-100 flex justify-end gap-4">
+                        <button
+                            onClick={onClose}
+                            className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleSave}
+                            disabled={saving || previewData.length === 0}
+                            className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-semibold shadow-lg shadow-green-500/25 flex items-center gap-2 transition-all disabled:opacity-50"
+                        >
+                            {saving ? 'Saving...' : <><Check size={18} /> Save {previewData.length} Records</>}
+                        </button>
+                    </div>
+                )}
+            </motion.div>
+        </div>
+    );
+};
+
 const MasterData = () => {
     const dispatch = useDispatch();
     const { courses, subjects, departments, isLoading } = useSelector((state) => state.master);
+    const { token } = useSelector((state) => state.auth);
     const [view, setView] = useState('grid'); // grid, courses, subjects, departments
+
+    // Import Modal State
+    const [showImportModal, setShowImportModal] = useState(false);
+    const [importCategory, setImportCategory] = useState('department');
 
     // Modal State
     const [showModal, setShowModal] = useState(false);
@@ -336,15 +583,29 @@ const MasterData = () => {
                         </motion.button>
                         <h2 className="text-2xl font-black text-gray-900 capitalize">{type} List</h2>
                     </div>
-                    <motion.button
-                        onClick={() => openModal(type.slice(0, -1))}
-                        whileHover={{ scale: 1.1, rotate: 90 }}
-                        whileTap={{ scale: 0.9 }}
-                        className="w-12 h-12 bg-gray-900 text-white rounded-full shadow-lg shadow-gray-900/20 flex items-center justify-center transition-all"
-                        title={`Create New ${type.slice(0, -1)}`}
-                    >
-                        <Plus size={24} />
-                    </motion.button>
+                    <div className="flex items-center gap-3">
+                        <motion.button
+                            onClick={() => {
+                                setImportCategory(type.slice(0, -1));
+                                setShowImportModal(true);
+                            }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="px-4 py-2.5 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-emerald-100 transition-colors"
+                            title={`Import ${type} from Excel`}
+                        >
+                            <FileSpreadsheet size={18} /> Import
+                        </motion.button>
+                        <motion.button
+                            onClick={() => openModal(type.slice(0, -1))}
+                            whileHover={{ scale: 1.1, rotate: 90 }}
+                            whileTap={{ scale: 0.9 }}
+                            className="w-12 h-12 bg-gray-900 text-white rounded-full shadow-lg shadow-gray-900/20 flex items-center justify-center transition-all"
+                            title={`Create New ${type.slice(0, -1)}`}
+                        >
+                            <Plus size={24} />
+                        </motion.button>
+                    </div>
                 </div>
 
                 {isLoading ? (
@@ -626,6 +887,14 @@ const MasterData = () => {
                 onConfirm={confirmDelete}
                 title="Are you sure?"
                 message={`This action cannot be undone. You are about to delete this ${deleteType?.slice(0, -1)}.`}
+            />
+
+            <ImportModal
+                isOpen={showImportModal}
+                onClose={() => setShowImportModal(false)}
+                category={importCategory}
+                token={token}
+                onSuccess={() => dispatch(getAllMasterData())}
             />
         </div>
     );

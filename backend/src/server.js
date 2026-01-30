@@ -42,6 +42,7 @@ app.use('/api/faculty', require('./routes/facultyRoutes'));
 app.use('/api/attendance', require('./routes/attendanceRoutes')); // Attendance Routes
 app.use('/api/master', require('./routes/masterRoutes')); // Master Data Routes
 app.use('/api/upload', require('./routes/uploadRoutes')); // File Upload Routes
+app.use('/api/import', require('./routes/importRoutes')); // Excel Import Routes
 
 // Global Error Handler
 app.use((err, req, res, next) => {

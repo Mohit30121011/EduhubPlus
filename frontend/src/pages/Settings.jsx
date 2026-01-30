@@ -7,14 +7,19 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getSchoolProfile, updateSchoolProfile } from '../redux/features/settingsSlice';
 import { updateProfile } from '../redux/features/authSlice';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const SettingsPage = () => {
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('campus');
+    const [uploadingLogo, setUploadingLogo] = useState(false);
+    const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
     // Redux State
     const { schoolProfile, isLoading: isSchoolLoading } = useSelector((state) => state.settings);
-    const { user, isLoading: isAuthLoading } = useSelector((state) => state.auth);
+    const { user, token, isLoading: isAuthLoading } = useSelector((state) => state.auth);
 
     // Local Forms State
     const [schoolForm, setSchoolForm] = useState({
@@ -28,7 +33,7 @@ const SettingsPage = () => {
     const [profileForm, setProfileForm] = useState({
         name: '',
         email: '',
-        password: '', // Only sent if changed
+        password: '',
         role: ''
     });
 
@@ -67,14 +72,69 @@ const SettingsPage = () => {
         setProfileForm({ ...profileForm, [e.target.name]: e.target.value });
     };
 
+    // Logo Upload Handler
+    const handleLogoUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('logo', file);
+
+        setUploadingLogo(true);
+        try {
+            const response = await axios.post(`${API_URL}/upload/logo`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            toast.success('Logo uploaded successfully!');
+            dispatch(getSchoolProfile()); // Refresh to get new logo
+        } catch (error) {
+            console.error('Logo upload error:', error);
+            toast.error('Failed to upload logo');
+        } finally {
+            setUploadingLogo(false);
+        }
+    };
+
+    // Avatar Upload Handler
+    const handleAvatarUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('avatar', file);
+
+        setUploadingAvatar(true);
+        try {
+            const response = await axios.post(`${API_URL}/upload/avatar`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            toast.success('Avatar uploaded successfully!');
+            // Update user in localStorage
+            const updatedUser = { ...user, avatar: response.data.avatar };
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            window.location.reload(); // Refresh to show new avatar
+        } catch (error) {
+            console.error('Avatar upload error:', error);
+            toast.error('Failed to upload avatar');
+        } finally {
+            setUploadingAvatar(false);
+        }
+    };
+
     const handleSave = async () => {
         if (activeTab === 'campus') {
             await dispatch(updateSchoolProfile(schoolForm));
             toast.success('Campus Info Updated!');
-            dispatch(getSchoolProfile()); // Refresh
+            dispatch(getSchoolProfile());
         } else if (activeTab === 'profile') {
             const dataToSend = { ...profileForm };
-            if (!dataToSend.password) delete dataToSend.password; // Don't send empty pwd
+            if (!dataToSend.password) delete dataToSend.password;
 
             await dispatch(updateProfile(dataToSend));
             toast.success('Profile Updated!');
@@ -135,11 +195,29 @@ const SettingsPage = () => {
                             <h2 className="text-xl font-black text-gray-900 border-b border-gray-100/50 pb-4">Campus Information</h2>
 
                             <div className="flex items-center gap-8">
-                                <div className="w-28 h-28 rounded-[2rem] bg-gradient-to-br from-gray-50 to-white border border-gray-100 shadow-inner flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:border-blue-200 hover:text-blue-500 transition-all group">
-                                    <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                                        <Upload size={20} className="text-blue-600" />
-                                    </div>
-                                    <span className="text-[10px] uppercase font-bold tracking-wider">Upload Logo</span>
+                                <input
+                                    type="file"
+                                    id="logo-upload"
+                                    hidden
+                                    accept="image/*"
+                                    onChange={handleLogoUpload}
+                                />
+                                <div
+                                    onClick={() => document.getElementById('logo-upload').click()}
+                                    className="w-28 h-28 rounded-[2rem] bg-gradient-to-br from-gray-50 to-white border border-gray-100 shadow-inner flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:border-blue-200 hover:text-blue-500 transition-all group overflow-hidden"
+                                >
+                                    {schoolProfile?.logoUrl ? (
+                                        <img src={schoolProfile.logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                                    ) : uploadingLogo ? (
+                                        <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                                    ) : (
+                                        <>
+                                            <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                                                <Upload size={20} className="text-blue-600" />
+                                            </div>
+                                            <span className="text-[10px] uppercase font-bold tracking-wider">Upload Logo</span>
+                                        </>
+                                    )}
                                 </div>
                                 <div className="flex-1 space-y-5">
                                     <div className="relative group">
@@ -205,8 +283,12 @@ const SettingsPage = () => {
                             <h2 className="text-xl font-black text-gray-900 border-b border-gray-100/50 pb-4">My Profile Info</h2>
 
                             <div className="flex items-center gap-8">
-                                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 border-4 border-white shadow-lg flex items-center justify-center text-white text-3xl font-bold">
-                                    {user?.name ? user.name[0] : (user?.email ? user.email[0].toUpperCase() : 'U')}
+                                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 border-4 border-white shadow-lg flex items-center justify-center text-white text-3xl font-bold overflow-hidden">
+                                    {user?.avatar ? (
+                                        <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                                    ) : (
+                                        user?.name ? user.name[0] : (user?.email ? user.email[0].toUpperCase() : 'U')
+                                    )}
                                 </div>
                                 <div>
                                     <h3 className="text-2xl font-black text-gray-900">{user?.name || 'User'}</h3>
@@ -216,19 +298,14 @@ const SettingsPage = () => {
                                         id="avatar-upload"
                                         hidden
                                         accept="image/*"
-                                        onChange={(e) => {
-                                            const file = e.target.files[0];
-                                            if (file) {
-                                                toast.success(`Selected: ${file.name}`);
-                                                // TODO: Handle upload
-                                            }
-                                        }}
+                                        onChange={handleAvatarUpload}
                                     />
                                     <button
                                         onClick={() => document.getElementById('avatar-upload').click()}
-                                        className="mt-2 text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors"
+                                        disabled={uploadingAvatar}
+                                        className="mt-2 text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors disabled:opacity-50"
                                     >
-                                        Change Avatar
+                                        {uploadingAvatar ? 'Uploading...' : 'Change Avatar'}
                                     </button>
                                 </div>
                             </div>

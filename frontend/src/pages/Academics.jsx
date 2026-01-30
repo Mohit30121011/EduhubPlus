@@ -34,7 +34,7 @@ const StatCard = ({ title, count, icon: Icon, color }) => (
 );
 
 const Academics = () => {
-    const [activeTab, setActiveTab] = useState('classes');
+    const [activeTab, setActiveTab] = useState(() => localStorage.getItem('academicsTab') || 'classes');
 
     return (
         <div className="space-y-8 pb-10">
@@ -60,21 +60,21 @@ const Academics = () => {
             {/* Tabs */}
             <div className="flex gap-6 border-b border-gray-200">
                 <button
-                    onClick={() => setActiveTab('classes')}
+                    onClick={() => { setActiveTab('classes'); localStorage.setItem('academicsTab', 'classes'); }}
                     className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === 'classes' ? 'text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
                 >
                     Classes & Sections
                     {activeTab === 'classes' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 rounded-t-full"></div>}
                 </button>
                 <button
-                    onClick={() => setActiveTab('subjects')}
+                    onClick={() => { setActiveTab('subjects'); localStorage.setItem('academicsTab', 'subjects'); }}
                     className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === 'subjects' ? 'text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
                 >
                     Subjects
                     {activeTab === 'subjects' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 rounded-t-full"></div>}
                 </button>
                 <button
-                    onClick={() => setActiveTab('timetables')}
+                    onClick={() => { setActiveTab('timetables'); localStorage.setItem('academicsTab', 'timetables'); }}
                     className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === 'timetables' ? 'text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
                 >
                     Timetables

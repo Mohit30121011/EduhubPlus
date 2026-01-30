@@ -41,37 +41,35 @@ router.get('/template/:category', protect, async (req, res) => {
         // Create workbook with sample data
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(template.sample);
-
-        // Add dropdown for Course template (departmentCode)
-        if (category === 'course') {
-            const departments = await Department.findAll({ attributes: ['code'] });
-            const deptCodes = departments.map(d => d.code).join(',');
-
-            if (deptCodes) {
-                // Add data validation for departmentCode column (column C)
-                ws['!dataValidation'] = [{
-                    type: 'list',
-                    sqref: 'C2:C100',
-                    formula1: `"${deptCodes}"`
-                }];
-            }
-        }
-
-        // Add dropdown for Subject template (courseCode)
-        if (category === 'subject') {
-            const courses = await Course.findAll({ attributes: ['code'] });
-            const courseCodes = courses.map(c => c.code).join(',');
-
-            if (courseCodes) {
-                ws['!dataValidation'] = [{
-                    type: 'list',
-                    sqref: 'C2:C100',
-                    formula1: `"${courseCodes}"`
-                }];
-            }
-        }
-
         XLSX.utils.book_append_sheet(wb, ws, category);
+
+        // Add Reference sheet for Course template with department codes
+        if (category === 'course') {
+            const departments = await Department.findAll({ attributes: ['code', 'name'] });
+            if (departments.length > 0) {
+                const refData = departments.map(d => ({
+                    Code: d.code,
+                    Name: d.name,
+                    Note: 'Copy code to departmentCode column'
+                }));
+                const refSheet = XLSX.utils.json_to_sheet(refData);
+                XLSX.utils.book_append_sheet(wb, refSheet, 'Available Departments');
+            }
+        }
+
+        // Add Reference sheet for Subject template with course codes
+        if (category === 'subject') {
+            const courses = await Course.findAll({ attributes: ['code', 'name'] });
+            if (courses.length > 0) {
+                const refData = courses.map(c => ({
+                    Code: c.code,
+                    Name: c.name,
+                    Note: 'Copy code to courseCode column'
+                }));
+                const refSheet = XLSX.utils.json_to_sheet(refData);
+                XLSX.utils.book_append_sheet(wb, refSheet, 'Available Courses');
+            }
+        }
 
         // Generate buffer
         const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });

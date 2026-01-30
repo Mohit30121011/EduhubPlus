@@ -115,8 +115,8 @@ router.post('/bulk/:category', protect, async (req, res) => {
                 processedData = data.map(row => ({
                     name: row.name,
                     code: row.code,
-                    departmentId: deptCodeMap[row.departmentCode] || null
-                })).filter(row => row.departmentId !== null);
+                    DepartmentId: deptCodeMap[row.departmentCode] || null
+                })).filter(row => row.DepartmentId !== null);
 
                 if (processedData.length === 0) {
                     return res.status(400).json({ message: 'No valid department codes found. Please create departments first.' });
@@ -132,8 +132,8 @@ router.post('/bulk/:category', protect, async (req, res) => {
                 processedData = data.map(row => ({
                     name: row.name,
                     code: row.code,
-                    courseId: courseCodeMap[row.courseCode] || null
-                })).filter(row => row.courseId !== null);
+                    CourseId: courseCodeMap[row.courseCode] || null
+                })).filter(row => row.CourseId !== null);
 
                 if (processedData.length === 0) {
                     return res.status(400).json({ message: 'No valid course codes found. Please create courses first.' });

@@ -17,12 +17,12 @@ const templates = {
         sample: [{ name: 'Computer Science', code: 'CS' }, { name: 'Electronics', code: 'EC' }]
     },
     course: {
-        columns: ['name', 'code', 'departmentId'],
-        sample: [{ name: 'B.Tech CSE', code: 'BTCS', departmentId: 1 }]
+        columns: ['name', 'code', 'departmentCode'],
+        sample: [{ name: 'B.Tech CSE', code: 'BTCS', departmentCode: 'CS' }]
     },
     subject: {
-        columns: ['name', 'code', 'courseId'],
-        sample: [{ name: 'Data Structures', code: 'CS201', courseId: 1 }]
+        columns: ['name', 'code', 'courseCode'],
+        sample: [{ name: 'Data Structures', code: 'CS201', courseCode: 'BTCS' }]
     }
 };
 
@@ -100,16 +100,45 @@ router.post('/bulk/:category', protect, async (req, res) => {
 
     try {
         let result;
+        let processedData;
 
         switch (category) {
             case 'department':
                 result = await Department.bulkCreate(data, { ignoreDuplicates: true });
                 break;
             case 'course':
-                result = await Course.bulkCreate(data, { ignoreDuplicates: true });
+                // Resolve departmentCode to departmentId
+                const departments = await Department.findAll();
+                const deptCodeMap = {};
+                departments.forEach(d => { deptCodeMap[d.code] = d.id; });
+
+                processedData = data.map(row => ({
+                    name: row.name,
+                    code: row.code,
+                    departmentId: deptCodeMap[row.departmentCode] || null
+                })).filter(row => row.departmentId !== null);
+
+                if (processedData.length === 0) {
+                    return res.status(400).json({ message: 'No valid department codes found. Please create departments first.' });
+                }
+                result = await Course.bulkCreate(processedData, { ignoreDuplicates: true });
                 break;
             case 'subject':
-                result = await Subject.bulkCreate(data, { ignoreDuplicates: true });
+                // Resolve courseCode to courseId
+                const courses = await Course.findAll();
+                const courseCodeMap = {};
+                courses.forEach(c => { courseCodeMap[c.code] = c.id; });
+
+                processedData = data.map(row => ({
+                    name: row.name,
+                    code: row.code,
+                    courseId: courseCodeMap[row.courseCode] || null
+                })).filter(row => row.courseId !== null);
+
+                if (processedData.length === 0) {
+                    return res.status(400).json({ message: 'No valid course codes found. Please create courses first.' });
+                }
+                result = await Subject.bulkCreate(processedData, { ignoreDuplicates: true });
                 break;
             default:
                 return res.status(400).json({ message: 'Invalid category' });

@@ -15,7 +15,8 @@ const getSchoolProfile = async (req, res) => {
                 tagline: '',
                 email: '',
                 website: '',
-                address: ''
+                address: '',
+                logoUrl: ''
             });
         }
 

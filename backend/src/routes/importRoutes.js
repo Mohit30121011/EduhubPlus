@@ -29,7 +29,7 @@ const templates = {
 // @desc    Download sample template
 // @route   GET /api/import/template/:category
 // @access  Private
-router.get('/template/:category', protect, (req, res) => {
+router.get('/template/:category', protect, async (req, res) => {
     const { category } = req.params;
     const template = templates[category];
 
@@ -37,17 +37,52 @@ router.get('/template/:category', protect, (req, res) => {
         return res.status(400).json({ message: 'Invalid category' });
     }
 
-    // Create workbook with sample data
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(template.sample);
-    XLSX.utils.book_append_sheet(wb, ws, category);
+    try {
+        // Create workbook with sample data
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(template.sample);
 
-    // Generate buffer
-    const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+        // Add dropdown for Course template (departmentCode)
+        if (category === 'course') {
+            const departments = await Department.findAll({ attributes: ['code'] });
+            const deptCodes = departments.map(d => d.code).join(',');
 
-    res.setHeader('Content-Disposition', `attachment; filename=${category}_template.xlsx`);
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.send(buffer);
+            if (deptCodes) {
+                // Add data validation for departmentCode column (column C)
+                ws['!dataValidation'] = [{
+                    type: 'list',
+                    sqref: 'C2:C100',
+                    formula1: `"${deptCodes}"`
+                }];
+            }
+        }
+
+        // Add dropdown for Subject template (courseCode)
+        if (category === 'subject') {
+            const courses = await Course.findAll({ attributes: ['code'] });
+            const courseCodes = courses.map(c => c.code).join(',');
+
+            if (courseCodes) {
+                ws['!dataValidation'] = [{
+                    type: 'list',
+                    sqref: 'C2:C100',
+                    formula1: `"${courseCodes}"`
+                }];
+            }
+        }
+
+        XLSX.utils.book_append_sheet(wb, ws, category);
+
+        // Generate buffer
+        const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+
+        res.setHeader('Content-Disposition', `attachment; filename=${category}_template.xlsx`);
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.send(buffer);
+    } catch (error) {
+        console.error('Template generation error:', error);
+        res.status(500).json({ message: 'Error generating template' });
+    }
 });
 
 // @desc    Parse uploaded Excel and return data

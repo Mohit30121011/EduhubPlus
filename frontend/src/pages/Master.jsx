@@ -360,16 +360,16 @@ const ImportModal = ({ isOpen, onClose, category, token, onSuccess }) => {
                                 </button>
                             </div>
 
-                            <div className="border border-gray-200 rounded-xl overflow-hidden">
-                                <table className="w-full text-sm">
+                            <div className="border border-gray-200 rounded-xl overflow-x-auto">
+                                <table className="w-full text-sm min-w-[600px]">
                                     <thead className="bg-gray-50">
                                         <tr>
                                             {columns.map(col => (
-                                                <th key={col} className="px-4 py-3 text-left font-bold text-gray-600 uppercase tracking-wider text-xs">
+                                                <th key={col} className="px-4 py-3 text-left font-bold text-gray-600 uppercase tracking-wider text-xs min-w-[150px]">
                                                     {col}
                                                 </th>
                                             ))}
-                                            <th className="px-4 py-3 text-right font-bold text-gray-600 uppercase tracking-wider text-xs">
+                                            <th className="px-4 py-3 text-right font-bold text-gray-600 uppercase tracking-wider text-xs w-[80px]">
                                                 Action
                                             </th>
                                         </tr>
@@ -378,16 +378,16 @@ const ImportModal = ({ isOpen, onClose, category, token, onSuccess }) => {
                                         {previewData.map((row, rowIndex) => (
                                             <tr key={rowIndex} className="hover:bg-gray-50">
                                                 {columns.map(col => (
-                                                    <td key={col} className="px-4 py-2">
+                                                    <td key={col} className="px-4 py-2 min-w-[150px]">
                                                         <input
                                                             type="text"
                                                             value={row[col] || ''}
                                                             onChange={(e) => handleCellChange(rowIndex, col, e.target.value)}
-                                                            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all"
+                                                            className="w-full min-w-[120px] px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all text-sm"
                                                         />
                                                     </td>
                                                 ))}
-                                                <td className="px-4 py-2 text-right">
+                                                <td className="px-4 py-2 text-right w-[80px]">
                                                     <button
                                                         onClick={() => handleDeleteRow(rowIndex)}
                                                         className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"

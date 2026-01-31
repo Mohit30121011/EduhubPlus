@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BookOpen, FolderPlus, Layers, Plus, ArrowRight, ArrowLeft, X, ChevronDown, Check, Sparkles, Trash2, AlertTriangle, Upload, Download, FileSpreadsheet, Search, SlidersHorizontal } from 'lucide-react';
+import { BookOpen, FolderPlus, Layers, Plus, ArrowRight, ArrowLeft, X, ChevronDown, Check, Sparkles, Trash2, AlertTriangle, Upload, Download, FileSpreadsheet, Search, SlidersHorizontal, Columns3, Eye, EyeOff } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllMasterData, createCourse, deleteCourse, createSubject, createDepartment, updateCourse, updateSubject, updateDepartment } from '../redux/features/masterSlice';
 import { toast } from 'react-hot-toast';
@@ -456,6 +456,39 @@ const MasterData = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showSearchInput, setShowSearchInput] = useState(false);
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+    const [showColumnDropdown, setShowColumnDropdown] = useState(false);
+    const [filterField, setFilterField] = useState('');
+    const [filterValue, setFilterValue] = useState('');
+
+    // Column visibility state for each type
+    const [visibleColumns, setVisibleColumns] = useState({
+        departments: { name: true, code: true },
+        courses: { name: true, code: true, department: true, fees: true },
+        subjects: { name: true, code: true, course: true }
+    });
+
+    // Get filtered data based on search and filter
+    const getFilteredData = (data, type) => {
+        let filtered = data;
+
+        // Apply search
+        if (searchQuery) {
+            filtered = filtered.filter(item =>
+                item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                item.code?.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
+
+        // Apply filter
+        if (filterField && filterValue) {
+            filtered = filtered.filter(item => {
+                const value = item[filterField];
+                return value?.toString().toLowerCase().includes(filterValue.toLowerCase());
+            });
+        }
+
+        return filtered;
+    };
 
     useEffect(() => {
         dispatch(getAllMasterData());
@@ -622,16 +655,103 @@ const MasterData = () => {
                             <Search size={18} />
                         </motion.button>
 
-                        {/* Filter Button */}
-                        <motion.button
-                            onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${showFilterDropdown ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-                            title="Filter"
-                        >
-                            <SlidersHorizontal size={18} />
-                        </motion.button>
+                        {/* Filter Button + Dropdown */}
+                        <div className="relative">
+                            <motion.button
+                                onClick={() => {
+                                    setShowFilterDropdown(!showFilterDropdown);
+                                    setShowColumnDropdown(false);
+                                }}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${(showFilterDropdown || filterField) ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                                title="Filter"
+                            >
+                                <SlidersHorizontal size={18} />
+                            </motion.button>
+                            <AnimatePresence>
+                                {showFilterDropdown && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                        className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 p-4 z-50"
+                                    >
+                                        <p className="text-xs font-bold text-gray-400 uppercase mb-3">Filter By</p>
+                                        <select
+                                            value={filterField}
+                                            onChange={(e) => setFilterField(e.target.value)}
+                                            className="w-full p-3 bg-gray-50 rounded-xl text-sm font-medium mb-2 outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        >
+                                            <option value="">Select Field</option>
+                                            <option value="name">Name</option>
+                                            <option value="code">Code</option>
+                                            {type === 'courses' && <option value="fees">Fees</option>}
+                                        </select>
+                                        <input
+                                            type="text"
+                                            placeholder="Filter value..."
+                                            value={filterValue}
+                                            onChange={(e) => setFilterValue(e.target.value)}
+                                            className="w-full p-3 bg-gray-50 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        />
+                                        {filterField && (
+                                            <button
+                                                onClick={() => { setFilterField(''); setFilterValue(''); }}
+                                                className="mt-3 w-full py-2 text-xs font-bold text-red-600 bg-red-50 rounded-xl hover:bg-red-100"
+                                            >
+                                                Clear Filter
+                                            </button>
+                                        )}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        {/* Column Visibility Button + Dropdown */}
+                        <div className="relative">
+                            <motion.button
+                                onClick={() => {
+                                    setShowColumnDropdown(!showColumnDropdown);
+                                    setShowFilterDropdown(false);
+                                }}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${showColumnDropdown ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                                title="Show/Hide Columns"
+                            >
+                                <Columns3 size={18} />
+                            </motion.button>
+                            <AnimatePresence>
+                                {showColumnDropdown && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                        className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                                    >
+                                        <p className="text-xs font-bold text-gray-400 uppercase p-3 pb-2">Show Columns</p>
+                                        {Object.keys(visibleColumns[type] || {}).map((col) => (
+                                            <button
+                                                key={col}
+                                                onClick={() => setVisibleColumns(prev => ({
+                                                    ...prev,
+                                                    [type]: { ...prev[type], [col]: !prev[type][col] }
+                                                }))}
+                                                className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                                            >
+                                                <span className="text-sm font-medium text-gray-700 capitalize">{col}</span>
+                                                {visibleColumns[type]?.[col] ? (
+                                                    <Eye size={16} className="text-blue-600" />
+                                                ) : (
+                                                    <EyeOff size={16} className="text-gray-400" />
+                                                )}
+                                            </button>
+                                        ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
 
                         {/* Import Button */}
                         <motion.button
@@ -649,7 +769,7 @@ const MasterData = () => {
 
                         {/* Export Button */}
                         <ExportDropdown
-                            data={data.map(item => ({
+                            data={getFilteredData(data, type).map(item => ({
                                 ...item,
                                 departmentName: type === 'courses' ? (departments.find(d => d.id === item.DepartmentId)?.name || '-') : undefined,
                                 courseName: type === 'subjects' ? (courses.find(c => c.id === item.CourseId)?.name || '-') : undefined
@@ -659,21 +779,21 @@ const MasterData = () => {
                             columns={
                                 type === 'courses'
                                     ? [
-                                        { key: 'name', header: 'Name' },
-                                        { key: 'code', header: 'Code' },
-                                        { key: 'departmentName', header: 'Department' },
-                                        { key: 'fees', header: 'Fees (₹)' }
-                                    ]
+                                        visibleColumns.courses.name && { key: 'name', header: 'Name' },
+                                        visibleColumns.courses.code && { key: 'code', header: 'Code' },
+                                        visibleColumns.courses.department && { key: 'departmentName', header: 'Department' },
+                                        visibleColumns.courses.fees && { key: 'fees', header: 'Fees (₹)' }
+                                    ].filter(Boolean)
                                     : type === 'subjects'
                                         ? [
-                                            { key: 'name', header: 'Name' },
-                                            { key: 'code', header: 'Code' },
-                                            { key: 'courseName', header: 'Course' }
-                                        ]
+                                            visibleColumns.subjects.name && { key: 'name', header: 'Name' },
+                                            visibleColumns.subjects.code && { key: 'code', header: 'Code' },
+                                            visibleColumns.subjects.course && { key: 'courseName', header: 'Course' }
+                                        ].filter(Boolean)
                                         : [
-                                            { key: 'name', header: 'Name' },
-                                            { key: 'code', header: 'Code' }
-                                        ]
+                                            visibleColumns.departments.name && { key: 'name', header: 'Name' },
+                                            visibleColumns.departments.code && { key: 'code', header: 'Code' }
+                                        ].filter(Boolean)
                             }
                             circular={true}
                         />
@@ -698,20 +818,26 @@ const MasterData = () => {
                         <p className="text-gray-400 font-bold mb-2">No {type} found</p>
                         <button onClick={() => openModal(type.slice(0, -1))} className="text-blue-600 text-sm font-bold hover:underline">Create your first {type.slice(0, -1)}</button>
                     </div>
+                ) : getFilteredData(data, type).length === 0 ? (
+                    <div className="text-center py-20 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                        <p className="text-gray-400 font-bold mb-2">No results found</p>
+                        <button onClick={() => { setSearchQuery(''); setFilterField(''); setFilterValue(''); }} className="text-blue-600 text-sm font-bold hover:underline">Clear filters</button>
+                    </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="text-xs font-extrabold text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                                    <th className="px-6 py-4 w-full">Name</th>
-                                    {type === 'courses' && <th className="px-6 py-4 whitespace-nowrap">Department</th>}
-                                    {type === 'courses' && <th className="px-6 py-4 whitespace-nowrap">Fees (₹)</th>}
-                                    <th className="px-6 py-4 whitespace-nowrap">Code</th>
+                                    {visibleColumns[type]?.name && <th className="px-6 py-4">Name</th>}
+                                    {type === 'courses' && visibleColumns.courses?.department && <th className="px-6 py-4 whitespace-nowrap">Department</th>}
+                                    {type === 'courses' && visibleColumns.courses?.fees && <th className="px-6 py-4 whitespace-nowrap">Fees (₹)</th>}
+                                    {type === 'subjects' && visibleColumns.subjects?.course && <th className="px-6 py-4 whitespace-nowrap">Course</th>}
+                                    {visibleColumns[type]?.code && <th className="px-6 py-4 whitespace-nowrap">Code</th>}
                                     <th className="px-6 py-4 text-right whitespace-nowrap">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {data.map((item, index) => (
+                                {getFilteredData(data, type).map((item, index) => (
                                     <motion.tr
                                         key={item.id}
                                         initial={{ opacity: 0, y: 10 }}
@@ -719,20 +845,26 @@ const MasterData = () => {
                                         transition={{ delay: index * 0.05 }}
                                         className="hover:bg-blue-50/50 transition-colors group"
                                     >
-                                        <td className="px-6 py-5 font-bold text-gray-700 leading-relaxed">{item.name}</td>
+                                        {visibleColumns[type]?.name && <td className="px-6 py-5 font-bold text-gray-700 leading-relaxed">{item.name}</td>}
                                         {/* Show Department Column for Courses */}
-                                        {type === 'courses' && (
+                                        {type === 'courses' && visibleColumns.courses?.department && (
                                             <td className="px-6 py-5 font-medium text-gray-500 whitespace-nowrap">
                                                 {departments.find(d => d.id === item.DepartmentId)?.code || 'N/A'}
                                             </td>
                                         )}
                                         {/* Show Fees Column for Courses */}
-                                        {type === 'courses' && (
+                                        {type === 'courses' && visibleColumns.courses?.fees && (
                                             <td className="px-6 py-5 font-medium text-emerald-600 whitespace-nowrap">
                                                 ₹{Number(item.fees || 0).toLocaleString('en-IN')}
                                             </td>
                                         )}
-                                        <td className="px-6 py-5 font-medium text-gray-500 whitespace-nowrap">{item.code}</td>
+                                        {/* Show Course Column for Subjects */}
+                                        {type === 'subjects' && visibleColumns.subjects?.course && (
+                                            <td className="px-6 py-5 font-medium text-gray-500 whitespace-nowrap">
+                                                {courses.find(c => c.id === item.CourseId)?.code || 'N/A'}
+                                            </td>
+                                        )}
+                                        {visibleColumns[type]?.code && <td className="px-6 py-5 font-medium text-gray-500 whitespace-nowrap">{item.code}</td>}
                                         <td className="px-6 py-5 text-right whitespace-nowrap">
                                             <div className="flex justify-end gap-2">
                                                 <motion.button

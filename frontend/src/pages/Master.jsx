@@ -5,6 +5,7 @@ import { getAllMasterData, createCourse, deleteCourse, createSubject, createDepa
 import { toast } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
+import ExportDropdown from '../components/ExportDropdown';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -596,6 +597,33 @@ const MasterData = () => {
                         >
                             <FileSpreadsheet size={18} /> Import
                         </motion.button>
+                        <ExportDropdown
+                            data={data.map(item => ({
+                                ...item,
+                                departmentName: type === 'courses' ? (departments.find(d => d.id === item.DepartmentId)?.name || '-') : undefined,
+                                courseName: type === 'subjects' ? (courses.find(c => c.id === item.CourseId)?.name || '-') : undefined
+                            }))}
+                            filename={type}
+                            title={`${type.charAt(0).toUpperCase() + type.slice(1)} List`}
+                            columns={
+                                type === 'courses'
+                                    ? [
+                                        { key: 'name', header: 'Name' },
+                                        { key: 'code', header: 'Code' },
+                                        { key: 'departmentName', header: 'Department' }
+                                    ]
+                                    : type === 'subjects'
+                                        ? [
+                                            { key: 'name', header: 'Name' },
+                                            { key: 'code', header: 'Code' },
+                                            { key: 'courseName', header: 'Course' }
+                                        ]
+                                        : [
+                                            { key: 'name', header: 'Name' },
+                                            { key: 'code', header: 'Code' }
+                                        ]
+                            }
+                        />
                         <motion.button
                             onClick={() => openModal(type.slice(0, -1))}
                             whileHover={{ scale: 1.1, rotate: 90 }}

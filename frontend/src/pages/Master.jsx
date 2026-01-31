@@ -669,7 +669,7 @@ const MasterData = () => {
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: 10 }}
-                                        className="fixed sm:absolute left-1/2 sm:left-auto sm:right-0 -translate-x-1/2 sm:translate-x-0 top-1/3 sm:top-auto sm:mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-[100]"
+                                        className="fixed inset-x-4 sm:inset-auto sm:absolute sm:right-0 top-24 sm:top-auto sm:mt-2 w-auto sm:w-72 max-w-sm mx-auto sm:mx-0 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-[100]"
                                     >
                                         <div className="flex items-center justify-between mb-4">
                                             <p className="text-sm font-bold text-gray-900">Advanced Filters</p>
@@ -748,7 +748,7 @@ const MasterData = () => {
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: 10 }}
-                                        className="fixed sm:absolute left-1/2 sm:left-auto sm:right-0 -translate-x-1/2 sm:translate-x-0 top-1/3 sm:top-auto sm:mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[100]"
+                                        className="fixed inset-x-4 sm:inset-auto sm:absolute sm:right-0 top-24 sm:top-auto sm:mt-2 w-auto sm:w-56 max-w-sm mx-auto sm:mx-0 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[100]"
                                     >
                                         <div className="flex items-center justify-between p-3 border-b border-gray-100">
                                             <p className="text-sm font-bold text-gray-900">Show Columns</p>

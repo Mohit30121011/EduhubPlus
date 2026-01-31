@@ -5,7 +5,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
-const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Export' }) => {
+const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Export', circular = false }) => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -153,13 +153,21 @@ const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Expo
         <div className="relative" ref={dropdownRef}>
             <motion.button
                 onClick={() => setIsOpen(!isOpen)}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold text-sm flex items-center gap-2 transition-colors"
+                whileHover={{ scale: circular ? 1.1 : 1.02 }}
+                whileTap={{ scale: circular ? 0.9 : 0.98 }}
+                className={circular
+                    ? "w-10 h-10 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full flex items-center justify-center transition-all"
+                    : "px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold text-sm flex items-center gap-2 transition-colors"
+                }
+                title="Export"
             >
                 <Download size={18} />
-                Export
-                <ChevronDown size={16} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                {!circular && (
+                    <>
+                        Export
+                        <ChevronDown size={16} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                    </>
+                )}
             </motion.button>
 
             <AnimatePresence>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BookOpen, FolderPlus, Layers, Plus, ArrowRight, ArrowLeft, X, ChevronDown, Check, Sparkles, Trash2, AlertTriangle, Upload, Download, FileSpreadsheet } from 'lucide-react';
+import { BookOpen, FolderPlus, Layers, Plus, ArrowRight, ArrowLeft, X, ChevronDown, Check, Sparkles, Trash2, AlertTriangle, Upload, Download, FileSpreadsheet, Search, SlidersHorizontal } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllMasterData, createCourse, deleteCourse, createSubject, createDepartment, updateCourse, updateSubject, updateDepartment } from '../redux/features/masterSlice';
 import { toast } from 'react-hot-toast';
@@ -452,6 +452,11 @@ const MasterData = () => {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
 
+    // Search and Filter State
+    const [searchQuery, setSearchQuery] = useState('');
+    const [showSearchInput, setShowSearchInput] = useState(false);
+    const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+
     useEffect(() => {
         dispatch(getAllMasterData());
     }, [dispatch]);
@@ -584,19 +589,65 @@ const MasterData = () => {
                         </motion.button>
                         <h2 className="text-xl sm:text-2xl font-black text-gray-900 capitalize">{type} List</h2>
                     </div>
-                    <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
+                    <div className="flex items-center gap-2 flex-wrap justify-end relative">
+                        {/* Search Input - Shows when search clicked */}
+                        <AnimatePresence>
+                            {showSearchInput && (
+                                <motion.div
+                                    initial={{ width: 0, opacity: 0 }}
+                                    animate={{ width: 'auto', opacity: 1 }}
+                                    exit={{ width: 0, opacity: 0 }}
+                                    className="overflow-hidden"
+                                >
+                                    <input
+                                        type="text"
+                                        placeholder="Search..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        autoFocus
+                                        className="w-32 sm:w-48 px-4 py-2 bg-gray-100 rounded-full text-sm font-medium focus:ring-2 focus:ring-blue-500/20 outline-none"
+                                    />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {/* Search Button */}
+                        <motion.button
+                            onClick={() => setShowSearchInput(!showSearchInput)}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${showSearchInput ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                            title="Search"
+                        >
+                            <Search size={18} />
+                        </motion.button>
+
+                        {/* Filter Button */}
+                        <motion.button
+                            onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${showFilterDropdown ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                            title="Filter"
+                        >
+                            <SlidersHorizontal size={18} />
+                        </motion.button>
+
+                        {/* Import Button */}
                         <motion.button
                             onClick={() => {
                                 setImportCategory(type.slice(0, -1));
                                 setShowImportModal(true);
                             }}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="px-3 sm:px-4 py-2 sm:py-2.5 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-1 sm:gap-2 hover:bg-emerald-100 transition-colors"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center hover:bg-emerald-200 transition-all"
                             title={`Import ${type} from Excel`}
                         >
-                            <FileSpreadsheet size={16} className="sm:w-[18px] sm:h-[18px]" /> <span className="hidden xs:inline">Import</span>
+                            <Upload size={18} />
                         </motion.button>
+
+                        {/* Export Button */}
                         <ExportDropdown
                             data={data.map(item => ({
                                 ...item,
@@ -624,15 +675,18 @@ const MasterData = () => {
                                             { key: 'code', header: 'Code' }
                                         ]
                             }
+                            circular={true}
                         />
+
+                        {/* Add Button */}
                         <motion.button
                             onClick={() => openModal(type.slice(0, -1))}
                             whileHover={{ scale: 1.1, rotate: 90 }}
                             whileTap={{ scale: 0.9 }}
-                            className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-900 text-white rounded-full shadow-lg shadow-gray-900/20 flex items-center justify-center transition-all"
+                            className="w-10 h-10 bg-gray-900 text-white rounded-full shadow-lg shadow-gray-900/20 flex items-center justify-center transition-all"
                             title={`Create New ${type.slice(0, -1)}`}
                         >
-                            <Plus size={20} className="sm:w-6 sm:h-6" />
+                            <Plus size={20} />
                         </motion.button>
                     </div>
                 </div>

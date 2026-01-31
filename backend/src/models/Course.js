@@ -24,6 +24,11 @@ const Course = sequelize.define('Course', {
     type: {
         type: DataTypes.ENUM('Semester', 'Yearly'),
         defaultValue: 'Semester'
+    },
+    fees: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0
     }
 }, {
     timestamps: true

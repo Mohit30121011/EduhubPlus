@@ -512,9 +512,9 @@ const MasterData = () => {
     };
 
     const modules = [
+        { id: 'departments', title: 'Departments', description: 'School Departments', icon: FolderPlus, color: 'text-purple-600', bg: 'bg-purple-50', count: departments?.length || 0 },
         { id: 'courses', title: 'Courses', description: 'Manage Academic Courses', icon: BookOpen, color: 'text-blue-600', bg: 'bg-blue-50', count: courses?.length || 0 },
         { id: 'subjects', title: 'Subjects', description: 'Manage Subjects & Topics', icon: Layers, color: 'text-indigo-600', bg: 'bg-indigo-50', count: subjects?.length || 0 },
-        { id: 'departments', title: 'Departments', description: 'School Departments', icon: FolderPlus, color: 'text-purple-600', bg: 'bg-purple-50', count: departments?.length || 0 },
     ];
 
     const renderGridView = () => (
@@ -610,7 +610,8 @@ const MasterData = () => {
                                     ? [
                                         { key: 'name', header: 'Name' },
                                         { key: 'code', header: 'Code' },
-                                        { key: 'departmentName', header: 'Department' }
+                                        { key: 'departmentName', header: 'Department' },
+                                        { key: 'fees', header: 'Fees (₹)' }
                                     ]
                                     : type === 'subjects'
                                         ? [
@@ -650,6 +651,7 @@ const MasterData = () => {
                                 <tr className="text-xs font-extrabold text-gray-400 uppercase tracking-widest border-b border-gray-100">
                                     <th className="px-6 py-4 w-full">Name</th>
                                     {type === 'courses' && <th className="px-6 py-4 whitespace-nowrap">Department</th>}
+                                    {type === 'courses' && <th className="px-6 py-4 whitespace-nowrap">Fees (₹)</th>}
                                     <th className="px-6 py-4 whitespace-nowrap">Code</th>
                                     <th className="px-6 py-4 text-right whitespace-nowrap">Actions</th>
                                 </tr>
@@ -668,6 +670,12 @@ const MasterData = () => {
                                         {type === 'courses' && (
                                             <td className="px-6 py-5 font-medium text-gray-500 whitespace-nowrap">
                                                 {departments.find(d => d.id === item.DepartmentId)?.code || 'N/A'}
+                                            </td>
+                                        )}
+                                        {/* Show Fees Column for Courses */}
+                                        {type === 'courses' && (
+                                            <td className="px-6 py-5 font-medium text-emerald-600 whitespace-nowrap">
+                                                ₹{Number(item.fees || 0).toLocaleString('en-IN')}
                                             </td>
                                         )}
                                         <td className="px-6 py-5 font-medium text-gray-500 whitespace-nowrap">{item.code}</td>
@@ -815,6 +823,17 @@ const MasterData = () => {
                                                 onChange={handleChange}
                                             />
                                         </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Fees (₹)</label>
+                                        <input
+                                            type="number"
+                                            name="fees"
+                                            placeholder="e.g. 50000"
+                                            value={formData.fees || ''}
+                                            className="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl font-bold text-gray-900 focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                                            onChange={handleChange}
+                                        />
                                     </div>
                                 </>
                             )}

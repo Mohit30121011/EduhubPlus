@@ -17,8 +17,8 @@ const templates = {
         sample: [{ name: 'Computer Science', code: 'CS' }, { name: 'Electronics', code: 'EC' }]
     },
     course: {
-        columns: ['name', 'code', 'departmentCode'],
-        sample: [{ name: 'B.Tech CSE', code: 'BTCS', departmentCode: 'CS' }]
+        columns: ['name', 'code', 'departmentCode', 'fees'],
+        sample: [{ name: 'B.Tech CSE', code: 'BTCS', departmentCode: 'CS', fees: 50000 }]
     },
     subject: {
         columns: ['name', 'code', 'courseCode'],
@@ -148,7 +148,8 @@ router.post('/bulk/:category', protect, async (req, res) => {
                 processedData = data.map(row => ({
                     name: row.name,
                     code: row.code,
-                    DepartmentId: deptCodeMap[row.departmentCode] || null
+                    DepartmentId: deptCodeMap[row.departmentCode] || null,
+                    fees: row.fees || 0
                 })).filter(row => row.DepartmentId !== null);
 
                 if (processedData.length === 0) {

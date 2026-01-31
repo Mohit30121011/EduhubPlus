@@ -572,7 +572,7 @@ const MasterData = () => {
                 transition={{ duration: 0.3 }}
                 className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white/60 shadow-sm p-8 min-h-[400px]"
             >
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                     <div className="flex items-center gap-4">
                         <motion.button
                             onClick={() => setView('grid')}
@@ -582,9 +582,9 @@ const MasterData = () => {
                         >
                             <ArrowLeft size={20} />
                         </motion.button>
-                        <h2 className="text-2xl font-black text-gray-900 capitalize">{type} List</h2>
+                        <h2 className="text-xl sm:text-2xl font-black text-gray-900 capitalize">{type} List</h2>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
                         <motion.button
                             onClick={() => {
                                 setImportCategory(type.slice(0, -1));
@@ -592,10 +592,10 @@ const MasterData = () => {
                             }}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="px-4 py-2.5 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-emerald-100 transition-colors"
+                            className="px-3 sm:px-4 py-2 sm:py-2.5 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-1 sm:gap-2 hover:bg-emerald-100 transition-colors"
                             title={`Import ${type} from Excel`}
                         >
-                            <FileSpreadsheet size={18} /> Import
+                            <FileSpreadsheet size={16} className="sm:w-[18px] sm:h-[18px]" /> <span className="hidden xs:inline">Import</span>
                         </motion.button>
                         <ExportDropdown
                             data={data.map(item => ({
@@ -629,10 +629,10 @@ const MasterData = () => {
                             onClick={() => openModal(type.slice(0, -1))}
                             whileHover={{ scale: 1.1, rotate: 90 }}
                             whileTap={{ scale: 0.9 }}
-                            className="w-12 h-12 bg-gray-900 text-white rounded-full shadow-lg shadow-gray-900/20 flex items-center justify-center transition-all"
+                            className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-900 text-white rounded-full shadow-lg shadow-gray-900/20 flex items-center justify-center transition-all"
                             title={`Create New ${type.slice(0, -1)}`}
                         >
-                            <Plus size={24} />
+                            <Plus size={20} className="sm:w-6 sm:h-6" />
                         </motion.button>
                     </div>
                 </div>

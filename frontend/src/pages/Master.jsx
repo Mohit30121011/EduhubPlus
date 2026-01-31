@@ -622,37 +622,31 @@ const MasterData = () => {
                         </motion.button>
                         <h2 className="text-xl sm:text-2xl font-black text-gray-900 capitalize">{type} List</h2>
                     </div>
-                    <div className="flex items-center gap-2 flex-wrap justify-end relative">
-                        {/* Search Input - Shows when search clicked */}
-                        <AnimatePresence>
-                            {showSearchInput && (
-                                <motion.div
-                                    initial={{ width: 0, opacity: 0 }}
-                                    animate={{ width: 'auto', opacity: 1 }}
-                                    exit={{ width: 0, opacity: 0 }}
-                                    className="overflow-hidden"
-                                >
-                                    <input
-                                        type="text"
-                                        placeholder="Search..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        autoFocus
-                                        className="w-32 sm:w-48 px-4 py-2 bg-gray-100 rounded-full text-sm font-medium focus:ring-2 focus:ring-blue-500/20 outline-none"
-                                    />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                    <div className="flex items-center gap-2 flex-wrap justify-end">
+                        {/* Search Input - Always visible when active, no animation */}
+                        {showSearchInput && (
+                            <input
+                                type="text"
+                                placeholder="Search by name or code..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                autoFocus
+                                className="w-36 sm:w-48 px-4 py-2.5 bg-gray-100 rounded-full text-sm font-medium focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                            />
+                        )}
 
                         {/* Search Button */}
                         <motion.button
-                            onClick={() => setShowSearchInput(!showSearchInput)}
+                            onClick={() => {
+                                setShowSearchInput(!showSearchInput);
+                                if (showSearchInput) setSearchQuery('');
+                            }}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${showSearchInput ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                             title="Search"
                         >
-                            <Search size={18} />
+                            {showSearchInput ? <X size={18} /> : <Search size={18} />}
                         </motion.button>
 
                         {/* Filter Button + Dropdown */}
@@ -672,37 +666,63 @@ const MasterData = () => {
                             <AnimatePresence>
                                 {showFilterDropdown && (
                                     <motion.div
-                                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                                        className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 p-4 z-50"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        className="fixed sm:absolute left-1/2 sm:left-auto sm:right-0 -translate-x-1/2 sm:translate-x-0 top-1/3 sm:top-auto sm:mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-[100]"
                                     >
-                                        <p className="text-xs font-bold text-gray-400 uppercase mb-3">Filter By</p>
-                                        <select
-                                            value={filterField}
-                                            onChange={(e) => setFilterField(e.target.value)}
-                                            className="w-full p-3 bg-gray-50 rounded-xl text-sm font-medium mb-2 outline-none focus:ring-2 focus:ring-blue-500/20"
-                                        >
-                                            <option value="">Select Field</option>
-                                            <option value="name">Name</option>
-                                            <option value="code">Code</option>
-                                            {type === 'courses' && <option value="fees">Fees</option>}
-                                        </select>
-                                        <input
-                                            type="text"
-                                            placeholder="Filter value..."
-                                            value={filterValue}
-                                            onChange={(e) => setFilterValue(e.target.value)}
-                                            className="w-full p-3 bg-gray-50 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500/20"
-                                        />
-                                        {filterField && (
-                                            <button
-                                                onClick={() => { setFilterField(''); setFilterValue(''); }}
-                                                className="mt-3 w-full py-2 text-xs font-bold text-red-600 bg-red-50 rounded-xl hover:bg-red-100"
-                                            >
-                                                Clear Filter
+                                        <div className="flex items-center justify-between mb-4">
+                                            <p className="text-sm font-bold text-gray-900">Advanced Filters</p>
+                                            <button onClick={() => setShowFilterDropdown(false)} className="text-gray-400 hover:text-gray-600">
+                                                <X size={16} />
                                             </button>
-                                        )}
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            <div>
+                                                <label className="text-xs font-bold text-gray-400 uppercase mb-1 block">Field</label>
+                                                <select
+                                                    value={filterField}
+                                                    onChange={(e) => setFilterField(e.target.value)}
+                                                    className="w-full p-3 bg-gray-50 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500/20"
+                                                >
+                                                    <option value="">Select Field</option>
+                                                    <option value="name">Name</option>
+                                                    <option value="code">Code</option>
+                                                    {type === 'courses' && <option value="fees">Fees</option>}
+                                                    {type === 'courses' && <option value="DepartmentId">Department</option>}
+                                                    {type === 'subjects' && <option value="CourseId">Course</option>}
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label className="text-xs font-bold text-gray-400 uppercase mb-1 block">Contains</label>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Enter value..."
+                                                    value={filterValue}
+                                                    onChange={(e) => setFilterValue(e.target.value)}
+                                                    className="w-full p-3 bg-gray-50 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500/20"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="flex gap-2 mt-4">
+                                            <button
+                                                onClick={() => setShowFilterDropdown(false)}
+                                                className="flex-1 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700"
+                                            >
+                                                Apply
+                                            </button>
+                                            {filterField && (
+                                                <button
+                                                    onClick={() => { setFilterField(''); setFilterValue(''); }}
+                                                    className="px-4 py-2.5 text-sm font-bold text-red-600 bg-red-50 rounded-xl hover:bg-red-100"
+                                                >
+                                                    Clear
+                                                </button>
+                                            )}
+                                        </div>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -725,12 +745,17 @@ const MasterData = () => {
                             <AnimatePresence>
                                 {showColumnDropdown && (
                                     <motion.div
-                                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                                        className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        className="fixed sm:absolute left-1/2 sm:left-auto sm:right-0 -translate-x-1/2 sm:translate-x-0 top-1/3 sm:top-auto sm:mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[100]"
                                     >
-                                        <p className="text-xs font-bold text-gray-400 uppercase p-3 pb-2">Show Columns</p>
+                                        <div className="flex items-center justify-between p-3 border-b border-gray-100">
+                                            <p className="text-sm font-bold text-gray-900">Show Columns</p>
+                                            <button onClick={() => setShowColumnDropdown(false)} className="text-gray-400 hover:text-gray-600">
+                                                <X size={16} />
+                                            </button>
+                                        </div>
                                         {Object.keys(visibleColumns[type] || {}).map((col) => (
                                             <button
                                                 key={col}
@@ -742,9 +767,11 @@ const MasterData = () => {
                                             >
                                                 <span className="text-sm font-medium text-gray-700 capitalize">{col}</span>
                                                 {visibleColumns[type]?.[col] ? (
-                                                    <Eye size={16} className="text-blue-600" />
+                                                    <div className="w-5 h-5 bg-blue-600 rounded flex items-center justify-center">
+                                                        <Check size={14} className="text-white" />
+                                                    </div>
                                                 ) : (
-                                                    <EyeOff size={16} className="text-gray-400" />
+                                                    <div className="w-5 h-5 bg-gray-200 rounded" />
                                                 )}
                                             </button>
                                         ))}

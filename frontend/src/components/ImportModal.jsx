@@ -60,7 +60,7 @@ const ImportModal = ({ isOpen, onClose, category, token, onSuccess }) => {
 
     const handleCellChange = (rowIndex, column, value) => {
         const updated = [...previewData];
-        updated[rowIndex][column] = value;
+        updated[rowIndex] = { ...updated[rowIndex], [column]: value };
         setPreviewData(updated);
     };
 
@@ -192,7 +192,7 @@ const ImportModal = ({ isOpen, onClose, category, token, onSuccess }) => {
                                     <thead className="bg-gray-50 text-xs uppercase font-bold text-gray-500">
                                         <tr>
                                             {columns.map(col => (
-                                                <th key={col} className="px-4 py-3 whitespace-nowrap">{col}</th>
+                                                <th key={col} className="px-4 py-3 whitespace-nowrap min-w-[150px]">{col}</th>
                                             ))}
                                             <th className="px-4 py-3 text-right">Action</th>
                                         </tr>
@@ -201,8 +201,13 @@ const ImportModal = ({ isOpen, onClose, category, token, onSuccess }) => {
                                         {previewData.map((row, idx) => (
                                             <tr key={idx} className="bg-white hover:bg-gray-50">
                                                 {columns.map(col => (
-                                                    <td key={col} className="px-4 py-2 max-w-xs truncate" title={row[col]}>
-                                                        {row[col]}
+                                                    <td key={col} className="px-4 py-2 min-w-[150px]">
+                                                        <input
+                                                            type="text"
+                                                            value={row[col] || ''}
+                                                            onChange={(e) => handleCellChange(idx, col, e.target.value)}
+                                                            className="w-full min-w-[120px] px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all text-sm"
+                                                        />
                                                     </td>
                                                 ))}
                                                 <td className="px-4 py-2 text-right">

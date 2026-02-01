@@ -8,6 +8,7 @@ import * as XLSX from 'xlsx';
 const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Export', circular = false }) => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
+    const [position, setPosition] = useState({ top: 0, left: 0 });
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -152,10 +153,26 @@ const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Expo
         { label: 'PDF File', icon: File, action: exportPDF, color: 'text-red-600', bg: 'bg-red-50' }
     ];
 
+    // Open Handler with positioning logic
+    const toggleOpen = () => {
+        if (!isOpen && dropdownRef.current) {
+            const rect = dropdownRef.current.getBoundingClientRect();
+            // Position: below the button, aligned to the right edge
+            // Left = rect.right - 200 (approx width of dropdown)
+            // Or simpler: Left = rect.left + (rect.width/2) - (dropdownWidth/2)
+            // Let's safe-align to bottom-right of button
+            setPosition({
+                top: rect.bottom + 8,
+                left: rect.right - 200
+            });
+        }
+        setIsOpen(!isOpen);
+    };
+
     return (
         <div className="relative" ref={dropdownRef}>
             <motion.button
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={toggleOpen}
                 whileHover={{ scale: circular ? 1.1 : 1.02 }}
                 whileTap={{ scale: circular ? 0.9 : 0.98 }}
                 className={circular
@@ -180,7 +197,13 @@ const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Expo
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                        style={{
+                            position: 'fixed',
+                            top: position.top,
+                            left: position.left,
+                            zIndex: 9999
+                        }}
+                        className="w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden"
                     >
                         {options.map((option, index) => (
                             <button

@@ -281,7 +281,7 @@ const Admin = () => {
                     {/* Toolbar */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                         <h2 className="text-xl font-black text-gray-900">Admins ({getFilteredData().length})</h2>
-                        <div className="flex items-center gap-2 flex-wrap justify-end">
+                        <div className="flex items-center gap-2 justify-end">
                             {showSearchInput && (
                                 <input
                                     type="text"

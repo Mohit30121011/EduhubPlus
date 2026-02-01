@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const { protect, authorize } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/authMiddleware');
 
 // Get all users (admin management) - SUPER_ADMIN only
 router.get('/users', protect, authorize('SUPER_ADMIN'), async (req, res) => {

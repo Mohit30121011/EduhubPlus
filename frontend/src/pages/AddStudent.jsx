@@ -227,10 +227,34 @@ const AddStudent = () => {
                         <ExportDropdown
                             data={[formData]}
                             columns={[
+                                // Personal
                                 { header: 'First Name', key: 'firstName' },
                                 { header: 'Last Name', key: 'lastName' },
+                                { header: 'DoB', key: 'dateOfBirth' },
+                                { header: 'Gender', key: 'gender' },
+                                { header: 'Category', key: 'category' },
+                                { header: 'Aadhar', key: 'aadharNumber' },
                                 { header: 'Phone', key: 'phone' },
                                 { header: 'Email', key: 'email' },
+
+                                // Address
+                                { header: 'Perm. City', key: 'permanentAddress.city' },
+                                { header: 'Perm. State', key: 'permanentAddress.state' },
+
+                                // Family
+                                { header: 'Father Name', key: 'familyDetails.father.name' },
+                                { header: 'Father Mobile', key: 'familyDetails.father.mobile' },
+                                { header: 'Mother Name', key: 'familyDetails.mother.name' },
+
+                                // Academic
+                                { header: 'X%', key: 'academicHistory.classX.percentage' },
+                                { header: 'XII%', key: 'academicHistory.classXII.percentage' },
+                                { header: 'Program', key: 'admissionDetails.programLevel' },
+                                { header: 'Type', key: 'admissionDetails.admissionType' },
+
+                                // Other
+                                { header: 'Hostel', key: 'hostelTransport.hostelRequired' },
+                                { header: 'Transport', key: 'hostelTransport.transportRequired' }
                             ]}
                             filename="Student_Draft"
                             circular={true}

@@ -20,16 +20,21 @@ const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Expo
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Helper to access nested keys (e.g., "familyDetails.father.name")
+    const getNestedValue = (obj, path) => {
+        return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+    };
+
     // Export as CSV
     const exportCSV = () => {
         const headers = columns.map(col => col.header || col.key);
-        const keys = columns.map(col => col.key);
 
         const csvContent = [
             headers.join(','),
             ...data.map(row =>
-                keys.map(key => {
-                    let value = row[key];
+                columns.map(col => {
+                    let value = getNestedValue(row, col.key);
+                    if (typeof value === 'object') value = JSON.stringify(value); // Handle arrays/objects
                     if (typeof value === 'string' && value.includes(',')) {
                         value = `"${value}"`;
                     }
@@ -49,11 +54,10 @@ const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Expo
     // Export as Excel
     const exportExcel = () => {
         const headers = columns.map(col => col.header || col.key);
-        const keys = columns.map(col => col.key);
 
         const wsData = [
             headers,
-            ...data.map(row => keys.map(key => row[key] || ''))
+            ...data.map(row => columns.map(col => getNestedValue(row, col.key) || ''))
         ];
 
         const wb = XLSX.utils.book_new();
@@ -71,7 +75,6 @@ const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Expo
     const exportPDF = () => {
         const doc = new jsPDF();
         const headers = columns.map(col => col.header || col.key);
-        const keys = columns.map(col => col.key);
 
         // Add title with gradient-like effect
         doc.setFillColor(59, 130, 246); // Blue
@@ -94,7 +97,7 @@ const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Expo
 
         // Prepare table data
         const tableData = data.map(row =>
-            keys.map(key => row[key] || '-')
+            columns.map(col => getNestedValue(row, col.key) || '-')
         );
 
         // Add styled table

@@ -31,8 +31,37 @@ const templates = {
         sample: [{ name: 'John Doe', email: 'john@example.com', phone: '9876543210', role: 'ADMIN', password: 'password123' }]
     },
     students: {
-        columns: ['enrollmentNo', 'firstName', 'middleName', 'lastName', 'email', 'phone', 'dateOfBirth', 'gender', 'departmentCode', 'courseCode'],
-        sample: [{ enrollmentNo: 'ENR001', firstName: 'John', middleName: '', lastName: 'Smith', email: 'student@example.com', phone: '9876543210', dateOfBirth: '2000-01-01', gender: 'MALE', departmentCode: 'CS', courseCode: 'BTCS' }]
+        columns: [
+            // Core
+            'enrollmentNo', 'firstName', 'middleName', 'lastName', 'email', 'phone', 'dateOfBirth', 'gender', 'departmentCode', 'courseCode',
+            // Personal
+            'regionalName', 'previousName', 'nationality', 'placeOfBirth', 'domicileState', 'category', 'subCategory', 'aadharNumber', 'passportNumber', 'religion', 'motherTongue', 'maritalStatus', 'abcId',
+            // Contact - Permanent
+            'permanentStreet', 'permanentCity', 'permanentState', 'permanentPincode', 'permanentCountry',
+            // Contact - Correspondence
+            'correspondenceStreet', 'correspondenceCity', 'correspondenceState', 'correspondencePincode', 'correspondenceCountry',
+            // Contact - Other
+            'alternateMobile', 'alternateEmail',
+            // Family - Father
+            'fatherName', 'fatherOccupation', 'fatherMobile', 'fatherEmail', 'fatherIncome',
+            // Family - Mother
+            'motherName', 'motherOccupation', 'motherMobile', 'motherEmail', 'motherIncome',
+            // Family - Guardian
+            'guardianName', 'guardianRelation', 'guardianMobile',
+            // Academic
+            'classX_percentage', 'classX_board', 'classX_year',
+            'classXII_percentage', 'classXII_board', 'classXII_year',
+            // Admission
+            'programLevel', 'admissionType', 'modeOfStudy', 'academicSession'
+        ],
+        sample: [{
+            enrollmentNo: 'ENR001', firstName: 'John', middleName: '', lastName: 'Smith', email: 'john@example.com', phone: '9876543210', dateOfBirth: '2000-01-15', gender: 'MALE', departmentCode: 'CS', courseCode: 'BTCS',
+            regionalName: 'John', nationality: 'Indian', category: 'GENERAL', aadharNumber: '123456789012',
+            permanentStreet: '123 Main St', permanentCity: 'Mumbai', permanentState: 'Maharashtra', permanentPincode: '400001', permanentCountry: 'India',
+            fatherName: 'Robert Smith', fatherMobile: '9876543211',
+            classX_percentage: '85', classX_board: 'CBSE', classX_year: '2016',
+            programLevel: 'UG', admissionType: 'Regular', modeOfStudy: 'Full-time', academicSession: '2024-25'
+        }]
     }
 };
 
@@ -200,40 +229,78 @@ router.post('/bulk/:category', protect, async (req, res) => {
             case 'students':
                 const studentDepts = await Department.findAll();
                 const studentCourses = await Course.findAll();
-                const sDeptMap = {}; studentDepts.forEach(d => sDeptMap[d.code] = d.name); // Storing name as model stores string currently
+                const sDeptMap = {}; studentDepts.forEach(d => sDeptMap[d.code] = d.name);
                 const sCourseMap = {}; studentCourses.forEach(c => sCourseMap[c.code] = c.name);
-
-                // For Student model, we need to create a User first? Or is it standalone?
-                // Model says: userId matches User. But currently we just want to load data. 
-                // Wait, Student.js says: userId: { allowNull: false }. 
-                // This implies we MUST create a User record for every student first or concurrently.
-                // For simplicity in this bulk import, we will auto-generate Users with default password.
 
                 processedData = [];
                 for (const row of data) {
+                    // 1. Create User
                     const userPayload = {
                         name: `${row.firstName} ${row.lastName}`,
                         email: row.email,
                         phone: row.phone,
                         role: 'STUDENT',
-                        password: 'Student@123',
+                        password: 'Student@123', // Default
                         isActive: true
                     };
-                    // Create User
                     const user = await User.create(userPayload).catch(err => console.log('User create fail (duplicate?):', err.message));
+
+                    // 2. Prepare Nested JSONs
                     if (user) {
+                        // Contact
+                        const contactDetails = {
+                            permanentAddress: {
+                                street: row.permanentStreet, city: row.permanentCity, state: row.permanentState, pincode: row.permanentPincode, country: row.permanentCountry
+                            },
+                            correspondenceAddress: {
+                                street: row.correspondenceStreet, city: row.correspondenceCity, state: row.correspondenceState, pincode: row.correspondencePincode, country: row.correspondenceCountry
+                            },
+                            alternateMobile: row.alternateMobile,
+                            alternateEmail: row.alternateEmail
+                        };
+
+                        // Family
+                        const familyDetails = {
+                            father: { name: row.fatherName, occupation: row.fatherOccupation, mobile: row.fatherMobile, email: row.fatherEmail, income: row.fatherIncome },
+                            mother: { name: row.motherName, occupation: row.motherOccupation, mobile: row.motherMobile, email: row.motherEmail, income: row.motherIncome },
+                            guardian: { name: row.guardianName, relation: row.guardianRelation, mobile: row.guardianMobile }
+                        };
+
+                        // Academic
+                        const academicHistory = {
+                            classX: { percentage: row.classX_percentage, board: row.classX_board, year: row.classX_year },
+                            classXII: { percentage: row.classXII_percentage, board: row.classXII_board, year: row.classXII_year }
+                        };
+
+                        // Admission
+                        const admissionDetails = {
+                            programLevel: row.programLevel,
+                            admissionType: row.admissionType,
+                            modeOfStudy: row.modeOfStudy,
+                            academicSession: row.academicSession
+                        };
+
                         processedData.push({
                             userId: user.id,
                             enrollmentNo: row.enrollmentNo,
-                            firstName: row.firstName,
-                            middleName: row.middleName,
-                            lastName: row.lastName,
-                            email: row.email,
-                            phone: row.phone,
-                            dateOfBirth: row.dateOfBirth,
-                            gender: row.gender,
+                            firstName: row.firstName, middleName: row.middleName, lastName: row.lastName,
+                            email: row.email, phone: row.phone, dateOfBirth: row.dateOfBirth, gender: row.gender,
+
+                            // Mapped Fields
                             department: sDeptMap[row.departmentCode] || row.departmentCode,
-                            course: sCourseMap[row.courseCode] || row.courseCode
+                            course: sCourseMap[row.courseCode] || row.courseCode,
+
+                            // Additional Info
+                            regionalName: row.regionalName, previousName: row.previousName, nationality: row.nationality,
+                            placeOfBirth: row.placeOfBirth, domicileState: row.domicileState, category: row.category,
+                            subCategory: row.subCategory, aadharNumber: row.aadharNumber, passportNumber: row.passportNumber,
+                            religion: row.religion, motherTongue: row.motherTongue, maritalStatus: row.maritalStatus, abcId: row.abcId,
+
+                            // JSON Fields
+                            contactDetails,
+                            familyDetails,
+                            academicHistory,
+                            admissionDetails
                         });
                     }
                 }

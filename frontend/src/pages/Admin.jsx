@@ -15,16 +15,16 @@ const adminRoles = [
 
 // Permission modules matching sidebar
 const permissionModules = [
-    { id: 'dashboard', label: 'Dashboard', icon: '🏠' },
-    { id: 'enquiries', label: 'Enquiries', icon: '📝' },
-    { id: 'admissions', label: 'Admissions', icon: '🎓' },
-    { id: 'academics', label: 'Academics', icon: '📚' },
-    { id: 'finances', label: 'Finances', icon: '💰' },
-    { id: 'content', label: 'Content', icon: '📄' },
-    { id: 'insights', label: 'Insights', icon: '📊' },
-    { id: 'staff', label: 'Staff', icon: '👥' },
-    { id: 'tasks', label: 'Tasks', icon: '✅' },
-    { id: 'master', label: 'Academic Data', icon: '⚙️' },
+    { id: 'dashboard', label: 'Dashboard' },
+    { id: 'enquiries', label: 'Enquiries' },
+    { id: 'admissions', label: 'Admissions' },
+    { id: 'academics', label: 'Academics' },
+    { id: 'finances', label: 'Finances' },
+    { id: 'content', label: 'Content' },
+    { id: 'insights', label: 'Insights' },
+    { id: 'staff', label: 'Staff' },
+    { id: 'tasks', label: 'Tasks' },
+    { id: 'master', label: 'Academic Data' },
 ];
 
 const Admin = () => {
@@ -62,12 +62,19 @@ const Admin = () => {
     const [showColumnDropdown, setShowColumnDropdown] = useState(false);
     const [filterRole, setFilterRole] = useState('');
 
-    // Column visibility
+    // Column visibility - new fields disabled by default
     const [visibleColumns, setVisibleColumns] = useState({
         avatar: true,
         name: true,
         email: true,
-        phone: true,
+        phone: false,
+        dateOfBirth: false,
+        address: false,
+        city: false,
+        state: false,
+        pincode: false,
+        aadhaarNumber: false,
+        joiningDate: false,
         role: true,
         status: true
     });
@@ -196,20 +203,15 @@ const Admin = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 p-4 sm:p-6 lg:p-8">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">
                     <div className="relative inline-block">
-                        <h1 className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900">
+                        <h1 className="text-3xl sm:text-4xl font-black text-gray-900">
                             Admin Management
                         </h1>
-                        <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: '100%' }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
-                            className="h-1.5 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 rounded-full mt-2"
-                        />
+                        <div className="h-1 bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full mt-2" />
                     </div>
                     <p className="text-gray-500 mt-4">Manage system administrators with granular permissions</p>
                 </div>
@@ -331,6 +333,13 @@ const Admin = () => {
                                         {visibleColumns.name && <th className="px-4 py-4">Name</th>}
                                         {visibleColumns.email && <th className="px-4 py-4">Email</th>}
                                         {visibleColumns.phone && <th className="px-4 py-4">Phone</th>}
+                                        {visibleColumns.dateOfBirth && <th className="px-4 py-4">DOB</th>}
+                                        {visibleColumns.address && <th className="px-4 py-4">Address</th>}
+                                        {visibleColumns.city && <th className="px-4 py-4">City</th>}
+                                        {visibleColumns.state && <th className="px-4 py-4">State</th>}
+                                        {visibleColumns.pincode && <th className="px-4 py-4">Pincode</th>}
+                                        {visibleColumns.aadhaarNumber && <th className="px-4 py-4">Aadhaar</th>}
+                                        {visibleColumns.joiningDate && <th className="px-4 py-4">Joining Date</th>}
                                         {visibleColumns.role && <th className="px-4 py-4">Role</th>}
                                         {visibleColumns.status && <th className="px-4 py-4">Status</th>}
                                         <th className="px-4 py-4 text-right">Actions</th>
@@ -359,6 +368,13 @@ const Admin = () => {
                                             {visibleColumns.name && <td className="px-4 py-4"><span className="font-bold text-gray-700">{u.name || '-'}</span></td>}
                                             {visibleColumns.email && <td className="px-4 py-4 text-gray-500 font-medium">{u.email}</td>}
                                             {visibleColumns.phone && <td className="px-4 py-4 text-gray-500 font-medium">{u.phone || '-'}</td>}
+                                            {visibleColumns.dateOfBirth && <td className="px-4 py-4 text-gray-500 font-medium">{u.dateOfBirth || '-'}</td>}
+                                            {visibleColumns.address && <td className="px-4 py-4 text-gray-500 font-medium">{u.address || '-'}</td>}
+                                            {visibleColumns.city && <td className="px-4 py-4 text-gray-500 font-medium">{u.city || '-'}</td>}
+                                            {visibleColumns.state && <td className="px-4 py-4 text-gray-500 font-medium">{u.state || '-'}</td>}
+                                            {visibleColumns.pincode && <td className="px-4 py-4 text-gray-500 font-medium">{u.pincode || '-'}</td>}
+                                            {visibleColumns.aadhaarNumber && <td className="px-4 py-4 text-gray-500 font-medium">{u.aadhaarNumber || '-'}</td>}
+                                            {visibleColumns.joiningDate && <td className="px-4 py-4 text-gray-500 font-medium">{u.joiningDate || '-'}</td>}
                                             {visibleColumns.role && (
                                                 <td className="px-4 py-4">
                                                     <span className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${getRoleStyle(u.role)}`}>
@@ -606,8 +622,8 @@ const Admin = () => {
                                                     <label
                                                         key={perm.id}
                                                         className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border-2 ${(formData.permissions || []).includes(perm.id)
-                                                                ? 'bg-blue-50 border-blue-200'
-                                                                : 'bg-gray-50 border-gray-100 hover:border-gray-200'
+                                                            ? 'bg-blue-50 border-blue-200'
+                                                            : 'bg-gray-50 border-gray-100 hover:border-gray-200'
                                                             }`}
                                                     >
                                                         <input
@@ -616,7 +632,6 @@ const Admin = () => {
                                                             onChange={() => togglePermission(perm.id)}
                                                             className="w-4 h-4 rounded"
                                                         />
-                                                        <span className="text-lg">{perm.icon}</span>
                                                         <span className="text-sm font-medium text-gray-700">{perm.label}</span>
                                                     </label>
                                                 ))}

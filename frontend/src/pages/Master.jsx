@@ -839,7 +839,20 @@ const MasterData = () => {
                 </div>
 
                 {isLoading ? (
-                    <div className="text-center py-20 text-gray-400 font-bold">Loading Data...</div>
+                    <div className="space-y-3">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                            <div key={i} className="bg-white rounded-xl p-4 animate-pulse">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 bg-gray-200 rounded-lg"></div>
+                                    <div className="flex-1 space-y-2">
+                                        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                                        <div className="h-3 bg-gray-100 rounded w-1/2"></div>
+                                    </div>
+                                    <div className="w-16 h-8 bg-gray-100 rounded-lg"></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 ) : data.length === 0 ? (
                     <div className="text-center py-20 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
                         <p className="text-gray-400 font-bold mb-2">No {type} found</p>

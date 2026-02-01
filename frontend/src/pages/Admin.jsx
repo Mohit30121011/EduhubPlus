@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Shield, Users, Plus, X, Check, AlertTriangle, Search, SlidersHorizontal, Columns3, Phone, MapPin, Calendar, CreditCard, Building, ChevronDown } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
 import PageHeader from '../components/PageHeader';
+import ExportDropdown from '../components/ExportDropdown';
+import ImportModal from '../components/ImportModal';
+import { Shield, Users, Plus, X, Check, AlertTriangle, Search, SlidersHorizontal, Columns3, Phone, MapPin, Calendar, CreditCard, Building, ChevronDown, Download, Upload } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -54,6 +56,17 @@ const CustomSelect = ({ label, options, value, onChange, name }) => {
                     )}
                 </AnimatePresence>
             </div>
+            {/* Import Modal */}
+            <ImportModal
+                isOpen={showImportModal}
+                onClose={() => setShowImportModal(false)}
+                category="admin"
+                token={token}
+                onSuccess={() => {
+                    fetchUsers();
+                    setShowImportModal(false);
+                }}
+            />
         </div>
     );
 };
@@ -85,6 +98,7 @@ const Admin = () => {
     const [showModal, setShowModal] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showImportModal, setShowImportModal] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
 
     // Form state with all fields
@@ -344,6 +358,32 @@ const Admin = () => {
                                     )}
                                 </AnimatePresence>
                             </div>
+
+                            {/* Import Button */}
+                            <motion.button
+                                onClick={() => setShowImportModal(true)}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center hover:bg-emerald-200 transition-all"
+                                title="Import Admins from Excel"
+                            >
+                                <Upload size={18} />
+                            </motion.button>
+
+                            {/* Export Button */}
+                            <ExportDropdown
+                                data={getFilteredData()}
+                                filename="admin_list"
+                                title="Admin List"
+                                columns={[
+                                    visibleColumns.name && { key: 'name', header: 'Name' },
+                                    visibleColumns.email && { key: 'email', header: 'Email' },
+                                    visibleColumns.phone && { key: 'phone', header: 'Phone' },
+                                    visibleColumns.role && { key: 'role', header: 'Role' },
+                                    visibleColumns.status && { key: 'isActive', header: 'Active' }
+                                ].filter(Boolean)}
+                                circular={true}
+                            />
 
                             {/* Add Button */}
                             <motion.button
@@ -734,7 +774,18 @@ const Admin = () => {
                     )}
                 </AnimatePresence>
             </div>
-        </div >
+            {/* Import Modal */}
+            <ImportModal
+                isOpen={showImportModal}
+                onClose={() => setShowImportModal(false)}
+                category="admin"
+                token={token}
+                onSuccess={() => {
+                    fetchUsers();
+                    setShowImportModal(false);
+                }}
+            />
+        </div>
     );
 };
 

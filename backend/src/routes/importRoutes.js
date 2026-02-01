@@ -6,6 +6,7 @@ const { protect } = require('../middleware/authMiddleware');
 const Department = require('../models/Department');
 const Course = require('../models/Course');
 const Subject = require('../models/Subject');
+const User = require('../models/User');
 
 // Multer setup for file upload
 const upload = multer({ storage: multer.memoryStorage() });
@@ -23,6 +24,10 @@ const templates = {
     subject: {
         columns: ['name', 'code', 'courseCode'],
         sample: [{ name: 'Data Structures', code: 'CS201', courseCode: 'BTCS' }]
+    },
+    admin: {
+        columns: ['name', 'email', 'phone', 'role', 'password'],
+        sample: [{ name: 'John Doe', email: 'john@example.com', phone: '9876543210', role: 'ADMIN', password: 'password123' }]
     }
 };
 
@@ -173,6 +178,19 @@ router.post('/bulk/:category', protect, async (req, res) => {
                     return res.status(400).json({ message: 'No valid course codes found. Please create courses first.' });
                 }
                 result = await Subject.bulkCreate(processedData, { ignoreDuplicates: true });
+                break;
+            case 'admin':
+                processedData = data.map(row => ({
+                    name: row.name,
+                    email: row.email,
+                    phone: row.phone,
+                    role: row.role || 'ADMIN',
+                    password: row.password || 'Admin@123', // Default password if missing
+                    isActive: true,
+                    permissions: ["dashboard", "enquiries", "admissions", "academics", "finances", "content", "insights", "staff", "tasks", "master"] // Default all permissions for imported admins
+                }));
+                // User hooks will handle password hashing
+                result = await User.bulkCreate(processedData, { ignoreDuplicates: true, validate: true, individualHooks: true });
                 break;
             default:
                 return res.status(400).json({ message: 'Invalid category' });

@@ -192,7 +192,7 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title, message }) => (
 );
 
 // Import Modal Component
-const ImportModal = ({ isOpen, onClose, category, token, onSuccess }) => {
+const LegacyImportModal = ({ isOpen, onClose, category, token, onSuccess }) => {
     const [step, setStep] = useState(1); // 1: Upload, 2: Preview
     const [previewData, setPreviewData] = useState([]);
     const [columns, setColumns] = useState([]);

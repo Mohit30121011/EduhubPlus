@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Shield, Users, Plus, X, Check, AlertTriangle, Search, SlidersHorizontal, Columns3, Phone, MapPin, Calendar, CreditCard, Building } from 'lucide-react';
+import { Shield, Users, Plus, X, Check, AlertTriangle, Search, SlidersHorizontal, Columns3, Phone, MapPin, Calendar, CreditCard, Building, ChevronDown } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
@@ -7,6 +7,56 @@ import { toast } from 'react-hot-toast';
 import PageHeader from '../components/PageHeader';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+// Custom styled select component
+const CustomSelect = ({ label, options, value, onChange, name }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const selectedOption = options.find(opt => opt.value === value);
+
+    return (
+        <div className="space-y-2 relative">
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">{label}</label>
+            <div className="relative">
+                <button
+                    type="button"
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="w-full p-3 bg-gray-50 border-2 border-gray-100 rounded-xl font-medium text-gray-900 flex justify-between items-center focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-left"
+                >
+                    <span className={!selectedOption ? "text-gray-400" : ""}>
+                        {selectedOption ? selectedOption.label : 'Select...'}
+                    </span>
+                    <ChevronDown size={18} className={`text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                <AnimatePresence>
+                    {isOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                        >
+                            {options.map((opt) => (
+                                <button
+                                    key={opt.value}
+                                    type="button"
+                                    onClick={() => {
+                                        onChange({ target: { name, value: opt.value } });
+                                        setIsOpen(false);
+                                    }}
+                                    className="w-full p-3 text-left font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex justify-between items-center transition-colors"
+                                >
+                                    {opt.label}
+                                    {value === opt.value && <Check size={16} className="text-blue-600" />}
+                                </button>
+                            ))}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        </div>
+    );
+};
 
 // Only admin roles - no students/faculty
 const adminRoles = [
@@ -414,7 +464,7 @@ const Admin = () => {
                                 animate={{ scale: 1, opacity: 1 }}
                                 exit={{ scale: 0.9, opacity: 0 }}
                                 onClick={(e) => e.stopPropagation()}
-                                className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
+                                className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl max-h-[85vh] lg:max-h-[90vh] overflow-y-auto"
                             >
                                 <div className="sticky top-0 bg-white p-6 border-b border-gray-100 flex items-center justify-between z-10">
                                     <h3 className="text-xl font-black text-gray-900">
@@ -425,7 +475,7 @@ const Admin = () => {
                                     </button>
                                 </div>
 
-                                <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                                <form onSubmit={handleSubmit} className="p-6 space-y-6 pb-24">
                                     {/* Personal Information */}
                                     <div>
                                         <h4 className="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
@@ -572,32 +622,28 @@ const Admin = () => {
                                                     className="w-full p-3 bg-gray-50 border-2 border-gray-100 rounded-xl font-medium text-gray-900 focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
                                                 />
                                             </div>
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Role *</label>
-                                                <select
-                                                    value={formData.role}
-                                                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                                                    className="w-full p-3 bg-gray-50 border-2 border-gray-100 rounded-xl font-medium text-gray-900 focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
-                                                >
-                                                    {adminRoles.map(r => (
-                                                        <option key={r.value} value={r.value}>{r.label}</option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                            {isEditMode && (
-                                                <div className="sm:col-span-2 flex items-center gap-3">
-                                                    <input
-                                                        type="checkbox"
-                                                        id="isActive"
-                                                        checked={formData.isActive}
-                                                        onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                                                        className="w-5 h-5 rounded"
-                                                    />
-                                                    <label htmlFor="isActive" className="text-sm font-medium text-gray-700">Active Account</label>
-                                                </div>
-                                            )}
+                                            <CustomSelect
+                                                label="Role *"
+                                                options={adminRoles}
+                                                value={formData.role}
+                                                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                                name="role"
+                                            />
                                         </div>
+                                        {isEditMode && (
+                                            <div className="sm:col-span-2 flex items-center gap-3">
+                                                <input
+                                                    type="checkbox"
+                                                    id="isActive"
+                                                    checked={formData.isActive}
+                                                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                                                    className="w-5 h-5 rounded"
+                                                />
+                                                <label htmlFor="isActive" className="text-sm font-medium text-gray-700">Active Account</label>
+                                            </div>
+                                        )}
                                     </div>
+
 
                                     {/* Permissions */}
                                     {formData.role === 'ADMIN' && (
@@ -688,7 +734,7 @@ const Admin = () => {
                     )}
                 </AnimatePresence>
             </div>
-        </div>
+        </div >
     );
 };
 

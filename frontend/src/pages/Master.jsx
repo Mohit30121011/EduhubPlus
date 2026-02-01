@@ -569,28 +569,28 @@ const MasterData = () => {
                     key={mod.id}
                     layoutId={mod.id}
                     onClick={() => setView(mod.id)}
-                    whileHover={{ y: -5, boxShadow: "0 20px 40px -5px rgba(0,0,0,0.1)" }}
+                    whileHover={{ y: -3, boxShadow: "0 15px 30px -5px rgba(0,0,0,0.08)" }}
                     whileTap={{ scale: 0.98 }}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0, transition: { delay: index * 0.1 } }}
-                    className="bg-white/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/60 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] cursor-pointer group relative overflow-hidden"
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0, transition: { delay: index * 0.08 } }}
+                    className="bg-white/80 backdrop-blur-xl p-5 sm:p-6 rounded-2xl border border-white/60 shadow-[0_8px_20px_-8px_rgba(0,0,0,0.05)] cursor-pointer group relative overflow-hidden"
                 >
                     <div className="absolute inset-0 bg-gradient-to-br from-transparent to-blue-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-                    <div className="flex justify-between items-start mb-6">
-                        <div className={`w-16 h-16 rounded-2xl ${mod.bg} ${mod.color} flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm relative z-10`}>
-                            <mod.icon size={28} strokeWidth={2.5} />
+                    <div className="flex justify-between items-start mb-4">
+                        <div className={`w-12 h-12 rounded-xl ${mod.bg} ${mod.color} flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm relative z-10`}>
+                            <mod.icon size={22} strokeWidth={2.5} />
                         </div>
-                        <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold">{mod.count} Items</span>
+                        <span className="bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs font-bold">{mod.count} Items</span>
                     </div>
 
                     <div className="relative z-10">
-                        <h3 className="text-xl font-black text-gray-900 mb-2">{mod.title}</h3>
-                        <p className="text-gray-500 text-sm font-medium leading-relaxed">{mod.description}</p>
+                        <h3 className="text-lg font-black text-gray-900 mb-1">{mod.title}</h3>
+                        <p className="text-gray-500 text-xs font-medium leading-relaxed">{mod.description}</p>
                         <motion.div
-                            className="mt-6 flex items-center text-sm font-bold text-gray-400 group-hover:text-blue-600 transition-colors"
+                            className="mt-4 flex items-center text-xs font-bold text-gray-400 group-hover:text-blue-600 transition-colors"
                         >
-                            Manage <ArrowRight size={16} className="ml-2 transition-transform group-hover:translate-x-1" />
+                            Manage <ArrowRight size={14} className="ml-1.5 transition-transform group-hover:translate-x-1" />
                         </motion.div>
                     </div>
                 </motion.div>

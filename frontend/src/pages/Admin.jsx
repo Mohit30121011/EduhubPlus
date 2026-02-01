@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import PageHeader from '../components/PageHeader';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -206,15 +207,10 @@ const Admin = () => {
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="mb-8">
-                    <div className="relative inline-block">
-                        <h1 className="text-3xl sm:text-4xl font-black text-gray-900">
-                            Admin Management
-                        </h1>
-                        <div className="h-1 bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full mt-2" />
-                    </div>
-                    <p className="text-gray-500 mt-4">Manage system administrators with granular permissions</p>
-                </div>
+                <PageHeader
+                    title="Admin Management"
+                    subtitle="Manage system administrators with granular permissions"
+                />
 
                 {/* Main Card */}
                 <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white/60 shadow-sm p-6 sm:p-8">

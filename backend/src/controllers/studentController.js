@@ -28,29 +28,26 @@ const createStudent = async (req, res) => {
 
     try {
         const {
-            email, password, enrollmentNo, firstName, lastName,
-            dateOfBirth, gender, phone, department, course
+            email, enrollmentNo, firstName, lastName,
+            // Extract other fields if necessary for User creation or validation
+            password // Optional, otherwise default to enrollmentNo
         } = req.body;
 
         // 1. Create User
+        // Default password to enrollmentNo if not provided
+        const userPassword = password || enrollmentNo;
+
         const user = await User.create({
             email,
-            password, // Will be hashed by hook
+            password: userPassword,
             role: 'STUDENT'
         }, { transaction: t });
 
         // 2. Create Student Profile
+        // Spread the entire body, but ensure userId is set
         const student = await Student.create({
-            userId: user.id,
-            enrollmentNo,
-            firstName,
-            lastName,
-            email, // Redundant but good for quick access
-            dateOfBirth,
-            gender,
-            phone,
-            department,
-            course
+            ...req.body,
+            userId: user.id
         }, { transaction: t });
 
         await t.commit();
@@ -58,6 +55,7 @@ const createStudent = async (req, res) => {
         res.status(201).json(student);
     } catch (error) {
         await t.rollback();
+        console.error('Error creating student:', error);
         res.status(400).json({ message: error.message });
     }
 };

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Shield, Users, Plus, X, ChevronDown, Check, Trash2, AlertTriangle, Search, SlidersHorizontal, Columns3, Eye, EyeOff, UserPlus, Mail, Lock, UserCog } from 'lucide-react';
+import { Shield, Users, Plus, X, Check, AlertTriangle, Search, SlidersHorizontal, Columns3, Mail, Lock, UserCog } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
@@ -7,12 +7,10 @@ import { toast } from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-const roles = [
+// Only admin roles - no students/faculty
+const adminRoles = [
     { value: 'SUPER_ADMIN', label: 'Super Admin', color: 'bg-red-100 text-red-600' },
     { value: 'ADMIN', label: 'Admin', color: 'bg-purple-100 text-purple-600' },
-    { value: 'FACULTY', label: 'Faculty', color: 'bg-blue-100 text-blue-600' },
-    { value: 'LIBRARIAN', label: 'Librarian', color: 'bg-green-100 text-green-600' },
-    { value: 'ACCOUNTANT', label: 'Accountant', color: 'bg-amber-100 text-amber-600' },
 ];
 
 const Admin = () => {
@@ -40,8 +38,9 @@ const Admin = () => {
     const [showColumnDropdown, setShowColumnDropdown] = useState(false);
     const [filterRole, setFilterRole] = useState('');
 
-    // Column visibility
+    // Column visibility - separate avatar and name
     const [visibleColumns, setVisibleColumns] = useState({
+        avatar: true,
         name: true,
         email: true,
         role: true,
@@ -61,16 +60,20 @@ const Admin = () => {
         );
     }
 
-    // Fetch users
+    // Fetch users - only ADMIN and SUPER_ADMIN
     const fetchUsers = async () => {
         try {
             setIsLoading(true);
             const res = await axios.get(`${API_URL}/admin/users`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setUsers(res.data.data || []);
+            // Filter only ADMIN and SUPER_ADMIN roles
+            const adminUsers = (res.data.data || []).filter(u =>
+                u.role === 'ADMIN' || u.role === 'SUPER_ADMIN'
+            );
+            setUsers(adminUsers);
         } catch (error) {
-            toast.error('Failed to fetch users');
+            toast.error('Failed to fetch admins');
             console.error(error);
         } finally {
             setIsLoading(false);
@@ -126,12 +129,12 @@ const Admin = () => {
                 await axios.put(`${API_URL}/admin/users/${formData.id}`, formData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                toast.success('User updated successfully');
+                toast.success('Admin updated successfully');
             } else {
                 await axios.post(`${API_URL}/admin/users`, formData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                toast.success('User created successfully');
+                toast.success('Admin created successfully');
             }
             setShowModal(false);
             fetchUsers();
@@ -146,33 +149,29 @@ const Admin = () => {
             await axios.delete(`${API_URL}/admin/users/${itemToDelete.id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            toast.success('User deleted successfully');
+            toast.success('Admin deleted successfully');
             setShowDeleteModal(false);
             fetchUsers();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to delete user');
+            toast.error(error.response?.data?.message || 'Failed to delete admin');
         }
     };
 
     const getRoleStyle = (role) => {
-        const r = roles.find(r => r.value === role);
+        const r = adminRoles.find(r => r.value === role);
         return r?.color || 'bg-gray-100 text-gray-600';
     };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 p-4 sm:p-6 lg:p-8">
             <div className="max-w-6xl mx-auto">
-                {/* Header */}
+                {/* Header - Academic Data Style */}
                 <div className="mb-8">
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/30">
-                            <Shield size={24} className="text-white" />
-                        </div>
-                        <div>
-                            <h1 className="text-2xl sm:text-3xl font-black text-gray-900">Admin Management</h1>
-                            <p className="text-sm text-gray-500">Manage system administrators and their roles</p>
-                        </div>
-                    </div>
+                    <h1 className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 mb-2 relative inline-block">
+                        Admin Management
+                        <span className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 rounded-full"></span>
+                    </h1>
+                    <p className="text-gray-500 mt-4">Manage system administrators and their access levels</p>
                 </div>
 
                 {/* Main Card */}
@@ -184,7 +183,7 @@ const Admin = () => {
                     {/* Toolbar */}
                     <div className="p-4 sm:p-6 border-b border-gray-100">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                            <h2 className="text-lg font-bold text-gray-900">Users ({getFilteredData().length})</h2>
+                            <h2 className="text-lg font-bold text-gray-900">Admins ({getFilteredData().length})</h2>
 
                             <div className="flex items-center gap-2 flex-wrap justify-end">
                                 {/* Search Input */}
@@ -244,8 +243,8 @@ const Admin = () => {
                                                     onChange={(e) => setFilterRole(e.target.value)}
                                                     className="w-full p-3 bg-gray-50 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500/20"
                                                 >
-                                                    <option value="">All Roles</option>
-                                                    {roles.map(r => (
+                                                    <option value="">All Admins</option>
+                                                    {adminRoles.map(r => (
                                                         <option key={r.value} value={r.value}>{r.label}</option>
                                                     ))}
                                                 </select>
@@ -342,8 +341,8 @@ const Admin = () => {
                             </div>
                         ) : getFilteredData().length === 0 ? (
                             <div className="text-center py-20 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
-                                <Users size={48} className="mx-auto text-gray-300 mb-4" />
-                                <p className="text-gray-400 font-bold mb-2">No users found</p>
+                                <Shield size={48} className="mx-auto text-gray-300 mb-4" />
+                                <p className="text-gray-400 font-bold mb-2">No admins found</p>
                                 <button onClick={() => openModal()} className="text-blue-600 text-sm font-bold hover:underline">Add your first admin</button>
                             </div>
                         ) : (
@@ -351,6 +350,7 @@ const Admin = () => {
                                 <table className="w-full text-left border-collapse">
                                     <thead>
                                         <tr className="text-xs font-extrabold text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                            {visibleColumns.avatar && <th className="px-4 py-4">Avatar</th>}
                                             {visibleColumns.name && <th className="px-4 py-4">Name</th>}
                                             {visibleColumns.email && <th className="px-4 py-4">Email</th>}
                                             {visibleColumns.role && <th className="px-4 py-4">Role</th>}
@@ -367,21 +367,23 @@ const Admin = () => {
                                                 transition={{ delay: index * 0.05 }}
                                                 className="hover:bg-blue-50/50 transition-colors"
                                             >
+                                                {visibleColumns.avatar && (
+                                                    <td className="px-4 py-4">
+                                                        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                                            {u.name?.charAt(0) || u.email?.charAt(0).toUpperCase()}
+                                                        </div>
+                                                    </td>
+                                                )}
                                                 {visibleColumns.name && (
                                                     <td className="px-4 py-4">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                                                                {u.name?.charAt(0) || u.email?.charAt(0).toUpperCase()}
-                                                            </div>
-                                                            <span className="font-bold text-gray-700">{u.name || '-'}</span>
-                                                        </div>
+                                                        <span className="font-bold text-gray-700">{u.name || '-'}</span>
                                                     </td>
                                                 )}
                                                 {visibleColumns.email && <td className="px-4 py-4 text-gray-500 font-medium">{u.email}</td>}
                                                 {visibleColumns.role && (
                                                     <td className="px-4 py-4">
                                                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${getRoleStyle(u.role)}`}>
-                                                            {u.role}
+                                                            {u.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}
                                                         </span>
                                                     </td>
                                                 )}
@@ -444,7 +446,7 @@ const Admin = () => {
                         >
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-xl font-black text-gray-900">
-                                    {isEditMode ? 'Edit User' : 'Add New Admin'}
+                                    {isEditMode ? 'Edit Admin' : 'Add New Admin'}
                                 </h3>
                                 <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">
                                     <X size={24} />
@@ -461,6 +463,7 @@ const Admin = () => {
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                             placeholder="Enter name"
+                                            required
                                             className="w-full pl-12 pr-4 py-3 bg-gray-50 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500/20"
                                         />
                                     </div>
@@ -505,7 +508,7 @@ const Admin = () => {
                                         onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                                         className="w-full p-3 bg-gray-50 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500/20"
                                     >
-                                        {roles.map(r => (
+                                        {adminRoles.map(r => (
                                             <option key={r.value} value={r.value}>{r.label}</option>
                                         ))}
                                     </select>
@@ -526,9 +529,9 @@ const Admin = () => {
 
                                 <button
                                     type="submit"
-                                    className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold hover:shadow-lg transition-all"
+                                    className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold hover:shadow-lg transition-all"
                                 >
-                                    {isEditMode ? 'Update User' : 'Create Admin'}
+                                    {isEditMode ? 'Update Admin' : 'Create Admin'}
                                 </button>
                             </form>
                         </motion.div>
@@ -554,9 +557,9 @@ const Admin = () => {
                             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <AlertTriangle size={32} className="text-red-500" />
                             </div>
-                            <h3 className="text-xl font-black text-gray-900 mb-2">Delete User?</h3>
+                            <h3 className="text-xl font-black text-gray-900 mb-2">Delete Admin?</h3>
                             <p className="text-gray-500 text-sm mb-6">
-                                Are you sure you want to delete <span className="font-bold">{itemToDelete?.email}</span>? This action cannot be undone.
+                                Are you sure you want to delete <span className="font-bold">{itemToDelete?.name || itemToDelete?.email}</span>? This action cannot be undone.
                             </p>
                             <div className="flex gap-3">
                                 <button

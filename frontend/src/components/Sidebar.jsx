@@ -77,7 +77,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         `}>
             {/* Logo Section - Fixed */}
             <div className="p-4 pb-3 flex items-center justify-center border-b border-gray-100 shrink-0">
-                <img src="/logo-new.png" alt="EduhubPlus" className="h-40 object-contain" />
+                <img src="/logo-new.png" alt="EduhubPlus" className="object-contain" />
             </div>
 
             {/* Scrollable Navigation Section */}

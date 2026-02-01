@@ -43,6 +43,43 @@ const User = sequelize.define('User', {
     isActive: {
         type: DataTypes.BOOLEAN,
         defaultValue: true
+    },
+    phone: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    dateOfBirth: {
+        type: DataTypes.DATEONLY,
+        allowNull: true
+    },
+    address: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+    city: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    state: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    pincode: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    aadhaarNumber: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    joiningDate: {
+        type: DataTypes.DATEONLY,
+        allowNull: true
+    },
+    permissions: {
+        type: DataTypes.JSON,
+        allowNull: true,
+        defaultValue: []
     }
 }, {
     timestamps: true,

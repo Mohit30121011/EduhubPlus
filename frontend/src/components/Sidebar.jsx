@@ -7,27 +7,46 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, reset } from '../redux/features/authSlice';
 
-const getNavItems = (userRole) => {
-    const items = [
-        { href: '/dashboard', icon: LayoutDashboard, label: 'Home' },
-        { href: '/dashboard/analytics', icon: TrendingUp, label: 'Dashboard' },
-        { href: '/dashboard/enquiries', icon: Users, label: 'Enquiries' },
-        { href: '/dashboard/admissions', icon: GraduationCap, label: 'Admissions' },
-        { href: '/dashboard/academics', icon: BookOpen, label: 'Academics' },
-        { href: '/dashboard/finances', icon: CalendarCheck, label: 'Finances' },
-        { href: '/dashboard/content', icon: FileText, label: 'Content' },
-        { href: '/dashboard/insights', icon: AlertCircle, label: 'Insights' },
-        { href: '/dashboard/staff', icon: Users, label: 'Staff' },
-        { href: '/dashboard/tasks', icon: CalendarCheck, label: 'Tasks' },
-        { href: '/dashboard/master', icon: FolderCog, label: 'Academic Data' },
+// Map of permission IDs to sidebar routes
+const permissionRouteMap = {
+    'dashboard': ['/dashboard', '/dashboard/analytics'],
+    'enquiries': ['/dashboard/enquiries'],
+    'admissions': ['/dashboard/admissions'],
+    'academics': ['/dashboard/academics'],
+    'finances': ['/dashboard/finances'],
+    'content': ['/dashboard/content'],
+    'insights': ['/dashboard/insights'],
+    'staff': ['/dashboard/staff'],
+    'tasks': ['/dashboard/tasks'],
+    'master': ['/dashboard/master'],
+};
+
+const getNavItems = (userRole, userPermissions = []) => {
+    const allItems = [
+        { href: '/dashboard', icon: LayoutDashboard, label: 'Home', permissionId: 'dashboard' },
+        { href: '/dashboard/analytics', icon: TrendingUp, label: 'Dashboard', permissionId: 'dashboard' },
+        { href: '/dashboard/enquiries', icon: Users, label: 'Enquiries', permissionId: 'enquiries' },
+        { href: '/dashboard/admissions', icon: GraduationCap, label: 'Admissions', permissionId: 'admissions' },
+        { href: '/dashboard/academics', icon: BookOpen, label: 'Academics', permissionId: 'academics' },
+        { href: '/dashboard/finances', icon: CalendarCheck, label: 'Finances', permissionId: 'finances' },
+        { href: '/dashboard/content', icon: FileText, label: 'Content', permissionId: 'content' },
+        { href: '/dashboard/insights', icon: AlertCircle, label: 'Insights', permissionId: 'insights' },
+        { href: '/dashboard/staff', icon: Users, label: 'Staff', permissionId: 'staff' },
+        { href: '/dashboard/tasks', icon: CalendarCheck, label: 'Tasks', permissionId: 'tasks' },
+        { href: '/dashboard/master', icon: FolderCog, label: 'Academic Data', permissionId: 'master' },
     ];
 
-    // Add Admin menu only for SUPER_ADMIN
+    // SUPER_ADMIN sees everything
     if (userRole === 'SUPER_ADMIN') {
-        items.push({ href: '/dashboard/admin', icon: Shield, label: 'Admin' });
+        allItems.push({ href: '/dashboard/admin', icon: Shield, label: 'Admin', permissionId: 'admin' });
+        return allItems;
     }
 
-    return items;
+    // Filter items based on permissions for ADMIN
+    const permissions = userPermissions || [];
+    const filteredItems = allItems.filter(item => permissions.includes(item.permissionId));
+
+    return filteredItems;
 };
 
 const quickLinks = [
@@ -57,23 +76,14 @@ const Sidebar = ({ isOpen, onClose }) => {
             bg-white pb-16 lg:pb-0
         `}>
             {/* Logo Section - Fixed */}
-            <div className="p-6 pb-4 flex items-center justify-between gap-4 border-b border-gray-100 shrink-0">
-                <div className="flex items-center gap-3">
-                    <img src="/logo.png" alt="EduhubPlus" className="w-10 h-10 object-contain" />
-                    <div>
-                        <h1 className="font-bold text-lg leading-none tracking-tight">
-                            <span className="text-blue-600">Eduhub</span>
-                            <span className="text-gray-500">Plus</span>
-                        </h1>
-                        <p className="text-xs font-medium text-gray-400 mt-0.5 uppercase tracking-wider">Campus Manager</p>
-                    </div>
-                </div>
+            <div className="p-4 pb-3 flex items-center justify-center border-b border-gray-100 shrink-0">
+                <img src="/logo.png" alt="EduhubPlus" className="h-10 object-contain" />
             </div>
 
             {/* Scrollable Navigation Section */}
             <div className="flex-1 overflow-y-auto pb-20">
                 <nav className="mt-4 space-y-1 px-2">
-                    {getNavItems(user?.role).map((item) => {
+                    {getNavItems(user?.role, user?.permissions).map((item) => {
                         const Icon = item.icon;
                         const active = location.pathname === item.href;
 

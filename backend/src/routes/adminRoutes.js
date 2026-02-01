@@ -7,7 +7,7 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 router.get('/users', protect, authorize('SUPER_ADMIN'), async (req, res) => {
     try {
         const users = await User.findAll({
-            attributes: ['id', 'name', 'email', 'role', 'isActive', 'createdAt'],
+            attributes: ['id', 'name', 'email', 'role', 'isActive', 'avatar', 'phone', 'dateOfBirth', 'address', 'city', 'state', 'pincode', 'aadhaarNumber', 'joiningDate', 'permissions', 'createdAt'],
             order: [['createdAt', 'DESC']]
         });
         res.json({ success: true, data: users });
@@ -20,7 +20,7 @@ router.get('/users', protect, authorize('SUPER_ADMIN'), async (req, res) => {
 // Create new admin/user - SUPER_ADMIN only
 router.post('/users', protect, authorize('SUPER_ADMIN'), async (req, res) => {
     try {
-        const { name, email, password, role } = req.body;
+        const { name, email, password, role, phone, dateOfBirth, address, city, state, pincode, aadhaarNumber, joiningDate, permissions } = req.body;
 
         // Check if user already exists
         const existingUser = await User.findOne({ where: { email } });
@@ -32,7 +32,16 @@ router.post('/users', protect, authorize('SUPER_ADMIN'), async (req, res) => {
             name,
             email,
             password,
-            role: role || 'ADMIN'
+            role: role || 'ADMIN',
+            phone,
+            dateOfBirth,
+            address,
+            city,
+            state,
+            pincode,
+            aadhaarNumber,
+            joiningDate,
+            permissions: permissions || []
         });
 
         res.status(201).json({
@@ -42,7 +51,16 @@ router.post('/users', protect, authorize('SUPER_ADMIN'), async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                isActive: user.isActive
+                isActive: user.isActive,
+                phone: user.phone,
+                dateOfBirth: user.dateOfBirth,
+                address: user.address,
+                city: user.city,
+                state: user.state,
+                pincode: user.pincode,
+                aadhaarNumber: user.aadhaarNumber,
+                joiningDate: user.joiningDate,
+                permissions: user.permissions
             }
         });
     } catch (error) {
@@ -54,7 +72,7 @@ router.post('/users', protect, authorize('SUPER_ADMIN'), async (req, res) => {
 // Update user - SUPER_ADMIN only
 router.put('/users/:id', protect, authorize('SUPER_ADMIN'), async (req, res) => {
     try {
-        const { name, email, role, isActive, password } = req.body;
+        const { name, email, role, isActive, password, phone, dateOfBirth, address, city, state, pincode, aadhaarNumber, joiningDate, permissions } = req.body;
         const user = await User.findByPk(req.params.id);
 
         if (!user) {
@@ -67,10 +85,19 @@ router.put('/users/:id', protect, authorize('SUPER_ADMIN'), async (req, res) => 
         }
 
         await user.update({
-            name: name || user.name,
-            email: email || user.email,
-            role: role || user.role,
+            name: name !== undefined ? name : user.name,
+            email: email !== undefined ? email : user.email,
+            role: role !== undefined ? role : user.role,
             isActive: isActive !== undefined ? isActive : user.isActive,
+            phone: phone !== undefined ? phone : user.phone,
+            dateOfBirth: dateOfBirth !== undefined ? dateOfBirth : user.dateOfBirth,
+            address: address !== undefined ? address : user.address,
+            city: city !== undefined ? city : user.city,
+            state: state !== undefined ? state : user.state,
+            pincode: pincode !== undefined ? pincode : user.pincode,
+            aadhaarNumber: aadhaarNumber !== undefined ? aadhaarNumber : user.aadhaarNumber,
+            joiningDate: joiningDate !== undefined ? joiningDate : user.joiningDate,
+            permissions: permissions !== undefined ? permissions : user.permissions,
             ...(password && { password })
         });
 
@@ -81,7 +108,16 @@ router.put('/users/:id', protect, authorize('SUPER_ADMIN'), async (req, res) => 
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                isActive: user.isActive
+                isActive: user.isActive,
+                phone: user.phone,
+                dateOfBirth: user.dateOfBirth,
+                address: user.address,
+                city: user.city,
+                state: user.state,
+                pincode: user.pincode,
+                aadhaarNumber: user.aadhaarNumber,
+                joiningDate: user.joiningDate,
+                permissions: user.permissions
             }
         });
     } catch (error) {

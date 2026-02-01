@@ -265,7 +265,7 @@ const AddStudent = () => {
                     <button
                         onClick={prevStep}
                         disabled={currentStep === 1}
-                        className={`px-8 py-4 rounded-2xl font-bold flex items-center gap-3 transition-all ${currentStep === 1
+                        className={`px-8 py-4 rounded-full font-bold flex items-center gap-3 transition-all ${currentStep === 1
                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                             : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-100 shadow-sm hover:shadow-md'
                             }`}
@@ -277,7 +277,7 @@ const AddStudent = () => {
                     {currentStep < 5 ? (
                         <button
                             onClick={nextStep}
-                            className="px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-2xl hover:shadow-xl hover:shadow-blue-500/20 flex items-center gap-3 transition-all transform hover:-translate-y-1"
+                            className="px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-full hover:shadow-xl hover:shadow-blue-500/20 flex items-center gap-3 transition-all transform hover:-translate-y-1"
                         >
                             Next Step
                             <ChevronRight size={20} strokeWidth={2.5} />
@@ -286,7 +286,7 @@ const AddStudent = () => {
                         <button
                             onClick={handleSubmit}
                             disabled={saving}
-                            className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-2xl hover:shadow-xl hover:shadow-emerald-500/20 flex items-center gap-3 transition-all transform hover:-translate-y-1"
+                            className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-full hover:shadow-xl hover:shadow-emerald-500/20 flex items-center gap-3 transition-all transform hover:-translate-y-1"
                         >
                             {saving ? 'Submitting...' : 'Submit Application'}
                             {!saving && <Check size={20} strokeWidth={2.5} />}

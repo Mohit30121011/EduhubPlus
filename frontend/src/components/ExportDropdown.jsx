@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Download, FileText, FileSpreadsheet, File, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import jsPDF from 'jspdf';
@@ -17,9 +18,20 @@ const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Expo
                 setIsOpen(false);
             }
         };
+
+        // Also close on scroll to avoid detached menu floating
+        const handleScroll = () => {
+            if (isOpen) setIsOpen(false);
+        };
+
         document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+        window.addEventListener('scroll', handleScroll, true); // Capture phase for all scrollables
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            window.removeEventListener('scroll', handleScroll, true);
+        };
+    }, [isOpen]);
 
     // Helper to access nested keys (e.g., "familyDetails.father.name")
     const getNestedValue = (obj, path) => {
@@ -157,13 +169,11 @@ const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Expo
     const toggleOpen = () => {
         if (!isOpen && dropdownRef.current) {
             const rect = dropdownRef.current.getBoundingClientRect();
-            // Position: below the button, aligned to the right edge
-            // Left = rect.right - 200 (approx width of dropdown)
-            // Or simpler: Left = rect.left + (rect.width/2) - (dropdownWidth/2)
-            // Let's safe-align to bottom-right of button
+            // Position: below the button, aligned to the right edge.
+            // Using viewport coordinates directly.
             setPosition({
                 top: rect.bottom + 8,
-                left: rect.right - 200
+                left: rect.right - 200 // Align right edge
             });
         }
         setIsOpen(!isOpen);
@@ -190,36 +200,46 @@ const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Expo
                 )}
             </motion.button>
 
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        transition={{ duration: 0.15 }}
-                        style={{
-                            position: 'fixed',
-                            top: position.top,
-                            left: position.left,
-                            zIndex: 9999
-                        }}
-                        className="w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden"
-                    >
-                        {options.map((option, index) => (
-                            <button
-                                key={index}
-                                onClick={option.action}
-                                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left"
-                            >
-                                <div className={`p-2 rounded-lg ${option.bg}`}>
-                                    <option.icon size={16} className={option.color} />
-                                </div>
-                                <span className="text-sm font-medium text-gray-700">{option.label}</span>
-                            </button>
-                        ))}
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {/* Portal to Body to escape all stacking contexts */}
+            {createPortal(
+                <AnimatePresence>
+                    {isOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                            transition={{ duration: 0.15 }}
+                            style={{
+                                position: 'fixed',
+                                top: position.top,
+                                left: position.left,
+                                zIndex: 9999,
+                                width: '12rem' // w-48
+                            }}
+                            className="bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden"
+                            // Stop propagation to prevent immediate close if clicking inside (though handled by ref check)
+                            onMouseDown={(e) => e.stopPropagation()}
+                        >
+                            {options.map((option, index) => (
+                                <button
+                                    key={index}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        option.action();
+                                    }}
+                                    className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left"
+                                >
+                                    <div className={`p-2 rounded-lg ${option.bg}`}>
+                                        <option.icon size={16} className={option.color} />
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-700">{option.label}</span>
+                                </button>
+                            ))}
+                        </motion.div>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </div>
     );
 };

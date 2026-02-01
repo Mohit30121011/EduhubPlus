@@ -7,6 +7,7 @@ const Department = require('../models/Department');
 const Course = require('../models/Course');
 const Subject = require('../models/Subject');
 const User = require('../models/User');
+const Student = require('../models/Student');
 
 // Multer setup for file upload
 const upload = multer({ storage: multer.memoryStorage() });
@@ -28,6 +29,10 @@ const templates = {
     admin: {
         columns: ['name', 'email', 'phone', 'role', 'password'],
         sample: [{ name: 'John Doe', email: 'john@example.com', phone: '9876543210', role: 'ADMIN', password: 'password123' }]
+    },
+    students: {
+        columns: ['enrollmentNo', 'firstName', 'middleName', 'lastName', 'email', 'phone', 'dateOfBirth', 'gender', 'departmentCode', 'courseCode'],
+        sample: [{ enrollmentNo: 'ENR001', firstName: 'John', middleName: '', lastName: 'Smith', email: 'student@example.com', phone: '9876543210', dateOfBirth: '2000-01-01', gender: 'MALE', departmentCode: 'CS', courseCode: 'BTCS' }]
     }
 };
 
@@ -191,6 +196,53 @@ router.post('/bulk/:category', protect, async (req, res) => {
                 }));
                 // User hooks will handle password hashing
                 result = await User.bulkCreate(processedData, { ignoreDuplicates: true, validate: true, individualHooks: true });
+                break;
+            case 'students':
+                const studentDepts = await Department.findAll();
+                const studentCourses = await Course.findAll();
+                const sDeptMap = {}; studentDepts.forEach(d => sDeptMap[d.code] = d.name); // Storing name as model stores string currently
+                const sCourseMap = {}; studentCourses.forEach(c => sCourseMap[c.code] = c.name);
+
+                // For Student model, we need to create a User first? Or is it standalone?
+                // Model says: userId matches User. But currently we just want to load data. 
+                // Wait, Student.js says: userId: { allowNull: false }. 
+                // This implies we MUST create a User record for every student first or concurrently.
+                // For simplicity in this bulk import, we will auto-generate Users with default password.
+
+                processedData = [];
+                for (const row of data) {
+                    const userPayload = {
+                        name: `${row.firstName} ${row.lastName}`,
+                        email: row.email,
+                        phone: row.phone,
+                        role: 'STUDENT',
+                        password: 'Student@123',
+                        isActive: true
+                    };
+                    // Create User
+                    const user = await User.create(userPayload).catch(err => console.log('User create fail (duplicate?):', err.message));
+                    if (user) {
+                        processedData.push({
+                            userId: user.id,
+                            enrollmentNo: row.enrollmentNo,
+                            firstName: row.firstName,
+                            middleName: row.middleName,
+                            lastName: row.lastName,
+                            email: row.email,
+                            phone: row.phone,
+                            dateOfBirth: row.dateOfBirth,
+                            gender: row.gender,
+                            department: sDeptMap[row.departmentCode] || row.departmentCode,
+                            course: sCourseMap[row.courseCode] || row.courseCode
+                        });
+                    }
+                }
+
+                if (processedData.length > 0) {
+                    result = await Student.bulkCreate(processedData, { ignoreDuplicates: true });
+                } else {
+                    result = [];
+                }
                 break;
             default:
                 return res.status(400).json({ message: 'Invalid category' });

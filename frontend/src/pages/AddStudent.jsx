@@ -198,20 +198,21 @@ const AddStudent = () => {
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header */}
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-6 mb-8">
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => navigate('/dashboard/students')}
-                            className="w-10 h-10 bg-white border border-gray-100 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm"
+                            className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm"
                         >
-                            <ArrowLeft size={18} className="text-gray-600" />
+                            <ArrowLeft size={20} className="text-gray-600" />
                         </button>
                         <div>
                             <h1 className="text-2xl font-black text-gray-900 tracking-tight">Student Enrollment</h1>
                             <p className="text-gray-500 font-medium text-sm mt-1">New Admission Application • Phase {currentStep} of 5</p>
                         </div>
                     </div>
-                    <div className="flex gap-3 items-center">
+
+                    <div className="flex flex-wrap items-center gap-3 ml-14">
                         {/* Import Button */}
                         <motion.button
                             onClick={() => setShowImportModal(true)}
@@ -223,19 +224,22 @@ const AddStudent = () => {
                         </motion.button>
 
                         {/* Export Button */}
-                        <ExportDropdown
-                            data={[formData]} // Export current form data as a single row
-                            columns={[
-                                { header: 'First Name', key: 'firstName' },
-                                { header: 'Last Name', key: 'lastName' },
-                                { header: 'Phone', key: 'phone' },
-                                { header: 'Email', key: 'email' },
-                            ]}
-                            filename="Student_Draft"
-                            circular={true}
-                        />
+                        <div className="w-10 h-10">
+                            <ExportDropdown
+                                data={[formData]}
+                                columns={[
+                                    { header: 'First Name', key: 'firstName' },
+                                    { header: 'Last Name', key: 'lastName' },
+                                    { header: 'Phone', key: 'phone' },
+                                    { header: 'Email', key: 'email' },
+                                ]}
+                                filename="Student_Draft"
+                                circular={true}
+                            />
+                        </div>
 
-                        <button className="px-6 py-2.5 bg-white text-gray-700 font-bold border border-gray-200 rounded-full hover:bg-gray-50 text-sm shadow-sm transition-all hover:shadow-md">
+                        <button className="ml-auto px-6 py-2.5 bg-white text-gray-700 font-bold border border-gray-200 rounded-full hover:bg-gray-50 text-sm shadow-sm transition-all hover:shadow-md flex items-center gap-2">
+                            <Save size={18} />
                             Save Draft
                         </button>
                     </div>

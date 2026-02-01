@@ -56,17 +56,7 @@ const CustomSelect = ({ label, options, value, onChange, name }) => {
                     )}
                 </AnimatePresence>
             </div>
-            {/* Import Modal */}
-            <ImportModal
-                isOpen={showImportModal}
-                onClose={() => setShowImportModal(false)}
-                category="admin"
-                token={token}
-                onSuccess={() => {
-                    fetchUsers();
-                    setShowImportModal(false);
-                }}
-            />
+
         </div>
     );
 };

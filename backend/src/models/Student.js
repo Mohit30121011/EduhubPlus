@@ -23,6 +23,7 @@ const Student = sequelize.define('Student', {
     },
     // Personal Information (Core)
     firstName: { type: DataTypes.STRING, allowNull: false },
+    middleName: { type: DataTypes.STRING },
     lastName: { type: DataTypes.STRING, allowNull: false },
     email: { type: DataTypes.STRING, validate: { isEmail: true } },
     phone: { type: DataTypes.STRING },

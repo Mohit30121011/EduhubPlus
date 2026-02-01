@@ -12,8 +12,12 @@ const StepPersonal = ({ formData, handleChange }) => {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Full Name</label>
+                        <label className="text-sm font-semibold text-gray-700">First Name</label>
                         <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} required className="input-field" placeholder="First Name" />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Middle Name</label>
+                        <input type="text" name="middleName" value={formData.middleName} onChange={handleChange} className="input-field" placeholder="Middle Name" />
                     </div>
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Last Name</label>

@@ -17,7 +17,7 @@ const AddStudent = () => {
     // Huge initial state for all 13 sections
     const [formData, setFormData] = useState({
         // Step 1: Personal
-        firstName: '', lastName: '', regionalName: '', previousName: '',
+        firstName: '', middleName: '', lastName: '', regionalName: '', previousName: '',
         dateOfBirth: '', gender: 'MALE', nationality: 'Indian', placeOfBirth: '',
         domicileState: '', category: 'GENERAL', subCategory: '', religion: '',
         aadharNumber: '', passportNumber: '', motherTongue: '', maritalStatus: 'Unmarried', abcId: '',
@@ -205,7 +205,7 @@ const AddStudent = () => {
                         </div>
                     </div>
                     <div className="flex gap-3">
-                        <button className="px-5 py-2.5 bg-white text-gray-700 font-bold border border-gray-200 rounded-xl hover:bg-gray-50 text-sm shadow-sm transition-all hover:shadow-md">
+                        <button className="px-6 py-2.5 bg-white text-gray-700 font-bold border border-gray-200 rounded-full hover:bg-gray-50 text-sm shadow-sm transition-all hover:shadow-md">
                             Save Draft
                         </button>
                     </div>

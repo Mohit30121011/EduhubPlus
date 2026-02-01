@@ -32,7 +32,7 @@ const StepPersonal = ({ formData, handleChange }) => {
                         <label className="text-sm font-semibold text-gray-700">Date of Birth</label>
                         <div className="relative">
                             <Calendar className="absolute left-3 top-2.5 text-gray-400" size={18} />
-                            <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} required className="input-field pl-10" />
+                            <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} required className="input-field pl-12" />
                         </div>
                     </div>
                     <div className="space-y-1">

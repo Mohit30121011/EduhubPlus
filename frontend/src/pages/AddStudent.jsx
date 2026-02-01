@@ -9,10 +9,17 @@ import StepAcademic from '../components/student-steps/StepAcademic';
 import StepOther from '../components/student-steps/StepOther';
 import StepDocuments from '../components/student-steps/StepDocuments';
 import { toast } from 'react-hot-toast';
+import ImportModal from '../components/ImportModal';
+import ExportDropdown from '../components/ExportDropdown';
+import { Upload } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { motion } from 'framer-motion';
 
 const AddStudent = () => {
     const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(1);
+    const { token } = useSelector((state) => state.auth);
+    const [showImportModal, setShowImportModal] = useState(false);
 
     // Huge initial state for all 13 sections
     const [formData, setFormData] = useState({
@@ -204,12 +211,44 @@ const AddStudent = () => {
                             <p className="text-gray-500 font-medium text-sm mt-1">New Admission Application • Phase {currentStep} of 5</p>
                         </div>
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex gap-3 items-center">
+                        {/* Import Button */}
+                        <motion.button
+                            onClick={() => setShowImportModal(true)}
+                            whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                            className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center hover:bg-emerald-200 transition-all shadow-sm"
+                            title="Import Students"
+                        >
+                            <Upload size={18} />
+                        </motion.button>
+
+                        {/* Export Button */}
+                        <ExportDropdown
+                            data={[formData]} // Export current form data as a single row
+                            columns={[
+                                { header: 'First Name', key: 'firstName' },
+                                { header: 'Last Name', key: 'lastName' },
+                                { header: 'Phone', key: 'phone' },
+                                { header: 'Email', key: 'email' },
+                            ]}
+                            filename="Student_Draft"
+                            circular={true}
+                        />
+
                         <button className="px-6 py-2.5 bg-white text-gray-700 font-bold border border-gray-200 rounded-full hover:bg-gray-50 text-sm shadow-sm transition-all hover:shadow-md">
                             Save Draft
                         </button>
                     </div>
                 </div>
+
+                {/* Import Modal */}
+                <ImportModal
+                    isOpen={showImportModal}
+                    onClose={() => setShowImportModal(false)}
+                    category="students"
+                    token={token}
+                    onSuccess={() => { toast.success('Data Imported'); setShowImportModal(false); }}
+                />
 
                 {/* Stepper */}
                 <EnrollmentStepper currentStep={currentStep} />

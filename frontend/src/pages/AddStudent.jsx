@@ -195,9 +195,9 @@ const AddStudent = () => {
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => navigate('/dashboard/students')}
-                            className="p-3 bg-white border border-gray-100 rounded-2xl hover:bg-gray-50 transition-colors shadow-sm"
+                            className="w-10 h-10 bg-white border border-gray-100 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm"
                         >
-                            <ArrowLeft size={20} className="text-gray-600" />
+                            <ArrowLeft size={18} className="text-gray-600" />
                         </button>
                         <div>
                             <h1 className="text-2xl font-black text-gray-900 tracking-tight">Student Enrollment</h1>

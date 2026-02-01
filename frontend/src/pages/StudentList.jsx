@@ -137,7 +137,7 @@ const StudentList = () => {
                                 <motion.button
                                     onClick={() => setShowFilterDropdown(!showFilterDropdown)}
                                     whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
-                                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${filterDept ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}
+                                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${filterDept ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'}`}
                                 >
                                     <Filter size={18} />
                                 </motion.button>
@@ -194,15 +194,17 @@ const StudentList = () => {
                                 </AnimatePresence>
                             </div>
 
-                            {/* Import/Export */}
+                            {/* Import Button (Emerald Circular) */}
                             <motion.button
                                 onClick={() => setShowImportModal(true)}
                                 whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
-                                className="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200"
+                                className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center hover:bg-emerald-200 transition-all"
+                                title="Import Students"
                             >
                                 <Upload size={18} />
                             </motion.button>
 
+                            {/* Export Button (Circular via Prop) */}
                             <ExportDropdown
                                 data={getFilteredData()}
                                 columns={[
@@ -213,54 +215,72 @@ const StudentList = () => {
                                     { header: 'Email', key: 'email' },
                                 ]}
                                 filename="Students_List"
+                                circular={true}
                             />
 
-                            {/* Add Button */}
+                            {/* Add Button (Circular Gradient) */}
                             <motion.button
                                 onClick={() => navigate('/dashboard/students/add')}
                                 whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                                className="px-5 py-2.5 bg-gray-900 text-white rounded-xl font-bold shadow-lg shadow-gray-900/20 flex items-center gap-2 hover:bg-gray-800 transition-all"
+                                className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white flex items-center justify-center shadow-lg hover:shadow-xl hover:shadow-blue-500/30 transition-all"
+                                title="Add New Student"
                             >
-                                <Plus size={18} />
-                                Add Student
+                                <Plus size={20} />
                             </motion.button>
                         </div>
                     </div>
 
                     {/* Table */}
-                    <div className="overflow-x-auto rounded-2xl border border-gray-100">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="bg-gray-50/50 border-b border-gray-100">
-                                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">#</th>
-                                    {visibleColumns.name && <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Student Name</th>}
-                                    {visibleColumns.enrollment && <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Enrollment</th>}
-                                    {visibleColumns.dept && <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Department</th>}
-                                    {visibleColumns.semester && <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Sem</th>}
-                                    {visibleColumns.status && <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>}
-                                    {visibleColumns.actions && <th className="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Actions</th>}
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan="7" className="px-6 py-12 text-center text-gray-500">Loading students...</td>
+                    {loading ? (
+                        <div className="space-y-3">
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />
+                            ))}
+                        </div>
+                    ) : getFilteredData().length === 0 ? (
+                        <div className="text-center py-20 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                                <Search size={24} />
+                            </div>
+                            <p className="text-gray-400 font-bold mb-2">No students found</p>
+                            <button onClick={() => navigate('/dashboard/students/add')} className="text-blue-600 text-sm font-bold hover:underline">Add your first student</button>
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="text-xs font-extrabold text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                        <th className="px-4 py-4">#</th>
+                                        {visibleColumns.name && <th className="px-4 py-4">Student Name</th>}
+                                        {visibleColumns.enrollment && <th className="px-4 py-4">Enrollment</th>}
+                                        {visibleColumns.dept && <th className="px-4 py-4">Department</th>}
+                                        {visibleColumns.semester && <th className="px-4 py-4">Sem</th>}
+                                        {visibleColumns.status && <th className="px-4 py-4">Status</th>}
+                                        {visibleColumns.actions && <th className="px-4 py-4 text-right">Actions</th>}
                                     </tr>
-                                ) : getFilteredData().length === 0 ? (
-                                    <tr>
-                                        <td colSpan="7" className="px-6 py-12 text-center text-gray-500">No students found</td>
-                                    </tr>
-                                ) : (
-                                    getFilteredData().map((student, index) => (
-                                        <tr key={student.id} className="hover:bg-blue-50/30 transition-colors group">
-                                            <td className="px-6 py-4 text-sm font-medium text-gray-400">{index + 1}</td>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {getFilteredData().map((student, index) => (
+                                        <motion.tr
+                                            key={student.id}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: index * 0.05 }}
+                                            className="hover:bg-blue-50/50 transition-colors group"
+                                        >
+                                            <td className="px-4 py-4 text-sm font-medium text-gray-400">{index + 1}</td>
 
                                             {visibleColumns.name && (
-                                                <td className="px-6 py-4">
+                                                <td className="px-4 py-4">
                                                     <div className="flex items-center gap-3">
-                                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${getAvatarColor(student.firstName)}`}>
-                                                            {student.firstName[0]}{student.lastName[0]}
-                                                        </div>
+                                                        {/* Avatar Logic matching Admin */}
+                                                        {student.avatar ? (
+                                                            <img src={student.avatar} alt={student.firstName} className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" />
+                                                        ) : (
+                                                            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm border-2 border-white">
+                                                                {student.firstName?.[0]}{student.lastName?.[0]}
+                                                            </div>
+                                                        )}
                                                         <div>
                                                             <div className="font-bold text-gray-900">{student.firstName} {student.lastName}</div>
                                                             <div className="text-xs text-gray-500">{student.email}</div>
@@ -270,28 +290,28 @@ const StudentList = () => {
                                             )}
 
                                             {visibleColumns.enrollment && (
-                                                <td className="px-6 py-4">
-                                                    <span className="px-2.5 py-1 bg-gray-100 rounded-lg text-xs font-mono font-semibold text-gray-600">
+                                                <td className="px-4 py-4">
+                                                    <span className="px-2.5 py-1 bg-gray-100 rounded-lg text-xs font-mono font-bold text-gray-600">
                                                         {student.enrollmentNo}
                                                     </span>
                                                 </td>
                                             )}
 
                                             {visibleColumns.dept && (
-                                                <td className="px-6 py-4 text-sm font-medium text-gray-600">{student.department || '-'}</td>
+                                                <td className="px-4 py-4 text-sm font-bold text-gray-600">{student.department || '-'}</td>
                                             )}
 
                                             {visibleColumns.semester && (
-                                                <td className="px-6 py-4 text-sm font-medium text-gray-600">
-                                                    <span className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold">
+                                                <td className="px-4 py-4 text-sm font-bold text-gray-600">
+                                                    <span className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-black">
                                                         {student.currentSemester}
                                                     </span>
                                                 </td>
                                             )}
 
                                             {visibleColumns.status && (
-                                                <td className="px-6 py-4">
-                                                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${student.applicationStatus === 'APPROVED' ? 'bg-green-100 text-green-600' :
+                                                <td className="px-4 py-4">
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-extrabold ${student.applicationStatus === 'APPROVED' ? 'bg-emerald-100 text-emerald-600' :
                                                             student.applicationStatus === 'REJECTED' ? 'bg-red-100 text-red-600' :
                                                                 'bg-amber-100 text-amber-600'
                                                         }`}>
@@ -301,7 +321,7 @@ const StudentList = () => {
                                             )}
 
                                             {visibleColumns.actions && (
-                                                <td className="px-6 py-4 text-right">
+                                                <td className="px-4 py-4 text-right">
                                                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                         <motion.button whileHover={{ scale: 1.1 }} className="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100">
                                                             <Eye size={16} />
@@ -319,12 +339,12 @@ const StudentList = () => {
                                                     </div>
                                                 </td>
                                             )}
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                                        </motion.tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -336,20 +356,27 @@ const StudentList = () => {
                 onSuccess={() => { fetchStudents(); setShowImportModal(false); }}
             />
 
-            {/* Delete Modal */}
+            {/* Delete Modal - Matching Admin Trash Design */}
             <AnimatePresence>
                 {showDeleteModal && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowDeleteModal(false)} className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" />
-                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-10 shadow-2xl text-center">
-                            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6 text-red-500">
-                                <Trash2 size={40} />
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowDeleteModal(false)} className="absolute inset-0 bg-red-900/20 backdrop-blur-md" />
+                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white rounded-[2.5rem] p-10 max-w-sm w-full relative z-10 shadow-2xl text-center border border-red-50 overflow-hidden">
+                            {/* Decorative Background Blobs */}
+                            <div className="absolute top-[-50px] right-[-50px] w-32 h-32 bg-red-100 rounded-full blur-3xl opacity-50"></div>
+
+                            <div className="relative w-24 h-24 mx-auto mb-6">
+                                <div className="w-full h-full bg-red-50 rounded-full flex items-center justify-center border-4 border-red-100 relative z-10">
+                                    <Trash2 size={40} className="text-red-500" strokeWidth={2.5} />
+                                </div>
                             </div>
+
                             <h3 className="text-2xl font-black text-gray-900 mb-2">Delete Student?</h3>
-                            <p className="text-gray-500 mb-8">Are you sure you want to delete <span className="font-bold text-gray-900">{studentToDelete?.firstName}</span>? This action cannot be undone.</p>
-                            <div className="flex gap-4">
-                                <button onClick={() => setShowDeleteModal(false)} className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200">Cancel</button>
-                                <button onClick={handleDelete} className="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 shadow-lg shadow-red-500/30">Delete</button>
+                            <p className="text-gray-500 font-medium mb-8">Are you sure you want to delete <span className="font-bold text-gray-900">{studentToDelete?.firstName}</span>? This action cannot be undone.</p>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <button onClick={() => setShowDeleteModal(false)} className="py-4 bg-gray-50 text-gray-600 font-bold rounded-2xl hover:bg-gray-100 transition-colors">Cancel</button>
+                                <button onClick={handleDelete} className="py-4 bg-gradient-to-r from-red-500 to-pink-600 text-white font-bold rounded-2xl hover:shadow-lg hover:shadow-red-500/30 transition-all">Delete</button>
                             </div>
                         </motion.div>
                     </div>

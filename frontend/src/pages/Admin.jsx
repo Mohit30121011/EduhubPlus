@@ -475,7 +475,7 @@ const Admin = () => {
                                     </button>
                                 </div>
 
-                                <form onSubmit={handleSubmit} className="p-6 space-y-6 pb-24">
+                                <form onSubmit={handleSubmit} className="p-6 space-y-6">
                                     {/* Personal Information */}
                                     <div>
                                         <h4 className="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">

@@ -2,24 +2,33 @@ import { Link, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard, Users, GraduationCap, CalendarCheck,
     FileText, BookOpen, Settings, LogOut, ChevronRight, TrendingUp, AlertCircle,
-    FolderCog
+    FolderCog, Shield
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, reset } from '../redux/features/authSlice';
 
-const navItems = [
-    { href: '/dashboard', icon: LayoutDashboard, label: 'Home' },
-    { href: '/dashboard/analytics', icon: TrendingUp, label: 'Dashboard' },
-    { href: '/dashboard/enquiries', icon: Users, label: 'Enquiries' },
-    { href: '/dashboard/admissions', icon: GraduationCap, label: 'Admissions' },
-    { href: '/dashboard/academics', icon: BookOpen, label: 'Academics' },
-    { href: '/dashboard/finances', icon: CalendarCheck, label: 'Finances' },
-    { href: '/dashboard/content', icon: FileText, label: 'Content' },
-    { href: '/dashboard/insights', icon: AlertCircle, label: 'Insights' },
-    { href: '/dashboard/staff', icon: Users, label: 'Staff' },
-    { href: '/dashboard/tasks', icon: CalendarCheck, label: 'Tasks' },
-    { href: '/dashboard/master', icon: FolderCog, label: 'Academic Data' },
-];
+const getNavItems = (userRole) => {
+    const items = [
+        { href: '/dashboard', icon: LayoutDashboard, label: 'Home' },
+        { href: '/dashboard/analytics', icon: TrendingUp, label: 'Dashboard' },
+        { href: '/dashboard/enquiries', icon: Users, label: 'Enquiries' },
+        { href: '/dashboard/admissions', icon: GraduationCap, label: 'Admissions' },
+        { href: '/dashboard/academics', icon: BookOpen, label: 'Academics' },
+        { href: '/dashboard/finances', icon: CalendarCheck, label: 'Finances' },
+        { href: '/dashboard/content', icon: FileText, label: 'Content' },
+        { href: '/dashboard/insights', icon: AlertCircle, label: 'Insights' },
+        { href: '/dashboard/staff', icon: Users, label: 'Staff' },
+        { href: '/dashboard/tasks', icon: CalendarCheck, label: 'Tasks' },
+        { href: '/dashboard/master', icon: FolderCog, label: 'Academic Data' },
+    ];
+
+    // Add Admin menu only for SUPER_ADMIN
+    if (userRole === 'SUPER_ADMIN') {
+        items.push({ href: '/dashboard/admin', icon: Shield, label: 'Admin' });
+    }
+
+    return items;
+};
 
 const quickLinks = [
     { href: '/dashboard/students/add', label: 'Enroll Student' },
@@ -63,7 +72,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             {/* Scrollable Navigation Section */}
             <div className="flex-1 overflow-y-auto pb-20">
                 <nav className="mt-4 space-y-1 px-2">
-                    {navItems.map((item) => {
+                    {getNavItems(user?.role).map((item) => {
                         const Icon = item.icon;
                         const active = location.pathname === item.href;
 

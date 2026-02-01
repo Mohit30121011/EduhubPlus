@@ -18,6 +18,7 @@ import Content from './pages/Content';
 import Insights from './pages/Insights';
 import Tasks from './pages/Tasks';
 import Master from './pages/Master';
+import Admin from './pages/Admin';
 import Settings from './pages/Settings';
 
 
@@ -56,6 +57,7 @@ function App() {
 
                     <Route path="tasks" element={<Tasks />} />
                     <Route path="master" element={<Master />} />
+                    <Route path="admin" element={<Admin />} />
                     <Route path="settings" element={<Settings />} />
 
                     <Route path="attendance" element={<Attendance />} />

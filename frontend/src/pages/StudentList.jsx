@@ -109,7 +109,7 @@ const StudentList = () => {
                             Students <span className="text-gray-400 font-medium">({getFilteredData().length})</span>
                         </h2>
 
-                        <div className="flex items-center gap-2 justify-end flex-wrap">
+                        <div className="flex items-center gap-2 justify-end flex-nowrap overflow-x-auto pb-1 sm:pb-0 scrollbar-hide">
                             {/* Search */}
                             {showSearchInput && (
                                 <motion.input
@@ -312,8 +312,8 @@ const StudentList = () => {
                                             {visibleColumns.status && (
                                                 <td className="px-4 py-4">
                                                     <span className={`px-3 py-1 rounded-full text-xs font-extrabold ${student.applicationStatus === 'APPROVED' ? 'bg-emerald-100 text-emerald-600' :
-                                                            student.applicationStatus === 'REJECTED' ? 'bg-red-100 text-red-600' :
-                                                                'bg-amber-100 text-amber-600'
+                                                        student.applicationStatus === 'REJECTED' ? 'bg-red-100 text-red-600' :
+                                                            'bg-amber-100 text-amber-600'
                                                         }`}>
                                                         {student.applicationStatus || 'PENDING'}
                                                     </span>

@@ -58,12 +58,13 @@ const Sidebar = ({ isOpen, onClose }) => {
         `}>
             {/* Logo Section - Fixed */}
             <div className="p-6 pb-4 flex items-center justify-between gap-4 border-b border-gray-100 shrink-0">
-                <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-primary-500/30">
-                        IC
-                    </div>
+                <div className="flex items-center gap-3">
+                    <img src="/logo.png" alt="EduhubPlus" className="w-10 h-10 object-contain" />
                     <div>
-                        <h1 className="font-bold text-lg text-secondary-600 leading-none tracking-tight header-accent">ICMS</h1>
+                        <h1 className="font-bold text-lg leading-none tracking-tight">
+                            <span className="text-blue-600">Eduhub</span>
+                            <span className="text-gray-500">Plus</span>
+                        </h1>
                         <p className="text-xs font-medium text-gray-400 mt-0.5 uppercase tracking-wider">Campus Manager</p>
                     </div>
                 </div>

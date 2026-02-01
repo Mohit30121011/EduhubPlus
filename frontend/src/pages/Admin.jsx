@@ -454,59 +454,50 @@ const Admin = () => {
                             </div>
 
                             <form onSubmit={handleSubmit} className="space-y-4">
-                                <div>
-                                    <label className="text-xs font-bold text-gray-400 uppercase mb-2 block">Name</label>
-                                    <div className="relative">
-                                        <UserCog size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                                        <input
-                                            type="text"
-                                            value={formData.name}
-                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            placeholder="Enter name"
-                                            required
-                                            className="w-full pl-12 pr-4 py-3 bg-gray-50 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500/20"
-                                        />
-                                    </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Name</label>
+                                    <input
+                                        type="text"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        placeholder="Enter full name"
+                                        required
+                                        className="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl font-bold text-gray-900 focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                                    />
                                 </div>
 
-                                <div>
-                                    <label className="text-xs font-bold text-gray-400 uppercase mb-2 block">Email</label>
-                                    <div className="relative">
-                                        <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                                        <input
-                                            type="email"
-                                            value={formData.email}
-                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                            placeholder="Enter email"
-                                            required
-                                            className="w-full pl-12 pr-4 py-3 bg-gray-50 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500/20"
-                                        />
-                                    </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Email</label>
+                                    <input
+                                        type="email"
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                        placeholder="Enter email address"
+                                        required
+                                        className="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl font-bold text-gray-900 focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                                    />
                                 </div>
 
-                                <div>
-                                    <label className="text-xs font-bold text-gray-400 uppercase mb-2 block">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">
                                         Password {isEditMode && '(leave blank to keep current)'}
                                     </label>
-                                    <div className="relative">
-                                        <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                                        <input
-                                            type="password"
-                                            value={formData.password}
-                                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                            placeholder={isEditMode ? 'Enter new password' : 'Enter password'}
-                                            required={!isEditMode}
-                                            className="w-full pl-12 pr-4 py-3 bg-gray-50 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500/20"
-                                        />
-                                    </div>
+                                    <input
+                                        type="password"
+                                        value={formData.password}
+                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                        placeholder={isEditMode ? 'Enter new password' : 'Enter password'}
+                                        required={!isEditMode}
+                                        className="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl font-bold text-gray-900 focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                                    />
                                 </div>
 
-                                <div>
-                                    <label className="text-xs font-bold text-gray-400 uppercase mb-2 block">Role</label>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Role</label>
                                     <select
                                         value={formData.role}
                                         onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                                        className="w-full p-3 bg-gray-50 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        className="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl font-bold text-gray-900 focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all appearance-none cursor-pointer"
                                     >
                                         {adminRoles.map(r => (
                                             <option key={r.value} value={r.value}>{r.label}</option>

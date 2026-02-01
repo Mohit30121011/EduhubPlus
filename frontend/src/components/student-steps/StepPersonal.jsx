@@ -192,24 +192,7 @@ const StepPersonal = ({ formData, handleChange }) => {
                 </div>
             </section>
 
-            <style>{`
-                .input-field {
-                    width: 100%;
-                    padding: 0.625rem 1rem;
-                    background-color: #F9FAFB;
-                    border: 1px solid #E5E7EB;
-                    border-radius: 0.75rem;
-                    font-size: 0.875rem;
-                    line-height: 1.25rem;
-                    transition: all 0.2s;
-                    outline: none;
-                }
-                .input-field:focus {
-                    background-color: #FFFFFF;
-                    border-color: #3B82F6;
-                    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-                }
-             `}</style>
+
         </div>
     );
 };

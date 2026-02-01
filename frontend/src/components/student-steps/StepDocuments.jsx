@@ -31,7 +31,7 @@ const StepDocuments = ({ formData, handleChange, handleFileChange }) => {
                     <FileText className="text-blue-600" />
                     Documents Upload
                 </h3>
-                <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                <div className="bg-white/50 p-6 rounded-2xl border border-white/60 shadow-sm backdrop-blur-sm">
                     <h4 className="font-bold text-gray-800 mb-4">Certificates & Proofs</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                         {renderFileUpload('photo', 'Passport Photo')}
@@ -61,7 +61,7 @@ const StepDocuments = ({ formData, handleChange, handleFileChange }) => {
                     <CheckCircle className="text-green-600" />
                     Declaration & Undertaking
                 </h3>
-                <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+                <div className="bg-blue-50/30 p-6 rounded-2xl border border-blue-100/50 backdrop-blur-sm">
                     <div className="flex items-start gap-4">
                         <input
                             type="checkbox"
@@ -82,22 +82,22 @@ const StepDocuments = ({ formData, handleChange, handleFileChange }) => {
                     {formData.declaration && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 animate-fadeIn">
                             <div className="space-y-1">
-                                <label className="text-xs font-semibold text-gray-500">Place</label>
+                                <label className="text-sm font-semibold text-gray-700">Place</label>
                                 <input
                                     type="text"
                                     value={formData.place || ''}
                                     onChange={(e) => handleChange(e, 'place')}
-                                    className="input-field bg-white"
+                                    className="input-field"
                                     placeholder="Place of submission"
                                 />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-xs font-semibold text-gray-500">Date</label>
+                                <label className="text-sm font-semibold text-gray-700">Date</label>
                                 <input
                                     type="date"
                                     value={formData.date || new Date().toISOString().split('T')[0]}
                                     onChange={(e) => handleChange(e, 'date')}
-                                    className="input-field bg-white"
+                                    className="input-field"
                                 />
                             </div>
                         </div>

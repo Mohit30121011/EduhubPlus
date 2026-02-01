@@ -4,52 +4,52 @@ import { Users, Phone, MapPin, DollarSign, Briefcase } from 'lucide-react';
 const StepFamily = ({ formData, handleChange }) => {
 
     const renderParentForm = (role, title) => (
-        <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100">
+        <div className="bg-white/50 p-5 rounded-2xl border border-white/60 shadow-sm backdrop-blur-sm">
             <h4 className="font-bold text-gray-800 mb-4 capitalize">{title} Details</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500">Name</label>
+                    <label className="text-sm font-semibold text-gray-700">Name</label>
                     <input
                         type="text"
                         value={formData.familyDetails?.[role]?.name || ''}
                         onChange={(e) => handleChange(e, 'familyDetails', role, 'name')}
-                        className="input-field bg-white"
+                        className="input-field"
                         placeholder={`Enter ${title} name`}
                     />
                 </div>
                 <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500">Occupation</label>
+                    <label className="text-sm font-semibold text-gray-700">Occupation</label>
                     <div className="relative">
-                        <Briefcase className="absolute left-3 top-2.5 text-gray-400" size={14} />
+                        <Briefcase className="absolute left-3 top-2.5 text-gray-400" size={18} />
                         <input
                             type="text"
                             value={formData.familyDetails?.[role]?.occupation || ''}
                             onChange={(e) => handleChange(e, 'familyDetails', role, 'occupation')}
-                            className="input-field bg-white pl-9"
+                            className="input-field pl-10"
                         />
                     </div>
                 </div>
                 <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500">Annual Income</label>
+                    <label className="text-sm font-semibold text-gray-700">Annual Income</label>
                     <div className="relative">
-                        <DollarSign className="absolute left-3 top-2.5 text-gray-400" size={14} />
+                        <DollarSign className="absolute left-3 top-2.5 text-gray-400" size={18} />
                         <input
                             type="text"
                             value={formData.familyDetails?.[role]?.annualIncome || ''}
                             onChange={(e) => handleChange(e, 'familyDetails', role, 'annualIncome')}
-                            className="input-field bg-white pl-9"
+                            className="input-field pl-10"
                         />
                     </div>
                 </div>
                 <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500">Contact Number</label>
+                    <label className="text-sm font-semibold text-gray-700">Contact Number</label>
                     <div className="relative">
-                        <Phone className="absolute left-3 top-2.5 text-gray-400" size={14} />
+                        <Phone className="absolute left-3 top-2.5 text-gray-400" size={18} />
                         <input
                             type="tel"
                             value={formData.familyDetails?.[role]?.contact || ''}
                             onChange={(e) => handleChange(e, 'familyDetails', role, 'contact')}
-                            className="input-field bg-white pl-9"
+                            className="input-field pl-10"
                         />
                     </div>
                 </div>
@@ -72,43 +72,43 @@ const StepFamily = ({ formData, handleChange }) => {
                 </div>
 
                 {/* Guardian (Optional) */}
-                <div className="bg-blue-50/50 p-5 rounded-2xl border border-blue-50 mt-4">
+                <div className="bg-blue-50/30 p-5 rounded-2xl border border-blue-100/50 mt-4 backdrop-blur-sm">
                     <h4 className="font-bold text-gray-800 mb-4">Guardian Details (If applicable)</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div className="space-y-1">
-                            <label className="text-xs font-semibold text-gray-500">Guardian Name</label>
+                            <label className="text-sm font-semibold text-gray-700">Guardian Name</label>
                             <input
                                 type="text"
                                 value={formData.familyDetails?.guardian?.name || ''}
                                 onChange={(e) => handleChange(e, 'familyDetails', 'guardian', 'name')}
-                                className="input-field bg-white"
+                                className="input-field"
                             />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-xs font-semibold text-gray-500">Relationship</label>
+                            <label className="text-sm font-semibold text-gray-700">Relationship</label>
                             <input
                                 type="text"
                                 value={formData.familyDetails?.guardian?.relationship || ''}
                                 onChange={(e) => handleChange(e, 'familyDetails', 'guardian', 'relationship')}
-                                className="input-field bg-white"
+                                className="input-field"
                             />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-xs font-semibold text-gray-500">Address</label>
+                            <label className="text-sm font-semibold text-gray-700">Address</label>
                             <input
                                 type="text"
                                 value={formData.familyDetails?.guardian?.address || ''}
                                 onChange={(e) => handleChange(e, 'familyDetails', 'guardian', 'address')}
-                                className="input-field bg-white"
+                                className="input-field"
                             />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-xs font-semibold text-gray-500">Contact</label>
+                            <label className="text-sm font-semibold text-gray-700">Contact</label>
                             <input
                                 type="tel"
                                 value={formData.familyDetails?.guardian?.contact || ''}
                                 onChange={(e) => handleChange(e, 'familyDetails', 'guardian', 'contact')}
-                                className="input-field bg-white"
+                                className="input-field"
                             />
                         </div>
                     </div>

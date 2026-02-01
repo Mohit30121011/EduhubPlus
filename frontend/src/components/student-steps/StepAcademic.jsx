@@ -4,63 +4,63 @@ import { BookOpen, Award, GraduationCap, ClipboardList } from 'lucide-react';
 const StepAcademic = ({ formData, handleChange }) => {
 
     const renderAcademicRow = (level, title) => (
-        <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100">
+        <div className="bg-white/50 p-5 rounded-2xl border border-white/60 shadow-sm backdrop-blur-sm">
             <h4 className="font-bold text-gray-800 mb-4">{title} Details</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500">Board / University</label>
+                    <label className="text-sm font-semibold text-gray-700">Board / University</label>
                     <input
                         type="text"
                         value={formData.academicHistory?.[level]?.board || ''}
                         onChange={(e) => handleChange(e, 'academicHistory', level, 'board')}
-                        className="input-field bg-white"
+                        className="input-field"
                     />
                 </div>
                 <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500">School / College</label>
+                    <label className="text-sm font-semibold text-gray-700">School / College</label>
                     <input
                         type="text"
                         value={formData.academicHistory?.[level]?.school || ''}
                         onChange={(e) => handleChange(e, 'academicHistory', level, 'school')}
-                        className="input-field bg-white"
+                        className="input-field"
                     />
                 </div>
                 <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500">Year of Passing</label>
+                    <label className="text-sm font-semibold text-gray-700">Year of Passing</label>
                     <input
                         type="text"
                         value={formData.academicHistory?.[level]?.passingYear || ''}
                         onChange={(e) => handleChange(e, 'academicHistory', level, 'passingYear')}
-                        className="input-field bg-white"
+                        className="input-field"
                     />
                 </div>
                 <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500">Percentage / CGPA</label>
+                    <label className="text-sm font-semibold text-gray-700">Percentage / CGPA</label>
                     <input
                         type="text"
                         value={formData.academicHistory?.[level]?.percentage || ''}
                         onChange={(e) => handleChange(e, 'academicHistory', level, 'percentage')}
-                        className="input-field bg-white"
+                        className="input-field"
                     />
                 </div>
                 {level !== 'classX' && (
                     <div className="space-y-1">
-                        <label className="text-xs font-semibold text-gray-500">{level === 'graduation' ? 'Specialization' : 'Stream'}</label>
+                        <label className="text-sm font-semibold text-gray-700">{level === 'graduation' ? 'Specialization' : 'Stream'}</label>
                         <input
                             type="text"
                             value={formData.academicHistory?.[level]?.stream || ''}
                             onChange={(e) => handleChange(e, 'academicHistory', level, 'stream')}
-                            className="input-field bg-white"
+                            className="input-field"
                         />
                     </div>
                 )}
                 <div className="md:col-span-2 space-y-1">
-                    <label className="text-xs font-semibold text-gray-500">Subjects</label>
+                    <label className="text-sm font-semibold text-gray-700">Subjects</label>
                     <input
                         type="text"
                         value={formData.academicHistory?.[level]?.subjects || ''}
                         onChange={(e) => handleChange(e, 'academicHistory', level, 'subjects')}
-                        className="input-field bg-white"
+                        className="input-field"
                         placeholder="Comma separated subjects"
                     />
                 </div>
@@ -169,23 +169,23 @@ const StepAcademic = ({ formData, handleChange }) => {
                     <ClipboardList className="text-blue-600" />
                     Entrance Exam Details (If Applicable)
                 </h3>
-                <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                <div className="bg-white/50 p-5 rounded-2xl border border-white/60 shadow-sm backdrop-blur-sm">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="space-y-1">
-                            <label className="text-xs font-semibold text-gray-500">Exam Name</label>
-                            <input type="text" value={formData.entranceExam?.examName || ''} onChange={(e) => handleChange(e, 'entranceExam', 'examName')} className="input-field bg-white" />
+                            <label className="text-sm font-semibold text-gray-700">Exam Name</label>
+                            <input type="text" value={formData.entranceExam?.examName || ''} onChange={(e) => handleChange(e, 'entranceExam', 'examName')} className="input-field" />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-xs font-semibold text-gray-500">Rank</label>
-                            <input type="text" value={formData.entranceExam?.rank || ''} onChange={(e) => handleChange(e, 'entranceExam', 'rank')} className="input-field bg-white" />
+                            <label className="text-sm font-semibold text-gray-700">Rank</label>
+                            <input type="text" value={formData.entranceExam?.rank || ''} onChange={(e) => handleChange(e, 'entranceExam', 'rank')} className="input-field" />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-xs font-semibold text-gray-500">Score / Percentile</label>
-                            <input type="text" value={formData.entranceExam?.score || ''} onChange={(e) => handleChange(e, 'entranceExam', 'score')} className="input-field bg-white" />
+                            <label className="text-sm font-semibold text-gray-700">Score / Percentile</label>
+                            <input type="text" value={formData.entranceExam?.score || ''} onChange={(e) => handleChange(e, 'entranceExam', 'score')} className="input-field" />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-xs font-semibold text-gray-500">Qualified?</label>
-                            <select value={formData.entranceExam?.qualified || 'No'} onChange={(e) => handleChange(e, 'entranceExam', 'qualified')} className="input-field bg-white">
+                            <label className="text-sm font-semibold text-gray-700">Qualified?</label>
+                            <select value={formData.entranceExam?.qualified || 'No'} onChange={(e) => handleChange(e, 'entranceExam', 'qualified')} className="input-field">
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
                             </select>

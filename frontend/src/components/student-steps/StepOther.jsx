@@ -11,7 +11,7 @@ const StepOther = ({ formData, handleChange }) => {
                         <Home className="text-blue-600" />
                         Hostel Facility
                     </h3>
-                    <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 h-full">
+                    <div className="bg-white/50 p-5 rounded-2xl border border-white/60 shadow-sm backdrop-blur-sm h-full">
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <label className="font-semibold text-gray-700">Hostel Required?</label>
@@ -25,11 +25,11 @@ const StepOther = ({ formData, handleChange }) => {
                             {formData.hostelTransport?.hostelRequired && (
                                 <div className="space-y-3 animate-fadeIn">
                                     <div className="space-y-1">
-                                        <label className="text-xs font-semibold text-gray-500">Type</label>
+                                        <label className="text-sm font-semibold text-gray-700">Type</label>
                                         <select
                                             value={formData.hostelTransport?.hostelType || ''}
                                             onChange={(e) => handleChange(e, 'hostelTransport', 'hostelType')}
-                                            className="input-field bg-white"
+                                            className="input-field"
                                         >
                                             <option value="">Select Type</option>
                                             <option value="Boys">Boys Hostel</option>
@@ -37,11 +37,11 @@ const StepOther = ({ formData, handleChange }) => {
                                         </select>
                                     </div>
                                     <div className="space-y-1">
-                                        <label className="text-xs font-semibold text-gray-500">Mess Required?</label>
+                                        <label className="text-sm font-semibold text-gray-700">Mess Required?</label>
                                         <select
                                             value={formData.hostelTransport?.messRequired || 'No'}
                                             onChange={(e) => handleChange(e, 'hostelTransport', 'messRequired')}
-                                            className="input-field bg-white"
+                                            className="input-field"
                                         >
                                             <option value="Yes">Yes</option>
                                             <option value="No">No</option>
@@ -58,7 +58,7 @@ const StepOther = ({ formData, handleChange }) => {
                         <Bus className="text-blue-600" />
                         Transport Facility
                     </h3>
-                    <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 h-full">
+                    <div className="bg-white/50 p-5 rounded-2xl border border-white/60 shadow-sm backdrop-blur-sm h-full">
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <label className="font-semibold text-gray-700">Transport Required?</label>
@@ -72,12 +72,12 @@ const StepOther = ({ formData, handleChange }) => {
                             {formData.hostelTransport?.transportRequired && (
                                 <div className="space-y-3 animate-fadeIn">
                                     <div className="space-y-1">
-                                        <label className="text-xs font-semibold text-gray-500">Route / Pickup Point</label>
+                                        <label className="text-sm font-semibold text-gray-700">Route / Pickup Point</label>
                                         <input
                                             type="text"
                                             value={formData.hostelTransport?.pickupLocation || ''}
                                             onChange={(e) => handleChange(e, 'hostelTransport', 'pickupLocation')}
-                                            className="input-field bg-white"
+                                            className="input-field"
                                             placeholder="Enter location"
                                         />
                                     </div>
@@ -125,7 +125,7 @@ const StepOther = ({ formData, handleChange }) => {
                     <CreditCard className="text-blue-600" />
                     Fee & Payment Details
                 </h3>
-                <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                <div className="bg-white/50 p-5 rounded-2xl border border-white/60 shadow-sm backdrop-blur-sm">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="space-y-1">
                             <label className="text-sm font-semibold text-gray-700">Amount Paid</label>
@@ -136,7 +136,7 @@ const StepOther = ({ formData, handleChange }) => {
                         </div>
                         <div className="space-y-1">
                             <label className="text-sm font-semibold text-gray-700">Payment Mode</label>
-                            <select value={formData.feeDetails?.paymentMode || 'Cash'} onChange={(e) => handleChange(e, 'feeDetails', 'paymentMode')} className="input-field bg-white">
+                            <select value={formData.feeDetails?.paymentMode || 'Cash'} onChange={(e) => handleChange(e, 'feeDetails', 'paymentMode')} className="input-field">
                                 <option value="Cash">Cash</option>
                                 <option value="UPI">UPI</option>
                                 <option value="NetBanking">Net Banking</option>
@@ -146,7 +146,7 @@ const StepOther = ({ formData, handleChange }) => {
                         </div>
                         <div className="space-y-1">
                             <label className="text-sm font-semibold text-gray-700">Transaction ID / Ref No.</label>
-                            <input type="text" value={formData.feeDetails?.transactionId || ''} onChange={(e) => handleChange(e, 'feeDetails', 'transactionId')} className="input-field bg-white" />
+                            <input type="text" value={formData.feeDetails?.transactionId || ''} onChange={(e) => handleChange(e, 'feeDetails', 'transactionId')} className="input-field" />
                         </div>
                     </div>
                 </div>

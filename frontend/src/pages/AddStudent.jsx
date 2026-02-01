@@ -224,19 +224,17 @@ const AddStudent = () => {
                         </motion.button>
 
                         {/* Export Button */}
-                        <div className="w-10 h-10">
-                            <ExportDropdown
-                                data={[formData]}
-                                columns={[
-                                    { header: 'First Name', key: 'firstName' },
-                                    { header: 'Last Name', key: 'lastName' },
-                                    { header: 'Phone', key: 'phone' },
-                                    { header: 'Email', key: 'email' },
-                                ]}
-                                filename="Student_Draft"
-                                circular={true}
-                            />
-                        </div>
+                        <ExportDropdown
+                            data={[formData]}
+                            columns={[
+                                { header: 'First Name', key: 'firstName' },
+                                { header: 'Last Name', key: 'lastName' },
+                                { header: 'Phone', key: 'phone' },
+                                { header: 'Email', key: 'email' },
+                            ]}
+                            filename="Student_Draft"
+                            circular={true}
+                        />
 
                         <button className="ml-auto px-6 py-2.5 bg-white text-gray-700 font-bold border border-gray-200 rounded-full hover:bg-gray-50 text-sm shadow-sm transition-all hover:shadow-md flex items-center gap-2">
                             <Save size={18} />

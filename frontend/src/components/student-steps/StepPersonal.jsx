@@ -38,7 +38,8 @@ const StepPersonal = ({ formData, handleChange }) => {
                                 value={formData.dateOfBirth}
                                 onChange={handleChange}
                                 required
-                                className="input-field pl-12"
+                                className="input-field"
+                                style={{ paddingLeft: '3rem' }}
                                 placeholder="DD-MM-YYYY"
                                 onFocus={(e) => e.target.type = 'date'}
                                 onBlur={(e) => { if (!e.target.value) e.target.type = 'text'; }}

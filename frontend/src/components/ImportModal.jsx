@@ -28,7 +28,23 @@ const ImportModal = ({ isOpen, onClose, category, token, onSuccess }) => {
             link.remove();
             toast.success('Template downloaded!');
         } catch (error) {
-            toast.error('Failed to download template');
+            console.error('Download Error:', error);
+            if (error.response && error.response.data instanceof Blob) {
+                // Read the blob to see the error message
+                const reader = new FileReader();
+                reader.onload = () => {
+                    try {
+                        const errorJson = JSON.parse(reader.result);
+                        console.error('Blob Error:', errorJson);
+                        toast.error(errorJson.message || 'Failed to download template');
+                    } catch (e) {
+                        toast.error('Failed to download template');
+                    }
+                };
+                reader.readAsText(error.response.data);
+            } else {
+                toast.error('Failed to download template');
+            }
         }
     };
 

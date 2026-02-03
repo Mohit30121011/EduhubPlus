@@ -225,7 +225,7 @@ const FacultyList = () => {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="text-xs font-extrabold text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <tr className="text-xs font-extrabold text-gray-400 uppercase tracking-widest border-b border-gray-100 whitespace-nowrap">
                                         {visibleColumns.photo && <th className="px-4 py-4">Photo</th>}
                                         {visibleColumns.name && <th className="px-4 py-4">Name</th>}
                                         {visibleColumns.designation && <th className="px-4 py-4">Designation</th>}
@@ -243,7 +243,7 @@ const FacultyList = () => {
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: index * 0.05 }}
-                                            className="hover:bg-blue-50/50 transition-colors"
+                                            className="hover:bg-blue-50/50 transition-colors whitespace-nowrap"
                                         >
                                             {visibleColumns.photo && (
                                                 <td className="px-4 py-4">

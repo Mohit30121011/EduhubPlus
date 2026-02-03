@@ -17,9 +17,6 @@ const backupDatabase = () => {
 
     console.log(`📦 Starting Database Backup: ${fileName}`);
 
-    // Command to dump database
-    // Assuming POSTGRES_URI is in format: postgres://user:pass@host:port/dbname
-    // pg_dump can accept the connection string directly via -d flag or just as argument
     const connectionString = process.env.POSTGRES_URI;
 
     if (!connectionString) {
@@ -27,15 +24,18 @@ const backupDatabase = () => {
         return;
     }
 
-    // Using pg_dump with connection string
-    // Note: Password execution might require .pgpass file or PGPASSWORD env var. 
-    // Setting PGPASSWORD inline is less secure but often necessary for simple node scripts without complex config.
-    // However, exec works in a shell, so we can set env vars for the command.
+    let pgDumpPath = 'pg_dump';
+    if (process.platform === 'win32') {
+        // Common path detected on this system
+        const commonPath = 'C:\\Program Files\\PostgreSQL\\16\\bin\\pg_dump.exe';
+        if (fs.existsSync(commonPath)) {
+            pgDumpPath = `"${commonPath}"`;
+        }
+    }
 
-    // Attempting to parse connection string to get password separately if needed, 
-    // but pg_dump handles connection strings well.
-
-    const command = `pg_dump "${connectionString}" -F c > "${filePath}"`;
+    // Command to dump database
+    // Using -d for connection string and -f for file output avoids shell redirection issues on Windows
+    const command = `${pgDumpPath} -d "${connectionString}" -F c -f "${filePath}"`;
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
@@ -43,8 +43,6 @@ const backupDatabase = () => {
             return;
         }
         if (stderr) {
-            // pg_dump often writes info to stderr, so we don't treat all stderr as failure
-            // but we log it.
             console.log(`ℹ️ Backup Output: ${stderr}`);
         }
         console.log(`✅ Backup Completed Successfully: ${filePath}`);

@@ -8,6 +8,7 @@ const Course = require('../models/Course');
 const Subject = require('../models/Subject');
 const User = require('../models/User');
 const Student = require('../models/Student');
+const Faculty = require('../models/Faculty');
 
 // Multer setup for file upload
 const upload = multer({ storage: multer.memoryStorage() });
@@ -61,6 +62,21 @@ const templates = {
             fatherName: 'Robert Smith', fatherMobile: '9876543211',
             classX_percentage: '85', classX_board: 'CBSE', classX_year: '2016',
             programLevel: 'UG', admissionType: 'Regular', modeOfStudy: 'Full-time', academicSession: '2024-25'
+        }]
+    },
+    faculty: {
+        columns: [
+            'employeeId', 'firstName', 'lastName', 'email', 'phone', 'gender', 'designation', 'department',
+            'dateOfBirth', 'nationality', 'maritalStatus',
+            'street', 'city', 'state', 'pincode', 'country',
+            'totalTeachingExp'
+        ],
+        sample: [{
+            employeeId: 'FAC001', firstName: 'Alice', lastName: 'Professor', email: 'alice@college.edu', phone: '9876543210',
+            gender: 'FEMALE', designation: 'Assistant Professor', department: 'Computer Science',
+            dateOfBirth: '1985-06-15', nationality: 'Indian', maritalStatus: 'Married',
+            street: '456 Faculty Lane', city: 'Mumbai', state: 'Maharashtra', pincode: '400001', country: 'India',
+            totalTeachingExp: '5'
         }]
     }
 };
@@ -311,6 +327,45 @@ router.post('/bulk/:category', protect, async (req, res) => {
                     result = [];
                 }
                 break;
+
+            case 'faculty':
+                processedData = [];
+                for (const row of data) {
+                    const userPayload = {
+                        name: `${row.firstName} ${row.lastName}`,
+                        email: row.email,
+                        phone: row.phone,
+                        role: 'FACULTY',
+                        password: 'Faculty@123',
+                        isActive: true
+                    };
+                    const user = await User.create(userPayload).catch(err => console.log('User create fail (duplicate?):', err.message));
+
+                    if (user) {
+                        processedData.push({
+                            userId: user.id,
+                            employeeId: row.employeeId,
+                            firstName: row.firstName, lastName: row.lastName,
+                            email: row.email, phone: row.phone, gender: row.gender,
+                            designation: row.designation, department: row.department,
+                            dateOfBirth: row.dateOfBirth, nationality: row.nationality, maritalStatus: row.maritalStatus,
+                            contactDetails: {
+                                permanentAddress: {
+                                    street: row.street, city: row.city, state: row.state, pincode: row.pincode, country: row.country
+                                },
+                                correspondenceAddress: {
+                                    street: row.street, city: row.city, state: row.state, pincode: row.pincode, country: row.country
+                                }
+                            },
+                            experienceDetails: { totalTeachingExp: row.totalTeachingExp }
+                        });
+                    }
+                }
+                if (processedData.length > 0) {
+                    result = await Faculty.bulkCreate(processedData, { ignoreDuplicates: true });
+                } else { result = []; }
+                break;
+
             default:
                 return res.status(400).json({ message: 'Invalid category' });
         }

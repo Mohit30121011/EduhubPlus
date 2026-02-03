@@ -11,6 +11,8 @@ import StepDocuments from '../components/student-steps/StepDocuments';
 import { toast } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
+import ImportModal from '../components/ImportModal';
+import ExportDropdown from '../components/ExportDropdown';
 
 const FACULTY_STEPS = [
     { id: 1, label: 'Personal' },
@@ -25,6 +27,7 @@ const AddFaculty = () => {
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
     const [currentStep, setCurrentStep] = useState(1);
     const { token } = useSelector((state) => state.auth);
+    const [showImportModal, setShowImportModal] = useState(false);
 
     // Initial State for Faculty
     const [formData, setFormData] = useState({
@@ -276,13 +279,42 @@ const AddFaculty = () => {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3 ml-14">
-                        {/* Placeholder for future Export/Import, keeping Save Draft for visual consistency */}
-                        <button className="ml-auto px-6 py-2.5 bg-white text-gray-700 font-bold border border-gray-200 rounded-full hover:bg-gray-50 text-sm shadow-sm transition-all hover:shadow-md flex items-center gap-2" onClick={() => toast.success("Draft saved locally (demo)")}>
+                        <ExportDropdown
+                            data={[formData]}
+                            columns={[
+                                { header: 'First Name', key: 'firstName' },
+                                { header: 'Last Name', key: 'lastName' },
+                                { header: 'Email', key: 'email' },
+                                { header: 'Phone', key: 'phone' },
+                                { header: 'Designation', key: 'professionalDetails.designation' }
+                            ]}
+                            filename="Faculty_Draft"
+                            circular={true}
+                        />
+
+                        <button
+                            onClick={() => setShowImportModal(true)}
+                            className="px-6 py-2.5 bg-white text-gray-700 font-bold border border-gray-200 rounded-full hover:bg-gray-50 text-sm shadow-sm transition-all hover:shadow-md flex items-center gap-2"
+                        >
+                            <Upload size={18} className="text-blue-600" />
+                            Import
+                        </button>
+
+                        <button className="ml-auto px-6 py-2.5 bg-white text-gray-700 font-bold border border-gray-200 rounded-full hover:bg-gray-50 text-sm shadow-sm transition-all hover:shadow-md flex items-center gap-2" onClick={() => toast.success("Draft saved locally")}>
                             <Save size={18} />
                             Save Draft
                         </button>
                     </div>
                 </div>
+
+                {/* Import Modal */}
+                <ImportModal
+                    isOpen={showImportModal}
+                    onClose={() => setShowImportModal(false)}
+                    category="faculty"
+                    token={token}
+                    onSuccess={() => { toast.success('Faculty Imported'); setShowImportModal(false); }}
+                />
 
                 {/* Stepper */}
                 <EnrollmentStepper currentStep={currentStep} steps={FACULTY_STEPS} />

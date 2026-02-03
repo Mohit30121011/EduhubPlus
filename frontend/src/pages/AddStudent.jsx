@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Check, ChevronRight, ChevronLeft, Save } from 'lucide-react';
 import axios from 'axios';
@@ -20,6 +20,24 @@ const AddStudent = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const { token } = useSelector((state) => state.auth);
     const [showImportModal, setShowImportModal] = useState(false);
+    const [departments, setDepartments] = useState([]);
+    const [courses, setCourses] = useState([]);
+
+    // Fetch master data on mount
+    useEffect(() => {
+        const fetchMasterData = async () => {
+            try {
+                const res = await axios.get('http://localhost:5000/api/master/all', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setDepartments(res.data.departments || []);
+                setCourses(res.data.courses || []);
+            } catch (err) {
+                console.error('Failed to fetch master data:', err);
+            }
+        };
+        if (token) fetchMasterData();
+    }, [token]);
 
     // Huge initial state for all 13 sections
     const [formData, setFormData] = useState({
@@ -187,7 +205,7 @@ const AddStudent = () => {
         switch (currentStep) {
             case 1: return <StepPersonal formData={formData} handleChange={(e, sec, subsec) => handleChange(e, sec, subsec)} />;
             case 2: return <StepFamily formData={formData} handleChange={(e, sec, subsec, fld) => handleChange(e, sec, subsec, fld)} />;
-            case 3: return <StepAcademic formData={formData} handleChange={(e, sec, subsec, fld) => handleChange(e, sec, subsec, fld)} />;
+            case 3: return <StepAcademic formData={formData} handleChange={(e, sec, subsec, fld) => handleChange(e, sec, subsec, fld)} departments={departments} courses={courses} />;
             case 4: return <StepOther formData={formData} handleChange={(e, sec, subsec) => handleChange(e, sec, subsec)} />;
             case 5: return <StepDocuments formData={formData} handleChange={handleChange} handleFileChange={handleFileChange} />;
             default: return null;

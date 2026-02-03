@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { BookOpen, Award, GraduationCap, ClipboardList } from 'lucide-react';
 
-const StepAcademic = ({ formData, handleChange }) => {
+const StepAcademic = ({ formData, handleChange, departments = [], courses = [] }) => {
+
+    // Filter courses based on selected department
+    const filteredCourses = useMemo(() => {
+        if (!formData.department) return courses;
+        return courses.filter(c => c.DepartmentId === formData.department || c.Department?.id === formData.department);
+    }, [formData.department, courses]);
 
     const renderAcademicRow = (level, title) => (
         <div className="bg-white/50 p-5 rounded-2xl border border-white/60 shadow-sm backdrop-blur-sm">
@@ -102,29 +108,44 @@ const StepAcademic = ({ formData, handleChange }) => {
                             <option value="PhD">PhD</option>
                         </select>
                     </div>
-                    <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Course Applied For</label>
-                        <input
-                            type="text"
-                            name="course"
-                            value={formData.course}
-                            onChange={handleChange}
-                            required
-                            className="input-field"
-                            placeholder="e.g. B.Tech"
-                        />
-                    </div>
+
+                    {/* Department Dropdown */}
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Department</label>
-                        <input
-                            type="text"
+                        <select
                             name="department"
-                            value={formData.department}
+                            value={formData.department || ''}
+                            onChange={(e) => {
+                                handleChange(e);
+                                // Reset course when department changes
+                                handleChange({ target: { name: 'course', value: '' } });
+                            }}
+                            required
+                            className="input-field"
+                        >
+                            <option value="">Select Department</option>
+                            {departments.map(dept => (
+                                <option key={dept.id} value={dept.id}>{dept.name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Course Dropdown (filtered by department) */}
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Course Applied For</label>
+                        <select
+                            name="course"
+                            value={formData.course || ''}
                             onChange={handleChange}
                             required
                             className="input-field"
-                            placeholder="e.g. Computer Science"
-                        />
+                            disabled={!formData.department}
+                        >
+                            <option value="">{formData.department ? 'Select Course' : 'Select Department First'}</option>
+                            {filteredCourses.map(course => (
+                                <option key={course.id} value={course.id}>{course.name} ({course.code})</option>
+                            ))}
+                        </select>
                     </div>
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Admission Type</label>

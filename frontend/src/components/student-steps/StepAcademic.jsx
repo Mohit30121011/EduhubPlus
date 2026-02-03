@@ -121,11 +121,11 @@ const StepAcademic = ({ formData, handleChange, departments = [], courses = [], 
                                 handleChange({ target: { name: 'course', value: '' } });
                             }}
                             required
-                            className={`input-field ${errors.department ? 'border-red-400' : ''}`}
+                            className={`input-field bg-white text-gray-900 cursor-pointer ${errors.department ? 'border-red-400' : ''}`}
                         >
-                            <option value="">Select Department</option>
+                            <option value="" className="text-gray-500">Select Department</option>
                             {departments.map(dept => (
-                                <option key={dept.id} value={dept.id}>{dept.name}</option>
+                                <option key={dept.id} value={dept.id} className="text-gray-900">{dept.name}</option>
                             ))}
                         </select>
                         {errors.department && <p className="text-xs text-red-500 mt-1">{errors.department}</p>}

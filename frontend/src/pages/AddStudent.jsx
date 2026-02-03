@@ -27,13 +27,24 @@ const AddStudent = () => {
     useEffect(() => {
         const fetchMasterData = async () => {
             try {
+                console.log('Fetching master data...');
                 const res = await axios.get('http://localhost:5000/api/master/all', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                setDepartments(res.data.departments || []);
+                console.log('Master Data Response:', res.data);
+
+                if (res.data.departments && res.data.departments.length > 0) {
+                    setDepartments(res.data.departments);
+                    console.log('Departments set:', res.data.departments);
+                } else {
+                    console.warn('No departments found in response');
+                    toast.error('No departments found. Please contact admin.');
+                }
+
                 setCourses(res.data.courses || []);
             } catch (err) {
                 console.error('Failed to fetch master data:', err);
+                toast.error('Failed to load form data');
             }
         };
         if (token) fetchMasterData();

@@ -122,4 +122,107 @@ const getFacultyById = async (req, res) => {
     }
 };
 
-module.exports = { getFaculty, createFaculty, getFacultyById };
+// @desc    Update faculty
+// @route   PUT /api/faculty/:id
+// @access  Private/Admin
+const updateFaculty = async (req, res) => {
+    const t = await sequelize.transaction();
+    try {
+        const faculty = await Faculty.findByPk(req.params.id);
+        if (!faculty) {
+            await t.rollback();
+            return res.status(404).json({ message: 'Faculty not found' });
+        }
+
+        // 1. Process Files (Append to existing or replace)
+        let documents = faculty.documents || {};
+        if (req.files) {
+            Object.keys(req.files).forEach(key => {
+                const file = req.files[key][0];
+                documents[key] = {
+                    name: file.originalname,
+                    url: file.path,
+                    publicId: file.filename
+                };
+            });
+        }
+
+        // 2. Parse Body Data
+        const parseJSON = (field) => {
+            try { return typeof field === 'string' ? JSON.parse(field) : field; } catch (e) { return field; }
+        };
+
+        const {
+            email, firstName, lastName,
+            contactDetails, identityDetails, academicQualifications,
+            professionalDetails, experienceDetails, researchDetails,
+            bankDetails, institutionalInfo, emergencyContact, declaration,
+            ...otherData
+        } = req.body;
+
+        const parsedProfessionalDetails = parseJSON(professionalDetails);
+
+        const facultyData = {
+            ...otherData,
+            firstName, lastName,
+            contactDetails: parseJSON(contactDetails),
+            identityDetails: parseJSON(identityDetails),
+            academicQualifications: parseJSON(academicQualifications),
+            ...parsedProfessionalDetails, // Spread flat fields
+            experienceDetails: parseJSON(experienceDetails),
+            researchDetails: parseJSON(researchDetails),
+            bankDetails: parseJSON(bankDetails),
+            institutionalInfo: parseJSON(institutionalInfo),
+            emergencyContact: parseJSON(emergencyContact),
+            declaration: parseJSON(declaration),
+            documents,
+            photoUrl: documents.photo ? documents.photo.url : faculty.photoUrl
+        };
+
+        // 3. Update Faculty
+        await faculty.update(facultyData, { transaction: t });
+
+        // 4. Update User (Email) if changed
+        if (email) {
+            await User.update({ email }, { where: { id: faculty.userId }, transaction: t });
+        }
+
+        await t.commit();
+        res.json(faculty);
+    } catch (error) {
+        await t.rollback();
+        console.error('Update Error:', error);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+// @desc    Delete faculty
+// @route   DELETE /api/faculty/:id
+// @access  Private/Admin
+const deleteFaculty = async (req, res) => {
+    const t = await sequelize.transaction();
+    try {
+        const faculty = await Faculty.findByPk(req.params.id);
+
+        if (faculty) {
+            // Delete associated User
+            await User.destroy({ where: { id: faculty.userId }, transaction: t });
+            // Delete Faculty (Cascade should handle this via DB, but good to be explicit or if cascade not set)
+            // Actually, if cascade is set on User->Faculty, destroying User is enough.
+            // But let's destroy Faculty first for safety if User is parent.
+            // Model says: User.hasOne(Faculty, { onDelete: 'CASCADE' });
+            // So deleting User should delete Faculty.
+
+            await t.commit();
+            res.json({ message: 'Faculty removed' });
+        } else {
+            await t.rollback();
+            res.status(404).json({ message: 'Faculty not found' });
+        }
+    } catch (error) {
+        await t.rollback();
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { getFaculty, createFaculty, getFacultyById, updateFaculty, deleteFaculty };

@@ -55,6 +55,7 @@ function App() {
 
                     <Route path="faculty" element={<FacultyList />} />
                     <Route path="faculty/add" element={<AddFaculty />} />
+                    <Route path="faculty/edit/:id" element={<AddFaculty />} />
                     <Route path="staff" element={<FacultyList />} />
                     <Route path="staff/add" element={<AddFaculty />} />
 

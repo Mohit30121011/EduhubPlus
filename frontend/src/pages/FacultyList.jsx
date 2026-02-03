@@ -75,9 +75,19 @@ const FacultyList = () => {
     };
 
     const handleDelete = async () => {
-        // Implement delete logic here if API supports it
-        toast.error("Delete functionality not yet implemented in backend");
-        setShowDeleteModal(false);
+        if (!itemToDelete) return;
+        try {
+            await axios.delete(`${API_URL}/faculty/${itemToDelete.id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            toast.success('Faculty member removed');
+            fetchFaculty();
+            setShowDeleteModal(false);
+            setItemToDelete(null);
+        } catch (error) {
+            console.error(error);
+            toast.error(error.response?.data?.message || 'Failed to delete faculty');
+        }
     };
 
     return (
@@ -291,7 +301,7 @@ const FacultyList = () => {
                                             )}
                                             <td className="px-4 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <button onClick={() => toast.error("Edit not implemented yet")} className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold hover:bg-blue-100 transition-colors">Edit</button>
+                                                    <button onClick={() => navigate(`edit/${f.id}`)} className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold hover:bg-blue-100 transition-colors">Edit</button>
                                                     <button onClick={() => { setItemToDelete(f); setShowDeleteModal(true); }} className="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-bold hover:bg-red-100 transition-colors">Delete</button>
                                                 </div>
                                             </td>

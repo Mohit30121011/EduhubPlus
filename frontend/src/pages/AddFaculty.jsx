@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Check, ChevronRight, ChevronLeft, Save, Upload } from 'lucide-react';
 import axios from 'axios';
 import EnrollmentStepper from '../components/EnrollmentStepper'; // Shared stepper
@@ -162,13 +162,77 @@ const AddFaculty = () => {
     };
     const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
+    const { id } = useParams();
+    const isEditMode = !!id;
+
+    // Fetch Data for Edit Mode
+    useEffect(() => {
+        if (isEditMode) {
+            const fetchFaculty = async () => {
+                const toastId = toast.loading('Loading faculty details...');
+                try {
+                    const res = await axios.get(`${API_URL}/faculty/${id}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    const data = res.data;
+
+                    // Populate State
+                    setFormData(prev => ({
+                        ...prev,
+                        firstName: data.firstName,
+                        lastName: data.lastName,
+                        middleName: data.middleName || '',
+                        email: data.User?.email || data.email,
+                        phone: data.phone,
+                        // ... Map other fields ...
+                        contactDetails: data.contactDetails || {},
+                        identityDetails: data.identityDetails || {},
+                        academicQualifications: data.academicQualifications || [],
+                        professionalDetails: {
+                            designation: data.designation,
+                            department: data.department,
+                            employeeCode: data.employeeId,
+                            facultyType: data.facultyType,
+                            joinDate: data.joinDate,
+                            natureOfAppointment: data.natureOfAppointment
+                        },
+                        experienceDetails: data.experienceDetails || { previousInstitutions: [] },
+                        researchDetails: data.researchDetails || {},
+                        bankDetails: data.bankDetails || {},
+                        institutionalInfo: data.institutionalInfo || {},
+                        emergencyContact: data.emergencyContact || {},
+                        documents: data.documents || {}, // Store existing doc URLs
+
+                        // Flatten some critical fields if needed by components
+                        gender: data.gender,
+                        dateOfBirth: data.dateOfBirth,
+                        nationality: data.nationality,
+                        maritalStatus: data.maritalStatus,
+
+                        // Address Flattening for inputs if components expect top-level (StepPersonal might)
+                        permanentAddress: data.contactDetails?.permanentAddress || {},
+                        correspondenceAddress: data.contactDetails?.correspondenceAddress || {},
+                        alternateMobile: data.contactDetails?.alternatePhone,
+                        alternateEmail: data.contactDetails?.personalEmail
+                    }));
+                    toast.success('Loaded', { id: toastId });
+                } catch (error) {
+                    console.error(error);
+                    toast.error('Failed to load faculty details', { id: toastId });
+                    navigate('/dashboard/faculty');
+                }
+            };
+            fetchFaculty();
+        }
+    }, [id, token, API_URL, navigate]);
+
     const handleSubmit = async () => {
         if (!formData.declaration) {
             toast.error('Please sign declaration');
             return;
         }
         setSaving(true);
-        const toastId = toast.loading('Submitting faculty application...');
+        const toastId = toast.loading(isEditMode ? 'Updating faculty...' : 'Submitting faculty application...');
 
         try {
             const submissionData = new FormData();
@@ -212,21 +276,25 @@ const AddFaculty = () => {
                 submissionData.append(key, JSON.stringify(value));
             });
 
-            // Files
+            // Files - Only append if it's a new File object
             if (formData.documents) {
                 Object.entries(formData.documents).forEach(([key, file]) => {
                     if (file instanceof File) submissionData.append(key, file);
                 });
             }
 
-            const response = await axios.post(`${API_URL}/faculty`, submissionData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            let response;
+            if (isEditMode) {
+                response = await axios.put(`${API_URL}/faculty/${id}`, submissionData, {
+                    headers: { 'Content-Type': 'multipart/form-data', 'Authorization': `Bearer ${token}` }
+                });
+            } else {
+                response = await axios.post(`${API_URL}/faculty`, submissionData, {
+                    headers: { 'Content-Type': 'multipart/form-data', 'Authorization': `Bearer ${token}` }
+                });
+            }
 
-            toast.success('Faculty Registered Successfully!', { id: toastId });
+            toast.success(isEditMode ? 'Faculty Updated Successfully!' : 'Faculty Registered Successfully!', { id: toastId });
             navigate('/dashboard/faculty');
 
         } catch (error) {
@@ -273,8 +341,8 @@ const AddFaculty = () => {
                             <ArrowLeft size={20} className="text-gray-600" />
                         </button>
                         <div>
-                            <h1 className="text-2xl font-black text-gray-900 tracking-tight">Faculty Registration</h1>
-                            <p className="text-gray-500 font-medium text-sm mt-1">New Faculty Application • Phase {currentStep} of {FACULTY_STEPS.length}</p>
+                            <h1 className="text-2xl font-black text-gray-900 tracking-tight">{isEditMode ? 'Edit Faculty' : 'Faculty Registration'}</h1>
+                            <p className="text-gray-500 font-medium text-sm mt-1">{isEditMode ? 'Update faculty details' : 'New Faculty Application'} • Phase {currentStep} of {FACULTY_STEPS.length}</p>
                         </div>
                     </div>
 
@@ -360,7 +428,7 @@ const AddFaculty = () => {
                             disabled={saving}
                             className="min-w-[180px] px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-full hover:shadow-xl hover:shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
                         >
-                            {saving ? 'Submitting...' : 'Submit Faculty'}
+                            {saving ? (isEditMode ? 'Updating...' : 'Submitting...') : (isEditMode ? 'Update Faculty' : 'Submit Faculty')}
                             {!saving && <Check size={20} strokeWidth={2.5} />}
                         </button>
                     )}

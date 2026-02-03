@@ -2,9 +2,17 @@ const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
 // PostgreSQL Connection
+const isProduction = process.env.NODE_ENV === 'production';
+
 const sequelize = new Sequelize(process.env.POSTGRES_URI, {
     dialect: 'postgres',
-    logging: false, // Reduced logging for cleaner output
+    logging: false,
+    dialectOptions: isProduction ? {
+        ssl: {
+            require: true,
+            rejectUnauthorized: false // Often needed for hosted DBs like Heroku/Render/AWS RDS if using self-signed certs
+        }
+    } : {},
     pool: {
         max: 5,
         min: 0,

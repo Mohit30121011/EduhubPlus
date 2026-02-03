@@ -55,6 +55,12 @@ app.use((err, req, res, next) => {
     });
 });
 
+// Initialize Backup Service
+const { initBackupService } = require('./services/backupService');
+if (process.env.NODE_ENV === 'production' || process.env.ENABLE_BACKUPS === 'true') {
+    initBackupService();
+}
+
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
 });

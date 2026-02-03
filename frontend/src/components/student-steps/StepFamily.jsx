@@ -1,7 +1,7 @@
 import React from 'react';
 import { Users, Phone, MapPin, DollarSign, Briefcase } from 'lucide-react';
 
-const StepFamily = ({ formData, handleChange, errors = {} }) => {
+const StepFamily = ({ formData, handleChange, errors = {}, showParents = true }) => {
 
     const renderParentForm = (role, title) => {
         const isFather = role === 'father';
@@ -63,62 +63,65 @@ const StepFamily = ({ formData, handleChange, errors = {} }) => {
     };
 
     return (
-        <div className="space-y-8 animate-fadeIn">
+        <div className="space-y-8">
             {/* 3. Parent / Guardian */}
-            <section className="space-y-4">
-                <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    <Users className="text-blue-600" />
-                    Parent / Guardian Information
-                </h3>
+            {/* 3. Parent / Guardian */}
+            {showParents && (
+                <section className="space-y-4">
+                    <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <Users className="text-blue-600" />
+                        Parent / Guardian Information
+                    </h3>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {renderParentForm('father', "Father's")}
-                    {renderParentForm('mother', "Mother's")}
-                </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {renderParentForm('father', "Father's")}
+                        {renderParentForm('mother', "Mother's")}
+                    </div>
 
-                {/* Guardian (Optional) */}
-                <div className="bg-blue-50/30 p-5 rounded-2xl border border-blue-100/50 mt-4 backdrop-blur-sm">
-                    <h4 className="font-bold text-gray-800 mb-4">Guardian Details (If applicable)</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="space-y-1">
-                            <label className="text-sm font-semibold text-gray-700">Guardian Name</label>
-                            <input
-                                type="text"
-                                value={formData.familyDetails?.guardian?.name || ''}
-                                onChange={(e) => handleChange(e, 'familyDetails', 'guardian', 'name')}
-                                className="input-field"
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-sm font-semibold text-gray-700">Relationship</label>
-                            <input
-                                type="text"
-                                value={formData.familyDetails?.guardian?.relationship || ''}
-                                onChange={(e) => handleChange(e, 'familyDetails', 'guardian', 'relationship')}
-                                className="input-field"
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-sm font-semibold text-gray-700">Address</label>
-                            <input
-                                type="text"
-                                value={formData.familyDetails?.guardian?.address || ''}
-                                onChange={(e) => handleChange(e, 'familyDetails', 'guardian', 'address')}
-                                className="input-field"
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-sm font-semibold text-gray-700">Contact</label>
-                            <input
-                                type="tel"
-                                value={formData.familyDetails?.guardian?.contact || ''}
-                                onChange={(e) => handleChange(e, 'familyDetails', 'guardian', 'contact')}
-                                className="input-field"
-                            />
+                    {/* Guardian (Optional) */}
+                    <div className="bg-blue-50/30 p-5 rounded-2xl border border-blue-100/50 mt-4 backdrop-blur-sm">
+                        <h4 className="font-bold text-gray-800 mb-4">Guardian Details (If applicable)</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="space-y-1">
+                                <label className="text-sm font-semibold text-gray-700">Guardian Name</label>
+                                <input
+                                    type="text"
+                                    value={formData.familyDetails?.guardian?.name || ''}
+                                    onChange={(e) => handleChange(e, 'familyDetails', 'guardian', 'name')}
+                                    className="input-field"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-sm font-semibold text-gray-700">Relationship</label>
+                                <input
+                                    type="text"
+                                    value={formData.familyDetails?.guardian?.relationship || ''}
+                                    onChange={(e) => handleChange(e, 'familyDetails', 'guardian', 'relationship')}
+                                    className="input-field"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-sm font-semibold text-gray-700">Address</label>
+                                <input
+                                    type="text"
+                                    value={formData.familyDetails?.guardian?.address || ''}
+                                    onChange={(e) => handleChange(e, 'familyDetails', 'guardian', 'address')}
+                                    className="input-field"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-sm font-semibold text-gray-700">Contact</label>
+                                <input
+                                    type="tel"
+                                    value={formData.familyDetails?.guardian?.contact || ''}
+                                    onChange={(e) => handleChange(e, 'familyDetails', 'guardian', 'contact')}
+                                    className="input-field"
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            )}
 
             {/* 4. Emergency & Local Guardian */}
             <section className="space-y-4">

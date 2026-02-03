@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, ChevronRight, ChevronLeft, Save } from 'lucide-react';
+import { ArrowLeft, Check, ChevronRight, ChevronLeft, Save, Upload } from 'lucide-react';
 import axios from 'axios';
-import EnrollmentStepper from '../components/EnrollmentStepper';
+import EnrollmentStepper from '../components/EnrollmentStepper'; // Shared stepper
 import StepPersonal from '../components/student-steps/StepPersonal';
 import StepFamily from '../components/student-steps/StepFamily'; // Reusing for Emergency Contact
 import StepFacultyAcademic from '../components/student-steps/StepFacultyAcademic';
@@ -79,17 +79,13 @@ const AddFaculty = () => {
                         ...prev[section],
                         [subsection]: {
                             ...prev[section]?.[subsection],
-                            [name]: value
+                            [field || name]: value
                         }
                     }
                 };
             }
             else if (subsection) {
-                // For StepFamily where structure is familyDetails.guardian.name (guardian is subsection)
-                // But StepFamily implementation calls handleChange(e, 'familyDetails', 'guardian', 'name') -> 3 levels
-                // StepFacultyProfessional calls handleChange(e, 'professionalDetails') -> 1 level (section is passed, name is field)
-
-                // If subsection is passed as a string (key), update that key in section object
+                // For StepFamily where structure is familyDetails.guardian.name
                 return {
                     ...prev,
                     [section]: {
@@ -99,7 +95,7 @@ const AddFaculty = () => {
                 }
             }
             else {
-                // Section level update: formData[section][name] = value
+                // Section level update
                 return {
                     ...prev,
                     [section]: {
@@ -136,10 +132,13 @@ const AddFaculty = () => {
                 if (!formData.email) newErrors.email = 'Email is required';
                 if (formData.aadharNumber && formData.aadharNumber.length !== 12) newErrors.aadharNumber = 'Aadhar must be 12 digits';
                 break;
+            case 2: // Family & Emergency
+                if (!formData.emergencyContact?.name) newErrors.emergencyName = 'Emergency contact name is required';
+                if (!formData.emergencyContact?.phone) newErrors.emergencyPhone = 'Emergency contact phone is required';
+                break;
             case 3: // Academic
                 if (!formData.academicQualifications?.length) {
                     toast.error('Please add at least one qualification');
-                    // return false; // Strict validation
                 }
                 break;
             case 5: // Docs
@@ -184,7 +183,7 @@ const AddFaculty = () => {
                     permanentAddress: formData.permanentAddress,
                     correspondenceAddress: formData.correspondenceAddress,
                     alternatePhone: formData.alternateMobile,
-                    personalEmail: formData.alternateEmail // Mapping
+                    personalEmail: formData.alternateEmail
                 },
                 identityDetails: {
                     aadharNumber: formData.aadharNumber,
@@ -234,80 +233,106 @@ const AddFaculty = () => {
         }
     };
 
+    const FACULTY_DOCS = [
+        { key: 'photo', label: 'Passport Photo' },
+        { key: 'resume', label: 'Resume / CV' },
+        { key: 'appointmentLetter', label: 'Appointment Letter' },
+        { key: 'experienceCertificate', label: 'Experience Certificate' },
+        { key: 'highestQualificationCertificate', label: 'Highest Qualification Certificate' },
+        { key: 'idProof', label: 'ID Proof (Aadhar/Passport)' },
+        { key: 'panCard', label: 'PAN Card' }
+    ];
+
     const renderStep = () => {
         switch (currentStep) {
             case 1: return <StepPersonal formData={formData} handleChange={handleChange} errors={errors} />;
-            case 2: return <StepFamily formData={formData} handleChange={(e, sec, subsec, fld) => handleChange(e, sec, subsec, fld)} errors={errors} />;
+            case 2: return <StepFamily formData={formData} handleChange={handleChange} errors={errors} showParents={false} />;
             case 3: return <StepFacultyAcademic formData={formData} handleChange={handleChange} errors={errors} />;
             case 4: return <StepFacultyProfessional formData={formData} handleChange={handleChange} errors={errors} />;
-            case 5: return <StepDocuments formData={formData} handleChange={handleChange} handleFileChange={handleFileChange} errors={errors} />;
+            case 5: return <StepDocuments formData={formData} handleChange={handleChange} handleFileChange={handleFileChange} errors={errors} docList={FACULTY_DOCS} />;
             default: return null;
         }
     };
 
+    // Refactored Layout matching AddStudent.jsx
     return (
-        <div className="min-h-screen bg-gray-50/50 pb-20">
-            {/* Header */}
-            <div className="bg-white border-b sticky top-0 z-30 shadow-sm/50 backdrop-blur-xl bg-white/80">
-                <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
+            <div className="max-w-7xl mx-auto space-y-6">
+
+                {/* Header */}
+                <div className="flex flex-col gap-6 mb-8">
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => navigate('/dashboard/faculty')}
+                            className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm"
+                        >
                             <ArrowLeft size={20} className="text-gray-600" />
                         </button>
-                        <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                            Add New Faculty
-                        </h1>
+                        <div>
+                            <h1 className="text-2xl font-black text-gray-900 tracking-tight">Faculty Registration</h1>
+                            <p className="text-gray-500 font-medium text-sm mt-1">New Faculty Application • Phase {currentStep} of {FACULTY_STEPS.length}</p>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3 ml-14">
+                        {/* Placeholder for future Export/Import, keeping Save Draft for visual consistency */}
+                        <button className="ml-auto px-6 py-2.5 bg-white text-gray-700 font-bold border border-gray-200 rounded-full hover:bg-gray-50 text-sm shadow-sm transition-all hover:shadow-md flex items-center gap-2" onClick={() => toast.success("Draft saved locally (demo)")}>
+                            <Save size={18} />
+                            Save Draft
+                        </button>
                     </div>
                 </div>
+
+                {/* Stepper */}
                 <EnrollmentStepper currentStep={currentStep} steps={FACULTY_STEPS} />
-            </div>
 
-            <main className="max-w-7xl mx-auto px-4 py-8">
-                <motion.div
-                    key={currentStep}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
-                >
-                    {renderStep()}
-                </motion.div>
-            </main>
+                {/* Main Form Area */}
+                <div className="bg-white/80 backdrop-blur-xl border border-white/60 shadow-sm rounded-[2.5rem] p-6 md:p-10 min-h-[60vh]">
+                    <motion.div
+                        key={currentStep}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        {renderStep()}
+                    </motion.div>
+                </div>
 
-            {/* Footer Actions */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-                <div className="max-w-7xl mx-auto flex justify-between items-center">
+                {/* Navigation Buttons */}
+                <div className="flex items-center justify-between pt-4">
                     <button
                         onClick={prevStep}
                         disabled={currentStep === 1}
-                        className={`min-w-[140px] px-6 py-3 rounded-full font-semibold border-2 transition-all flex items-center justify-center gap-2 ${currentStep === 1
-                            ? 'border-gray-100 text-gray-300 cursor-not-allowed'
-                            : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                        className={`min-w-[160px] px-6 py-4 rounded-full font-bold flex items-center justify-center gap-2 transition-all ${currentStep === 1
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 shadow-sm hover:shadow-md'
                             }`}
                     >
-                        <ChevronLeft size={20} />
+                        <ChevronLeft size={20} strokeWidth={2.5} />
                         Previous
                     </button>
 
-                    {currentStep === 5 ? (
+                    {currentStep < 5 ? (
                         <button
-                            onClick={handleSubmit}
-                            disabled={saving}
-                            className="min-w-[160px] px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-full hover:shadow-lg hover:shadow-emerald-500/30 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
+                            onClick={nextStep}
+                            className="min-w-[160px] px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-full hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
                         >
-                            {saving ? 'Saving...' : 'Submit Faculty'}
-                            <Save size={20} />
+                            Next
+                            <ChevronRight size={20} strokeWidth={2.5} />
                         </button>
                     ) : (
                         <button
-                            onClick={nextStep}
-                            className="min-w-[160px] px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-full hover:shadow-lg hover:shadow-blue-500/20 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
+                            onClick={handleSubmit}
+                            disabled={saving}
+                            className="min-w-[180px] px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-full hover:shadow-xl hover:shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
                         >
-                            Next
-                            <ChevronRight size={20} />
+                            {saving ? 'Submitting...' : 'Submit Faculty'}
+                            {!saving && <Check size={20} strokeWidth={2.5} />}
                         </button>
                     )}
                 </div>
+
             </div>
         </div>
     );

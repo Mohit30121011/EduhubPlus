@@ -55,7 +55,8 @@ function App() {
 
                     <Route path="faculty" element={<FacultyList />} />
                     <Route path="faculty/add" element={<AddFaculty />} />
-                    <Route path="staff" element={<FacultyList />} /> {/* Mapping Staff to Faculty for now */}
+                    <Route path="staff" element={<FacultyList />} />
+                    <Route path="staff/add" element={<AddFaculty />} />
 
                     <Route path="tasks" element={<Tasks />} />
                     <Route path="master" element={<Master />} />

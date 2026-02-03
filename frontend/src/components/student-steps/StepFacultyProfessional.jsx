@@ -220,13 +220,23 @@ const StepFacultyProfessional = ({ formData, handleChange, errors = {} }) => {
                         />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Patents / Projects</label>
+                        <label className="text-sm font-semibold text-gray-700">Patents (if any)</label>
+                        <textarea
+                            name="patents"
+                            value={formData.researchDetails?.patents || ''}
+                            onChange={(e) => handleChange(e, 'researchDetails')}
+                            className="input-field h-20 pt-2"
+                            placeholder="Patent details..."
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Projects (Ongoing / Completed)</label>
                         <textarea
                             name="projects"
                             value={formData.researchDetails?.projects || ''}
                             onChange={(e) => handleChange(e, 'researchDetails')}
                             className="input-field h-20 pt-2"
-                            placeholder="Ongoing or Completed Projects/Patents..."
+                            placeholder="Project details..."
                         />
                     </div>
                 </div>
@@ -268,6 +278,10 @@ const StepFacultyProfessional = ({ formData, handleChange, errors = {} }) => {
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Subjects Handled</label>
                         <input type="text" name="subjects" value={formData.institutionalInfo?.subjects || ''} onChange={(e) => handleChange(e, 'institutionalInfo')} className="input-field" placeholder="Comma separated" />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Classes / Sections Assigned</label>
+                        <input type="text" name="classesAssigned" value={formData.institutionalInfo?.classesAssigned || ''} onChange={(e) => handleChange(e, 'institutionalInfo')} className="input-field" placeholder="e.g. Class 10A, 12B" />
                     </div>
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Timetable Preferences</label>

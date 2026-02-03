@@ -8,12 +8,13 @@ router.route('/')
     .get(protect, authorize('ADMIN', 'SUPER_ADMIN'), getFaculty)
     .post(protect, authorize('ADMIN', 'SUPER_ADMIN'), uploadFacultyDocs.fields([
         { name: 'photo', maxCount: 1 },
-        { name: 'signature', maxCount: 1 },
         { name: 'resume', maxCount: 1 },
         { name: 'appointmentLetter', maxCount: 1 },
+        { name: 'experienceCertificate', maxCount: 5 }, // Allow multiple or merged
+        { name: 'highestQualificationCertificate', maxCount: 5 },
         { name: 'idProof', maxCount: 1 },
-        { name: 'experienceCertificates', maxCount: 1 }, // Assuming merged PDF
-        { name: 'academicCertificates', maxCount: 1 } // Assuming merged PDF
+        { name: 'panCard', maxCount: 1 },
+        { name: 'signature', maxCount: 1 } // Keep just in case
     ]), createFaculty);
 
 router.route('/:id')

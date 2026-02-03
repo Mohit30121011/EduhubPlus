@@ -1,7 +1,7 @@
 import React from 'react';
 import { FileText, CheckCircle, Upload } from 'lucide-react';
 
-const StepDocuments = ({ formData, handleChange, handleFileChange, errors = {} }) => {
+const StepDocuments = ({ formData, handleChange, handleFileChange, errors = {}, docList }) => {
 
     const renderFileUpload = (key, label) => (
         <div className="space-y-2">
@@ -40,7 +40,7 @@ const StepDocuments = ({ formData, handleChange, handleFileChange, errors = {} }
         { key: 'disabilityCertificate', label: 'Disability Certificate' }
     ];
 
-    const docsToRender = formData.docList || defaultDocs;
+    const docsToRender = docList || defaultDocs;
 
     return (
         <div className="space-y-8 animate-fadeIn">

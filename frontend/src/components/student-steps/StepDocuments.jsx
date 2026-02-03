@@ -1,7 +1,7 @@
 import React from 'react';
 import { FileText, CheckCircle, Upload } from 'lucide-react';
 
-const StepDocuments = ({ formData, handleChange, handleFileChange }) => {
+const StepDocuments = ({ formData, handleChange, handleFileChange, errors = {} }) => {
 
     const renderFileUpload = (key, label) => (
         <div className="space-y-2">
@@ -61,7 +61,7 @@ const StepDocuments = ({ formData, handleChange, handleFileChange }) => {
                     <CheckCircle className="text-green-600" />
                     Declaration & Undertaking
                 </h3>
-                <div className="bg-blue-50/30 p-6 rounded-2xl border border-blue-100/50 backdrop-blur-sm">
+                <div className={`bg-blue-50/30 p-6 rounded-2xl border backdrop-blur-sm ${errors.declaration ? 'border-red-400 bg-red-50/20' : 'border-blue-100/50'}`}>
                     <div className="flex items-start gap-4">
                         <input
                             type="checkbox"
@@ -76,6 +76,7 @@ const StepDocuments = ({ formData, handleChange, handleFileChange }) => {
                             <p className="text-sm text-gray-600">
                                 I understand that any discrepancy found in the information will lead to cancellation of admission.
                             </p>
+                            {errors.declaration && <p className="text-sm text-red-500 font-medium">{errors.declaration}</p>}
                         </div>
                     </div>
 

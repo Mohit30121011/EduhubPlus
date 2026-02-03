@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { BookOpen, Award, GraduationCap, ClipboardList } from 'lucide-react';
 
-const StepAcademic = ({ formData, handleChange, departments = [], courses = [] }) => {
+const StepAcademic = ({ formData, handleChange, departments = [], courses = [], errors = {} }) => {
 
     // Filter courses based on selected department
     const filteredCourses = useMemo(() => {
@@ -111,7 +111,7 @@ const StepAcademic = ({ formData, handleChange, departments = [], courses = [] }
 
                     {/* Department Dropdown */}
                     <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Department</label>
+                        <label className="text-sm font-semibold text-gray-700">Department <span className="text-red-500">*</span></label>
                         <select
                             name="department"
                             value={formData.department || ''}
@@ -121,24 +121,25 @@ const StepAcademic = ({ formData, handleChange, departments = [], courses = [] }
                                 handleChange({ target: { name: 'course', value: '' } });
                             }}
                             required
-                            className="input-field"
+                            className={`input-field ${errors.department ? 'border-red-400' : ''}`}
                         >
                             <option value="">Select Department</option>
                             {departments.map(dept => (
                                 <option key={dept.id} value={dept.id}>{dept.name}</option>
                             ))}
                         </select>
+                        {errors.department && <p className="text-xs text-red-500 mt-1">{errors.department}</p>}
                     </div>
 
                     {/* Course Dropdown (filtered by department) */}
                     <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Course Applied For</label>
+                        <label className="text-sm font-semibold text-gray-700">Course Applied For <span className="text-red-500">*</span></label>
                         <select
                             name="course"
                             value={formData.course || ''}
                             onChange={handleChange}
                             required
-                            className="input-field"
+                            className={`input-field ${errors.course ? 'border-red-400' : ''}`}
                             disabled={!formData.department}
                         >
                             <option value="">{formData.department ? 'Select Course' : 'Select Department First'}</option>
@@ -146,6 +147,7 @@ const StepAcademic = ({ formData, handleChange, departments = [], courses = [] }
                                 <option key={course.id} value={course.id}>{course.name} ({course.code})</option>
                             ))}
                         </select>
+                        {errors.course && <p className="text-xs text-red-500 mt-1">{errors.course}</p>}
                     </div>
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Admission Type</label>

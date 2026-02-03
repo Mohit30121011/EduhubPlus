@@ -1,61 +1,66 @@
 import React from 'react';
 import { Users, Phone, MapPin, DollarSign, Briefcase } from 'lucide-react';
 
-const StepFamily = ({ formData, handleChange }) => {
+const StepFamily = ({ formData, handleChange, errors = {} }) => {
 
-    const renderParentForm = (role, title) => (
-        <div className="bg-white/50 p-5 rounded-2xl border border-white/60 shadow-sm backdrop-blur-sm">
-            <h4 className="font-bold text-gray-800 mb-4 capitalize">{title} Details</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                    <label className="text-sm font-semibold text-gray-700">Name</label>
-                    <input
-                        type="text"
-                        value={formData.familyDetails?.[role]?.name || ''}
-                        onChange={(e) => handleChange(e, 'familyDetails', role, 'name')}
-                        className="input-field"
-                        placeholder={`Enter ${title} name`}
-                    />
-                </div>
-                <div className="space-y-1">
-                    <label className="text-sm font-semibold text-gray-700">Occupation</label>
-                    <div className="relative">
-                        <Briefcase className="absolute left-3 top-2.5 text-gray-400" size={18} />
+    const renderParentForm = (role, title) => {
+        const isFather = role === 'father';
+        return (
+            <div className="bg-white/50 p-5 rounded-2xl border border-white/60 shadow-sm backdrop-blur-sm">
+                <h4 className="font-bold text-gray-800 mb-4 capitalize">{title} Details</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Name {isFather && <span className="text-red-500">*</span>}</label>
                         <input
                             type="text"
-                            value={formData.familyDetails?.[role]?.occupation || ''}
-                            onChange={(e) => handleChange(e, 'familyDetails', role, 'occupation')}
-                            className="input-field pl-10"
+                            value={formData.familyDetails?.[role]?.name || ''}
+                            onChange={(e) => handleChange(e, 'familyDetails', role, 'name')}
+                            className={`input-field ${isFather && errors.fatherName ? 'border-red-400' : ''}`}
+                            placeholder={`Enter ${title} name`}
                         />
+                        {isFather && errors.fatherName && <p className="text-xs text-red-500 mt-1">{errors.fatherName}</p>}
                     </div>
-                </div>
-                <div className="space-y-1">
-                    <label className="text-sm font-semibold text-gray-700">Annual Income</label>
-                    <div className="relative">
-                        <DollarSign className="absolute left-3 top-2.5 text-gray-400" size={18} />
-                        <input
-                            type="text"
-                            value={formData.familyDetails?.[role]?.annualIncome || ''}
-                            onChange={(e) => handleChange(e, 'familyDetails', role, 'annualIncome')}
-                            className="input-field pl-10"
-                        />
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Occupation</label>
+                        <div className="relative">
+                            <Briefcase className="absolute left-3 top-2.5 text-gray-400" size={18} />
+                            <input
+                                type="text"
+                                value={formData.familyDetails?.[role]?.occupation || ''}
+                                onChange={(e) => handleChange(e, 'familyDetails', role, 'occupation')}
+                                className="input-field pl-10"
+                            />
+                        </div>
                     </div>
-                </div>
-                <div className="space-y-1">
-                    <label className="text-sm font-semibold text-gray-700">Contact Number</label>
-                    <div className="relative">
-                        <Phone className="absolute left-3 top-2.5 text-gray-400" size={18} />
-                        <input
-                            type="tel"
-                            value={formData.familyDetails?.[role]?.contact || ''}
-                            onChange={(e) => handleChange(e, 'familyDetails', role, 'contact')}
-                            className="input-field pl-10"
-                        />
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Annual Income</label>
+                        <div className="relative">
+                            <DollarSign className="absolute left-3 top-2.5 text-gray-400" size={18} />
+                            <input
+                                type="text"
+                                value={formData.familyDetails?.[role]?.annualIncome || ''}
+                                onChange={(e) => handleChange(e, 'familyDetails', role, 'annualIncome')}
+                                className="input-field pl-10"
+                            />
+                        </div>
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Contact Number {isFather && <span className="text-red-500">*</span>}</label>
+                        <div className="relative">
+                            <Phone className="absolute left-3 top-2.5 text-gray-400" size={18} />
+                            <input
+                                type="tel"
+                                value={formData.familyDetails?.[role]?.contact || ''}
+                                onChange={(e) => handleChange(e, 'familyDetails', role, 'contact')}
+                                className={`input-field pl-10 ${isFather && errors.fatherMobile ? 'border-red-400' : ''}`}
+                            />
+                        </div>
+                        {isFather && errors.fatherMobile && <p className="text-xs text-red-500 mt-1">{errors.fatherMobile}</p>}
                     </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     return (
         <div className="space-y-8 animate-fadeIn">

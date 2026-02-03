@@ -279,7 +279,12 @@ const AddStudent = () => {
             navigate('/dashboard/students');
         } catch (error) {
             console.error('Submission Error:', error);
-            toast.error(error.response?.data?.message || 'Failed to submit application', { id: toastId });
+            if (error.response) {
+                console.error('Error Data:', error.response.data);
+                console.error('Error Status:', error.response.status);
+            }
+            const errorMessage = error.response?.data?.message || 'Failed to submit application';
+            toast.error(errorMessage, { id: toastId });
         } finally {
             setSaving(false);
         }

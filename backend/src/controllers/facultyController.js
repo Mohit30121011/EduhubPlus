@@ -164,7 +164,7 @@ const updateFaculty = async (req, res) => {
 
         const facultyData = {
             ...otherData,
-            firstName, lastName,
+            firstName, lastName, email,
             contactDetails: parseJSON(contactDetails),
             identityDetails: parseJSON(identityDetails),
             academicQualifications: parseJSON(academicQualifications),
@@ -188,6 +188,8 @@ const updateFaculty = async (req, res) => {
         if (req.body.password && req.body.password.trim() !== '') {
             userUpdates.password = req.body.password;
         }
+
+        console.log('Update Debug:', { userId: faculty.userId, userUpdates, emailArg: email });
 
         if (Object.keys(userUpdates).length > 0) {
             await User.update(userUpdates, { where: { id: faculty.userId }, individualHooks: true, transaction: t });

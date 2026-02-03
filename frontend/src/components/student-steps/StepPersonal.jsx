@@ -87,6 +87,14 @@ const StepPersonal = ({ formData, handleChange, errors = {} }) => {
                         <input type="text" name="abcId" value={formData.abcId} onChange={handleChange} className="input-field" placeholder="Academic Bank of Credits" />
                     </div>
                     <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">PAN Number</label>
+                        <input type="text" name="pan" value={formData.pan || ''} onChange={handleChange} className="input-field" />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Voter ID</label>
+                        <input type="text" name="voterId" value={formData.voterId || ''} onChange={handleChange} className="input-field" />
+                    </div>
+                    <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Religion</label>
                         <input type="text" name="religion" value={formData.religion} onChange={handleChange} className="input-field" />
                     </div>
@@ -111,6 +119,22 @@ const StepPersonal = ({ formData, handleChange, errors = {} }) => {
                         <select name="maritalStatus" value={formData.maritalStatus} onChange={handleChange} className="input-field">
                             <option value="Unmarried">Unmarried</option>
                             <option value="Married">Married</option>
+                            <option value="Divorced">Divorced</option>
+                            <option value="Widowed">Widowed</option>
+                        </select>
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Blood Group</label>
+                        <select name="bloodGroup" value={formData.bloodGroup || ''} onChange={handleChange} className="input-field">
+                            <option value="">Select</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
                         </select>
                     </div>
                 </div>

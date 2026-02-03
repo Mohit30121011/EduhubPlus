@@ -4,7 +4,7 @@ const { sequelize } = require('../config/db');
 
 // @desc    Get all faculty
 // @route   GET /api/faculty
-// @access  Private
+// @access  Private/Admin
 const getFaculty = async (req, res) => {
     try {
         const faculty = await Faculty.findAll({
@@ -12,7 +12,7 @@ const getFaculty = async (req, res) => {
                 model: User,
                 attributes: ['email', 'isActive']
             },
-            order: [['firstName', 'ASC']]
+            order: [['createdAt', 'DESC']]
         });
         res.json(faculty);
     } catch (error) {
@@ -27,37 +27,99 @@ const createFaculty = async (req, res) => {
     const t = await sequelize.transaction();
 
     try {
+        // 1. Process Files
+        const documents = {};
+        if (req.files) {
+            Object.keys(req.files).forEach(key => {
+                const file = req.files[key][0];
+                documents[key] = {
+                    name: file.originalname,
+                    url: file.path, // Cloudinary URL
+                    publicId: file.filename
+                };
+            });
+        }
+
+        // 2. Parse Body Data
+        const parseJSON = (field) => {
+            try {
+                return typeof field === 'string' ? JSON.parse(field) : field;
+            } catch (e) {
+                return field;
+            }
+        };
+
         const {
-            email, password, employeeId, firstName, lastName,
-            designation, department, specialization, phone
+            email, firstName, lastName, password,
+            contactDetails, identityDetails, academicQualifications,
+            professionalDetails, experienceDetails, researchDetails,
+            bankDetails, institutionalInfo, emergencyContact, declaration,
+            ...otherData
         } = req.body;
 
-        // 1. Create User
+        const parsedProfessionalDetails = parseJSON(professionalDetails);
+        const employeeId = parsedProfessionalDetails?.employeeCode || `FAC${Date.now()}`;
+
+        const facultyData = {
+            ...otherData,
+            email, firstName, lastName, employeeId,
+            contactDetails: parseJSON(contactDetails),
+            identityDetails: parseJSON(identityDetails),
+            academicQualifications: parseJSON(academicQualifications),
+            professionalDetails: parsedProfessionalDetails,
+            experienceDetails: parseJSON(experienceDetails),
+            researchDetails: parseJSON(researchDetails),
+            bankDetails: parseJSON(bankDetails),
+            institutionalInfo: parseJSON(institutionalInfo),
+            emergencyContact: parseJSON(emergencyContact),
+            declaration: parseJSON(declaration),
+            documents, // Attach uploaded docs
+            photoUrl: documents.photo ? documents.photo.url : null
+        };
+
+        // 3. Create User
+        // Default password to employeeId
+        const userPassword = password || employeeId;
+
         const user = await User.create({
             email,
-            password,
+            password: userPassword,
             role: 'FACULTY'
         }, { transaction: t });
 
-        // 2. Create Faculty Profile
+        // 4. Create Faculty Profile
         const faculty = await Faculty.create({
-            userId: user.id,
-            employeeId,
-            firstName,
-            lastName,
-            designation,
-            department,
-            specialization,
-            phone
+            ...facultyData,
+            userId: user.id
         }, { transaction: t });
 
         await t.commit();
-        res.status(201).json(faculty);
 
+        res.status(201).json(faculty);
     } catch (error) {
         await t.rollback();
+        console.error('Error creating faculty:', error);
         res.status(400).json({ message: error.message });
     }
 };
 
-module.exports = { getFaculty, createFaculty };
+// @desc    Get faculty profile by ID
+// @route   GET /api/faculty/:id
+// @access  Private
+const getFacultyById = async (req, res) => {
+    try {
+        const faculty = await Faculty.findByPk(req.params.id, {
+            include: { model: User, attributes: ['email', 'role'] }
+        });
+
+        if (faculty) {
+            res.json(faculty);
+        } else {
+            res.status(404).json({ message: 'Faculty not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { getFaculty, createFaculty, getFacultyById };

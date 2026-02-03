@@ -23,6 +23,25 @@ const StepDocuments = ({ formData, handleChange, handleFileChange, errors = {} }
         </div>
     );
 
+    const defaultDocs = [
+        { key: 'photo', label: 'Passport Photo' },
+        { key: 'studentSignature', label: 'Student Signature' },
+        { key: 'parentSignature', label: 'Parent Signature' },
+        { key: 'idProof', label: 'ID Proof (Aadhar/Passport)' },
+        { key: 'classXMarksheet', label: 'Class X Marksheet' },
+        { key: 'classXIIMarksheet', label: 'Class XII Marksheet' },
+        { key: 'graduationMarksheet', label: 'Graduation Marksheet' },
+        { key: 'transferCertificate', label: 'Transfer Certificate' },
+        { key: 'migrationCertificate', label: 'Migration Certificate' },
+        { key: 'characterCertificate', label: 'Character Certificate' },
+        { key: 'casteCertificate', label: 'Caste Certificate' },
+        { key: 'incomeCertificate', label: 'Income Certificate' },
+        { key: 'domicileCertificate', label: 'Domicile Certificate' },
+        { key: 'disabilityCertificate', label: 'Disability Certificate' }
+    ];
+
+    const docsToRender = formData.docList || defaultDocs;
+
     return (
         <div className="space-y-8 animate-fadeIn">
             {/* 10. Documents Upload */}
@@ -34,23 +53,7 @@ const StepDocuments = ({ formData, handleChange, handleFileChange, errors = {} }
                 <div className="bg-white/50 p-6 rounded-2xl border border-white/60 shadow-sm backdrop-blur-sm">
                     <h4 className="font-bold text-gray-800 mb-4">Certificates & Proofs</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                        {renderFileUpload('photo', 'Passport Photo')}
-                        {renderFileUpload('studentSignature', 'Student Signature')}
-                        {renderFileUpload('parentSignature', 'Parent Signature')}
-                        {renderFileUpload('idProof', 'ID Proof (Aadhar/Passport)')}
-
-                        {renderFileUpload('classXMarksheet', 'Class X Marksheet')}
-                        {renderFileUpload('classXIIMarksheet', 'Class XII Marksheet')}
-                        {renderFileUpload('graduationMarksheet', 'Graduation Marksheet')}
-                        {renderFileUpload('transferCertificate', 'Transfer Certificate')}
-
-                        {renderFileUpload('migrationCertificate', 'Migration Certificate')}
-                        {renderFileUpload('characterCertificate', 'Character Certificate')}
-                        {renderFileUpload('casteCertificate', 'Caste Certificate')}
-                        {renderFileUpload('incomeCertificate', 'Income Certificate')}
-
-                        {renderFileUpload('domicileCertificate', 'Domicile Certificate')}
-                        {renderFileUpload('disabilityCertificate', 'Disability Certificate')}
+                        {docsToRender.map(doc => renderFileUpload(doc.key, doc.label))}
                     </div>
                 </div>
             </section>

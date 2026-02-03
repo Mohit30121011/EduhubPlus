@@ -38,15 +38,28 @@ const studentDocumentStorage = new CloudinaryStorage({
     params: {
         folder: 'icms/student-docs',
         allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
-        resource_type: 'auto' // Important for PDFs
+        resource_type: 'auto'
     }
 });
 
 const uploadStudentDocs = multer({ storage: studentDocumentStorage });
 
+// Storage for faculty documents
+const facultyDocumentStorage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'icms/faculty-docs',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
+        resource_type: 'auto'
+    }
+});
+
+const uploadFacultyDocs = multer({ storage: facultyDocumentStorage });
+
 module.exports = {
     cloudinary,
     uploadAvatar,
     uploadLogo,
-    uploadStudentDocs
+    uploadStudentDocs,
+    uploadFacultyDocs
 };

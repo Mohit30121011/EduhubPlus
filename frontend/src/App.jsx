@@ -8,6 +8,7 @@ import DashboardLayout from './components/layout/DashboardLayout';
 import StudentList from './pages/StudentList';
 import AddStudent from './pages/AddStudent';
 import FacultyList from './pages/FacultyList';
+import AddFaculty from './pages/AddFaculty';
 import Attendance from './pages/Attendance';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
 import EnquiryList from './pages/EnquiryList';
@@ -53,6 +54,7 @@ function App() {
                     <Route path="students/add" element={<AddStudent />} />
 
                     <Route path="faculty" element={<FacultyList />} />
+                    <Route path="faculty/add" element={<AddFaculty />} />
                     <Route path="staff" element={<FacultyList />} /> {/* Mapping Staff to Faculty for now */}
 
                     <Route path="tasks" element={<Tasks />} />

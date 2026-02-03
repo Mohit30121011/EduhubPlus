@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 
-const steps = [
+const STUDENT_STEPS = [
     { id: 1, label: 'Personal' },
     { id: 2, label: 'Family' },
     { id: 3, label: 'Academic' },
@@ -10,7 +10,7 @@ const steps = [
     { id: 5, label: 'Docs' }
 ];
 
-const EnrollmentStepper = ({ currentStep }) => {
+const EnrollmentStepper = ({ currentStep, steps = STUDENT_STEPS }) => {
     return (
         <div className="w-full py-6 px-4">
             <div className="relative flex items-center justify-between max-w-3xl mx-auto">

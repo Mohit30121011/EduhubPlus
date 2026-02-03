@@ -137,12 +137,12 @@ const AddStudent = () => {
                 if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required';
                 if (!formData.phone?.trim()) newErrors.phone = 'Phone number is required';
                 if (!formData.email?.trim()) newErrors.email = 'Email is required';
-                else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Invalid email format';
+                else if (!/\S+@\S+\.\S/.test(formData.email)) newErrors.email = 'Invalid email format';
                 if (formData.aadharNumber && formData.aadharNumber.length !== 12) newErrors.aadharNumber = 'Aadhar must be 12 digits';
                 break;
             case 2: // Family
                 if (!formData.familyDetails?.father?.name?.trim()) newErrors.fatherName = 'Father\'s name is required';
-                if (!formData.familyDetails?.father?.mobile?.trim()) newErrors.fatherMobile = 'Father\'s mobile is required';
+                if (!formData.familyDetails?.father?.contact?.trim()) newErrors.fatherMobile = 'Father\'s mobile is required';
                 break;
             case 3: // Academic
                 if (!formData.department) newErrors.department = 'Department is required';
@@ -332,7 +332,7 @@ const AddStudent = () => {
 
                                 // Family
                                 { header: 'Father Name', key: 'familyDetails.father.name' },
-                                { header: 'Father Mobile', key: 'familyDetails.father.mobile' },
+                                { header: 'Father Mobile', key: 'familyDetails.father.contact' },
                                 { header: 'Mother Name', key: 'familyDetails.mother.name' },
 
                                 // Academic

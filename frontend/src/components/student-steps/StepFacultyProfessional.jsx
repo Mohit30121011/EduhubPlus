@@ -187,6 +187,19 @@ const StepFacultyProfessional = ({ formData, handleChange, errors = {} }) => {
                             <option value="Not Applicable">Not Applicable</option>
                         </select>
                     </div>
+                    {formData.researchDetails?.phdStatus === 'Pursuing' && (
+                        <div className="space-y-1">
+                            <label className="text-sm font-semibold text-gray-700">Guide / Supervisor Details</label>
+                            <input
+                                type="text"
+                                name="guideDetails"
+                                value={formData.researchDetails?.guideDetails || ''}
+                                onChange={(e) => handleChange(e, 'researchDetails')}
+                                className="input-field"
+                                placeholder="Name & Affiliation"
+                            />
+                        </div>
+                    )}
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Research Area / Interests</label>
                         <textarea
@@ -255,6 +268,14 @@ const StepFacultyProfessional = ({ formData, handleChange, errors = {} }) => {
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Subjects Handled</label>
                         <input type="text" name="subjects" value={formData.institutionalInfo?.subjects || ''} onChange={(e) => handleChange(e, 'institutionalInfo')} className="input-field" placeholder="Comma separated" />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Timetable Preferences</label>
+                        <input type="text" name="timetable" value={formData.institutionalInfo?.timetable || ''} onChange={(e) => handleChange(e, 'institutionalInfo')} className="input-field" placeholder="e.g. Morning slots" />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Committee Memberships</label>
+                        <input type="text" name="committees" value={formData.institutionalInfo?.committees || ''} onChange={(e) => handleChange(e, 'institutionalInfo')} className="input-field" placeholder="e.g. Exam Cell, Discipline" />
                     </div>
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Additional Responsibilities</label>

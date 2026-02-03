@@ -158,6 +158,15 @@ const StepFamily = ({ formData, handleChange, errors = {} }) => {
                                     className="input-field bg-white"
                                 />
                             </div>
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-gray-500">Address</label>
+                                <input
+                                    type="text"
+                                    value={formData.emergencyContact?.address || ''}
+                                    onChange={(e) => handleChange(e, 'emergencyContact', 'address')}
+                                    className="input-field bg-white"
+                                />
+                            </div>
                         </div>
                     </div>
 

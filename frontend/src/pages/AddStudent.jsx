@@ -28,7 +28,7 @@ const AddStudent = () => {
         const fetchMasterData = async () => {
             try {
                 console.log('Fetching master data...');
-                const res = await axios.get('http://localhost:5000/api/master/all', {
+                const res = await axios.get('http://localhost:5000/api/academic/all', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 console.log('Master Data Response:', res.data);

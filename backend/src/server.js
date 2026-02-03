@@ -40,7 +40,7 @@ app.use('/api/settings', require('./routes/settingsRoutes'));
 app.use('/api/students', require('./routes/studentRoutes'));
 app.use('/api/faculty', require('./routes/facultyRoutes'));
 app.use('/api/attendance', require('./routes/attendanceRoutes')); // Attendance Routes
-app.use('/api/master', require('./routes/masterRoutes')); // Master Data Routes
+app.use('/api/academic', require('./routes/masterRoutes')); // Master Data Routes (Renamed to generic 'academic' to avoid adblockers)
 app.use('/api/upload', require('./routes/uploadRoutes')); // File Upload Routes
 app.use('/api/import', require('./routes/importRoutes')); // Excel Import Routes
 app.use('/api/admin', require('./routes/adminRoutes')); // Admin Management Routes

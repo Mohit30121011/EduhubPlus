@@ -8,29 +8,25 @@ import * as XLSX from 'xlsx';
 
 const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Export', circular = false }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const dropdownRef = useRef(null);
+    const buttonRef = useRef(null);
+    const menuRef = useRef(null);
     const [position, setPosition] = useState({ top: 0, left: 0 });
 
-    // Close dropdown when clicking outside
+    // Close dropdown when clicking outside (check both button and menu)
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            const clickedButton = buttonRef.current?.contains(event.target);
+            const clickedMenu = menuRef.current?.contains(event.target);
+
+            if (!clickedButton && !clickedMenu) {
                 setIsOpen(false);
             }
         };
 
-        // Also close on scroll to avoid detached menu floating
-        const handleScroll = () => {
-            if (isOpen) setIsOpen(false);
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        window.addEventListener('scroll', handleScroll, true); // Capture phase for all scrollables
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-            window.removeEventListener('scroll', handleScroll, true);
-        };
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => document.removeEventListener('mousedown', handleClickOutside);
+        }
     }, [isOpen]);
 
     // Helper to access nested keys (e.g., "familyDetails.father.name")
@@ -47,7 +43,7 @@ const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Expo
             ...data.map(row =>
                 columns.map(col => {
                     let value = getNestedValue(row, col.key);
-                    if (typeof value === 'object') value = JSON.stringify(value); // Handle arrays/objects
+                    if (typeof value === 'object') value = JSON.stringify(value);
                     if (typeof value === 'string' && value.includes(',')) {
                         value = `"${value}"`;
                     }
@@ -75,8 +71,6 @@ const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Expo
 
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(wsData);
-
-        // Set column widths
         ws['!cols'] = columns.map(() => ({ wch: 20 }));
 
         XLSX.utils.book_append_sheet(wb, ws, 'Data');
@@ -89,69 +83,34 @@ const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Expo
         const doc = new jsPDF();
         const headers = columns.map(col => col.header || col.key);
 
-        // Add title with gradient-like effect
-        doc.setFillColor(59, 130, 246); // Blue
+        doc.setFillColor(59, 130, 246);
         doc.rect(0, 0, 220, 30, 'F');
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
         doc.text(title, 14, 20);
 
-        // Add date
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         doc.text(`Generated: ${new Date().toLocaleDateString('en-IN', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+            day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
         })}`, 14, 40);
 
-        // Prepare table data
-        const tableData = data.map(row =>
-            columns.map(col => getNestedValue(row, col.key) || '-')
-        );
+        const tableData = data.map(row => columns.map(col => getNestedValue(row, col.key) || '-'));
 
-        // Add styled table
         doc.autoTable({
             head: [headers],
             body: tableData,
             startY: 50,
             theme: 'grid',
-            headStyles: {
-                fillColor: [31, 41, 55], // Gray-800
-                textColor: [255, 255, 255],
-                fontStyle: 'bold',
-                fontSize: 10,
-                cellPadding: 5,
-                halign: 'left'
-            },
-            bodyStyles: {
-                fontSize: 9,
-                cellPadding: 4,
-                textColor: [55, 65, 81], // Gray-700
-                lineColor: [229, 231, 235], // Gray-200
-                lineWidth: 0.5
-            },
-            alternateRowStyles: {
-                fillColor: [249, 250, 251] // Gray-50
-            },
-            columnStyles: columns.reduce((acc, col, index) => {
-                acc[index] = { cellWidth: 'auto' };
-                return acc;
-            }, {}),
+            headStyles: { fillColor: [31, 41, 55], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 10, cellPadding: 5 },
+            bodyStyles: { fontSize: 9, cellPadding: 4, textColor: [55, 65, 81], lineColor: [229, 231, 235], lineWidth: 0.5 },
+            alternateRowStyles: { fillColor: [249, 250, 251] },
             margin: { left: 14, right: 14 },
-            didDrawPage: (data) => {
-                // Add footer
+            didDrawPage: () => {
                 doc.setFontSize(8);
                 doc.setTextColor(156, 163, 175);
-                doc.text(
-                    `Page ${doc.internal.getNumberOfPages()}`,
-                    doc.internal.pageSize.width / 2,
-                    doc.internal.pageSize.height - 10,
-                    { align: 'center' }
-                );
+                doc.text(`Page ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 10, { align: 'center' });
             }
         });
 
@@ -165,23 +124,36 @@ const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Expo
         { label: 'PDF File', icon: File, action: exportPDF, color: 'text-red-600', bg: 'bg-red-50' }
     ];
 
-    // Open Handler with positioning logic
+    const MENU_WIDTH = 192; // 12rem
+
     const toggleOpen = () => {
-        if (!isOpen && dropdownRef.current) {
-            const rect = dropdownRef.current.getBoundingClientRect();
-            // Position: below the button, aligned to the right edge.
-            // Using viewport coordinates directly.
+        if (!isOpen && buttonRef.current) {
+            const rect = buttonRef.current.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+
+            // Calculate left: try to align right edge of menu with right edge of button
+            let left = rect.right - MENU_WIDTH;
+
+            // Boundary check: don't go off left edge
+            if (left < 8) left = 8;
+
+            // Boundary check: don't go off right edge
+            if (left + MENU_WIDTH > viewportWidth - 8) {
+                left = viewportWidth - MENU_WIDTH - 8;
+            }
+
             setPosition({
                 top: rect.bottom + 8,
-                left: rect.right - 200 // Align right edge
+                left: left
             });
         }
         setIsOpen(!isOpen);
     };
 
     return (
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative">
             <motion.button
+                ref={buttonRef}
                 onClick={toggleOpen}
                 whileHover={{ scale: circular ? 1.1 : 1.02 }}
                 whileTap={{ scale: circular ? 0.9 : 0.98 }}
@@ -200,11 +172,12 @@ const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Expo
                 )}
             </motion.button>
 
-            {/* Portal to Body to escape all stacking contexts */}
+            {/* Portal to document.body */}
             {createPortal(
                 <AnimatePresence>
                     {isOpen && (
                         <motion.div
+                            ref={menuRef}
                             initial={{ opacity: 0, y: -10, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -213,20 +186,15 @@ const ExportDropdown = ({ data, columns, filename = 'export', title = 'Data Expo
                                 position: 'fixed',
                                 top: position.top,
                                 left: position.left,
-                                zIndex: 9999,
-                                width: '12rem' // w-48
+                                zIndex: 99999,
+                                width: MENU_WIDTH
                             }}
-                            className="bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden"
-                            // Stop propagation to prevent immediate close if clicking inside (though handled by ref check)
-                            onMouseDown={(e) => e.stopPropagation()}
+                            className="bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden"
                         >
                             {options.map((option, index) => (
                                 <button
                                     key={index}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        option.action();
-                                    }}
+                                    onClick={() => option.action()}
                                     className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left"
                                 >
                                     <div className={`p-2 rounded-lg ${option.bg}`}>

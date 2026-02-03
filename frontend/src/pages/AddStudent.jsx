@@ -191,10 +191,29 @@ const AddStudent = () => {
         const toastId = toast.loading('Submitting application...');
 
         try {
-            // Construct Payload matching Backend Schema
-            const payload = {
-                ...formData,
-                // Combine addresses and contacts into contactDetails
+            // Construct FormData for multipart/form-data submission
+            const submissionData = new FormData();
+
+            // 1. Append Top-Level Fields
+            submissionData.append('enrollmentNo', formData.enrollmentNo || `EN${Date.now()}`);
+            submissionData.append('firstName', formData.firstName);
+            submissionData.append('middleName', formData.middleName || '');
+            submissionData.append('lastName', formData.lastName);
+            submissionData.append('email', formData.email);
+            submissionData.append('phone', formData.phone);
+            submissionData.append('dateOfBirth', formData.dateOfBirth);
+            submissionData.append('gender', formData.gender);
+            submissionData.append('category', formData.category);
+            submissionData.append('regionalName', formData.regionalName || '');
+            submissionData.append('religion', formData.religion || '');
+            submissionData.append('motherTongue', formData.motherTongue || '');
+            submissionData.append('nationality', formData.nationality || 'Indian');
+            submissionData.append('maritalStatus', formData.maritalStatus || 'Unmarried');
+            submissionData.append('department', formData.department);
+            submissionData.append('course', formData.course);
+
+            // 2. Append Nested Objects as JSON Strings
+            const nestedObjects = {
                 contactDetails: {
                     permanentAddress: formData.permanentAddress,
                     correspondenceAddress: formData.correspondenceAddress,
@@ -202,30 +221,32 @@ const AddStudent = () => {
                     alternateEmail: formData.alternateEmail,
                     emergencyContact: formData.emergencyContact
                 },
-                // Ensure familyDetails is structure correct
                 familyDetails: formData.familyDetails,
-                // Ensure academicHistory is correct
                 academicHistory: formData.academicHistory,
-                // Ensure admissionDetails
                 admissionDetails: formData.admissionDetails,
-                // Ensure other groups
                 hostelTransport: formData.hostelTransport,
                 medicalInfo: formData.medicalInfo,
                 feeDetails: formData.feeDetails,
-                entranceExam: formData.entranceExam,
-
-                // Top Level Fields required by Backend
-                // Users Model: email, password (default to enrollmentNo)
-                // Student Model: enrollmentNo, firstName, lastName, etc.
-                enrollmentNo: formData.enrollmentNo || `EN${Date.now()}`, // Fallback generation
-                // Note: documents are excluded from JSON payload for now as they are Files
-                documents: {} // TODO: Handle File Uploads via FormData
+                entranceExam: formData.entranceExam
             };
 
+            Object.entries(nestedObjects).forEach(([key, value]) => {
+                submissionData.append(key, JSON.stringify(value));
+            });
+
+            // 3. Append Files
+            if (formData.documents) {
+                Object.entries(formData.documents).forEach(([key, file]) => {
+                    if (file instanceof File) {
+                        submissionData.append(key, file);
+                    }
+                });
+            }
+
             const token = localStorage.getItem('token');
-            const response = await axios.post('http://localhost:5000/api/students', payload, {
+            const response = await axios.post('http://localhost:5000/api/students', submissionData, {
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`
                 }
             });

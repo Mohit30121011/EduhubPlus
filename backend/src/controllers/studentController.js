@@ -27,13 +27,50 @@ const createStudent = async (req, res) => {
     const t = await sequelize.transaction();
 
     try {
+        // 1. Process Files
+        const documents = {};
+        if (req.files) {
+            Object.keys(req.files).forEach(key => {
+                const file = req.files[key][0];
+                documents[key] = {
+                    name: file.originalname,
+                    url: file.path, // Cloudinary URL
+                    publicId: file.filename
+                };
+            });
+        }
+
+        // 2. Parse Body Data (FormData sends everything as strings)
+        const parseJSON = (field) => {
+            try {
+                return typeof field === 'string' ? JSON.parse(field) : field;
+            } catch (e) {
+                return field;
+            }
+        };
+
         const {
-            email, enrollmentNo, firstName, lastName,
-            // Extract other fields if necessary for User creation or validation
-            password // Optional, otherwise default to enrollmentNo
+            email, enrollmentNo, firstName, lastName, password,
+            contactDetails, familyDetails, academicHistory,
+            admissionDetails, hostelTransport, medicalInfo,
+            feeDetails, entranceExam, ...otherData
         } = req.body;
 
-        // 1. Create User
+        const studentData = {
+            ...otherData,
+            email, enrollmentNo, firstName, lastName,
+            contactDetails: parseJSON(contactDetails),
+            familyDetails: parseJSON(familyDetails),
+            academicHistory: parseJSON(academicHistory),
+            admissionDetails: parseJSON(admissionDetails),
+            hostelTransport: parseJSON(hostelTransport),
+            medicalInfo: parseJSON(medicalInfo),
+            feeDetails: parseJSON(feeDetails),
+            entranceExam: parseJSON(entranceExam),
+            documents // Attach uploaded docs
+        };
+
+        // 3. Create User
         // Default password to enrollmentNo if not provided
         const userPassword = password || enrollmentNo;
 
@@ -43,10 +80,9 @@ const createStudent = async (req, res) => {
             role: 'STUDENT'
         }, { transaction: t });
 
-        // 2. Create Student Profile
-        // Spread the entire body, but ensure userId is set
+        // 4. Create Student Profile
         const student = await Student.create({
-            ...req.body,
+            ...studentData,
             userId: user.id
         }, { transaction: t });
 

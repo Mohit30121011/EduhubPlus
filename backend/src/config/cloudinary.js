@@ -32,8 +32,21 @@ const logoStorage = new CloudinaryStorage({
 const uploadAvatar = multer({ storage: avatarStorage });
 const uploadLogo = multer({ storage: logoStorage });
 
+// Storage for student documents
+const studentDocumentStorage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'icms/student-docs',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
+        resource_type: 'auto' // Important for PDFs
+    }
+});
+
+const uploadStudentDocs = multer({ storage: studentDocumentStorage });
+
 module.exports = {
     cloudinary,
     uploadAvatar,
-    uploadLogo
+    uploadLogo,
+    uploadStudentDocs
 };

@@ -245,7 +245,7 @@ const AddStudent = () => {
             case 1: return <StepPersonal formData={formData} handleChange={(e, sec, subsec) => handleChange(e, sec, subsec)} errors={errors} />;
             case 2: return <StepFamily formData={formData} handleChange={(e, sec, subsec, fld) => handleChange(e, sec, subsec, fld)} errors={errors} />;
             case 3: return <StepAcademic formData={formData} handleChange={(e, sec, subsec, fld) => handleChange(e, sec, subsec, fld)} departments={departments} courses={courses} errors={errors} />;
-            case 4: return <StepOther formData={formData} handleChange={(e, sec, subsec) => handleChange(e, sec, subsec)} errors={errors} />;
+            case 4: return <StepOther formData={formData} handleChange={(e, sec, subsec) => handleChange(e, sec, subsec)} errors={errors} courses={courses} />;
             case 5: return <StepDocuments formData={formData} handleChange={handleChange} handleFileChange={handleFileChange} errors={errors} />;
             default: return null;
         }

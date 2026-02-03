@@ -1,7 +1,17 @@
-import React from 'react';
-import { Home, Bus, Activity, CreditCard } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { Home, Bus, Activity, CreditCard, IndianRupee } from 'lucide-react';
 
-const StepOther = ({ formData, handleChange }) => {
+const StepOther = ({ formData, handleChange, errors = {}, courses = [] }) => {
+
+    // Calculate fee details based on selected course
+    const selectedCourse = useMemo(() => {
+        return courses.find(c => c.id === formData.course);
+    }, [courses, formData.course]);
+
+    const totalFee = selectedCourse?.fees || 0;
+    const amountPaid = parseFloat(formData.feeDetails?.amount) || 0;
+    const remainingAmount = Math.max(0, totalFee - amountPaid);
+
     return (
         <div className="space-y-8 animate-fadeIn">
             {/* 8. Hostel & Transport */}
@@ -126,12 +136,49 @@ const StepOther = ({ formData, handleChange }) => {
                     Fee & Payment Details
                 </h3>
                 <div className="bg-white/50 p-5 rounded-2xl border border-white/60 shadow-sm backdrop-blur-sm">
+                    {/* Fee Summary Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-100">
+                            <p className="text-sm text-gray-600 mb-1">Total Course Fee</p>
+                            <p className="text-2xl font-bold text-blue-600 flex items-center gap-1">
+                                <IndianRupee size={20} />
+                                {totalFee.toLocaleString('en-IN')}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">{selectedCourse?.name || 'Select a course'}</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl border border-green-100">
+                            <p className="text-sm text-gray-600 mb-1">Amount Paid</p>
+                            <p className="text-2xl font-bold text-green-600 flex items-center gap-1">
+                                <IndianRupee size={20} />
+                                {amountPaid.toLocaleString('en-IN')}
+                            </p>
+                        </div>
+                        <div className="bg-gradient-to-br from-orange-50 to-amber-50 p-4 rounded-xl border border-orange-100">
+                            <p className="text-sm text-gray-600 mb-1">Remaining Amount</p>
+                            <p className={`text-2xl font-bold flex items-center gap-1 ${remainingAmount > 0 ? 'text-orange-600' : 'text-green-600'}`}>
+                                <IndianRupee size={20} />
+                                {remainingAmount.toLocaleString('en-IN')}
+                            </p>
+                            {remainingAmount === 0 && totalFee > 0 && (
+                                <p className="text-xs text-green-600 mt-1">✓ Fully Paid</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Payment Input Fields */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="space-y-1">
                             <label className="text-sm font-semibold text-gray-700">Amount Paid</label>
                             <div className="relative">
                                 <span className="absolute left-3 top-2.5 text-gray-500">₹</span>
-                                <input type="number" value={formData.feeDetails?.amount || ''} onChange={(e) => handleChange(e, 'feeDetails', 'amount')} className="input-field pl-8" />
+                                <input
+                                    type="number"
+                                    value={formData.feeDetails?.amount || ''}
+                                    onChange={(e) => handleChange(e, 'feeDetails', 'amount')}
+                                    className="input-field pl-8"
+                                    placeholder="Enter amount"
+                                    max={totalFee}
+                                />
                             </div>
                         </div>
                         <div className="space-y-1">

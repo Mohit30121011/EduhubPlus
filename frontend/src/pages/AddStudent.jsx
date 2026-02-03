@@ -360,7 +360,7 @@ const AddStudent = () => {
                             onClick={nextStep}
                             className="min-w-[160px] px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-full hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
                         >
-                            Next Step
+                            Next
                             <ChevronRight size={20} strokeWidth={2.5} />
                         </button>
                     ) : (

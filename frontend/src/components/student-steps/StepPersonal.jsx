@@ -173,6 +173,10 @@ const StepPersonal = ({ formData, handleChange, errors = {} }) => {
                         <label className="text-sm font-semibold text-gray-700">Alt Email ID</label>
                         <input type="email" name="alternateEmail" value={formData.alternateEmail} onChange={handleChange} className="input-field" />
                     </div>
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Login Password</label>
+                        <input type="text" name="password" value={formData.password} onChange={handleChange} className="input-field" placeholder="Set login password" />
+                    </div>
                 </div>
 
                 {/* Permanent Address */}

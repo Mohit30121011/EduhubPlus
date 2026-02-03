@@ -182,9 +182,15 @@ const updateFaculty = async (req, res) => {
         // 3. Update Faculty
         await faculty.update(facultyData, { transaction: t });
 
-        // 4. Update User (Email) if changed
-        if (email) {
-            await User.update({ email }, { where: { id: faculty.userId }, transaction: t });
+        // 4. Update User (Email & Password)
+        const userUpdates = {};
+        if (email) userUpdates.email = email;
+        if (req.body.password && req.body.password.trim() !== '') {
+            userUpdates.password = req.body.password;
+        }
+
+        if (Object.keys(userUpdates).length > 0) {
+            await User.update(userUpdates, { where: { id: faculty.userId }, individualHooks: true, transaction: t });
         }
 
         await t.commit();

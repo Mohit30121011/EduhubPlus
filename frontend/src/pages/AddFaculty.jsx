@@ -37,7 +37,7 @@ const AddFaculty = () => {
         domicileState: '', category: 'GENERAL', subCategory: '', religion: '',
         aadharNumber: '', passportNumber: '', pan: '', voterId: '',
         motherTongue: '', maritalStatus: 'Unmarried', bloodGroup: '',
-        phone: '', alternateMobile: '', email: '', alternateEmail: '',
+        phone: '', alternateMobile: '', email: '', alternateEmail: '', password: '',
         permanentAddress: { street: '', city: '', state: '', pincode: '', country: 'India' },
         correspondenceAddress: { street: '', city: '', state: '', pincode: '', country: 'India' },
         sameAsPermanent: false,
@@ -240,7 +240,8 @@ const AddFaculty = () => {
             // Top Level
             const topLevel = ['firstName', 'middleName', 'lastName', 'gender', 'dateOfBirth',
                 'nationality', 'maritalStatus', 'bloodGroup', 'email', 'phone', 'alternateMobile', 'personalEmail',
-                'previousName', 'placeOfBirth', 'domicileState', 'category', 'subCategory', 'religion', 'motherTongue'
+                'previousName', 'placeOfBirth', 'domicileState', 'category', 'subCategory', 'religion', 'motherTongue',
+                'password' // Added password to collection
             ];
 
             topLevel.forEach(k => submissionData.append(k, formData[k] || ''));

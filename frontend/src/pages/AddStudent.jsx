@@ -124,6 +124,39 @@ const AddStudent = () => {
         });
     };
 
+    // Form Validation
+    const [errors, setErrors] = useState({});
+
+    const validateStep = (step) => {
+        const newErrors = {};
+
+        switch (step) {
+            case 1: // Personal
+                if (!formData.firstName?.trim()) newErrors.firstName = 'First name is required';
+                if (!formData.lastName?.trim()) newErrors.lastName = 'Last name is required';
+                if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required';
+                if (!formData.phone?.trim()) newErrors.phone = 'Phone number is required';
+                if (!formData.email?.trim()) newErrors.email = 'Email is required';
+                else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Invalid email format';
+                if (formData.aadharNumber && formData.aadharNumber.length !== 12) newErrors.aadharNumber = 'Aadhar must be 12 digits';
+                break;
+            case 2: // Family
+                if (!formData.familyDetails?.father?.name?.trim()) newErrors.fatherName = 'Father\'s name is required';
+                if (!formData.familyDetails?.father?.mobile?.trim()) newErrors.fatherMobile = 'Father\'s mobile is required';
+                break;
+            case 3: // Academic
+                if (!formData.department) newErrors.department = 'Department is required';
+                if (!formData.course) newErrors.course = 'Course is required';
+                break;
+            case 5: // Documents
+                if (!formData.declaration) newErrors.declaration = 'Please accept the declaration';
+                break;
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     // File Handler
     const handleFileChange = (e, key) => {
         const file = e.target.files[0];
@@ -139,7 +172,13 @@ const AddStudent = () => {
         }
     };
 
-    const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 5));
+    const nextStep = () => {
+        if (validateStep(currentStep)) {
+            setCurrentStep(prev => Math.min(prev + 1, 5));
+        } else {
+            toast.error('Please fill all required fields');
+        }
+    };
     const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
     const handleSubmit = async () => {
@@ -203,11 +242,11 @@ const AddStudent = () => {
 
     const renderStep = () => {
         switch (currentStep) {
-            case 1: return <StepPersonal formData={formData} handleChange={(e, sec, subsec) => handleChange(e, sec, subsec)} />;
-            case 2: return <StepFamily formData={formData} handleChange={(e, sec, subsec, fld) => handleChange(e, sec, subsec, fld)} />;
-            case 3: return <StepAcademic formData={formData} handleChange={(e, sec, subsec, fld) => handleChange(e, sec, subsec, fld)} departments={departments} courses={courses} />;
-            case 4: return <StepOther formData={formData} handleChange={(e, sec, subsec) => handleChange(e, sec, subsec)} />;
-            case 5: return <StepDocuments formData={formData} handleChange={handleChange} handleFileChange={handleFileChange} />;
+            case 1: return <StepPersonal formData={formData} handleChange={(e, sec, subsec) => handleChange(e, sec, subsec)} errors={errors} />;
+            case 2: return <StepFamily formData={formData} handleChange={(e, sec, subsec, fld) => handleChange(e, sec, subsec, fld)} errors={errors} />;
+            case 3: return <StepAcademic formData={formData} handleChange={(e, sec, subsec, fld) => handleChange(e, sec, subsec, fld)} departments={departments} courses={courses} errors={errors} />;
+            case 4: return <StepOther formData={formData} handleChange={(e, sec, subsec) => handleChange(e, sec, subsec)} errors={errors} />;
+            case 5: return <StepDocuments formData={formData} handleChange={handleChange} handleFileChange={handleFileChange} errors={errors} />;
             default: return null;
         }
     };
@@ -307,9 +346,9 @@ const AddStudent = () => {
                     <button
                         onClick={prevStep}
                         disabled={currentStep === 1}
-                        className={`px-8 py-4 rounded-full font-bold flex items-center gap-3 transition-all ${currentStep === 1
+                        className={`min-w-[160px] px-6 py-4 rounded-full font-bold flex items-center justify-center gap-2 transition-all ${currentStep === 1
                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-100 shadow-sm hover:shadow-md'
+                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 shadow-sm hover:shadow-md'
                             }`}
                     >
                         <ChevronLeft size={20} strokeWidth={2.5} />
@@ -319,7 +358,7 @@ const AddStudent = () => {
                     {currentStep < 5 ? (
                         <button
                             onClick={nextStep}
-                            className="px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-full hover:shadow-xl hover:shadow-blue-500/20 flex items-center gap-3 transition-all transform hover:-translate-y-1"
+                            className="min-w-[160px] px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-full hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
                         >
                             Next Step
                             <ChevronRight size={20} strokeWidth={2.5} />
@@ -328,7 +367,7 @@ const AddStudent = () => {
                         <button
                             onClick={handleSubmit}
                             disabled={saving}
-                            className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-full hover:shadow-xl hover:shadow-emerald-500/20 flex items-center gap-3 transition-all transform hover:-translate-y-1"
+                            className="min-w-[180px] px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-full hover:shadow-xl hover:shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
                         >
                             {saving ? 'Submitting...' : 'Submit Application'}
                             {!saving && <Check size={20} strokeWidth={2.5} />}

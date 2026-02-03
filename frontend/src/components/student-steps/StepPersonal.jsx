@@ -1,7 +1,7 @@
 import React from 'react';
 import { User, Calendar, MapPin, Phone, Mail, FileText, Globe, Heart, Shield } from 'lucide-react';
 
-const StepPersonal = ({ formData, handleChange }) => {
+const StepPersonal = ({ formData, handleChange, errors = {} }) => {
     return (
         <div className="space-y-8 animate-fadeIn">
             {/* 1. Personal Information */}
@@ -12,16 +12,18 @@ const StepPersonal = ({ formData, handleChange }) => {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">First Name</label>
-                        <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} required className="input-field" placeholder="First Name" />
+                        <label className="text-sm font-semibold text-gray-700">First Name <span className="text-red-500">*</span></label>
+                        <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} required className={`input-field ${errors.firstName ? 'border-red-400' : ''}`} placeholder="First Name" />
+                        {errors.firstName && <p className="text-xs text-red-500 mt-1">{errors.firstName}</p>}
                     </div>
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Middle Name</label>
                         <input type="text" name="middleName" value={formData.middleName} onChange={handleChange} className="input-field" placeholder="Middle Name" />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Last Name</label>
-                        <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} required className="input-field" placeholder="Last Name" />
+                        <label className="text-sm font-semibold text-gray-700">Last Name <span className="text-red-500">*</span></label>
+                        <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} required className={`input-field ${errors.lastName ? 'border-red-400' : ''}`} placeholder="Last Name" />
+                        {errors.lastName && <p className="text-xs text-red-500 mt-1">{errors.lastName}</p>}
                     </div>
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Regional Name</label>
@@ -108,22 +110,24 @@ const StepPersonal = ({ formData, handleChange }) => {
                 {/* Contact */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
                     <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Mobile No.</label>
+                        <label className="text-sm font-semibold text-gray-700">Mobile No. <span className="text-red-500">*</span></label>
                         <div className="relative">
                             <Phone className="absolute left-3 top-2.5 text-gray-400" size={18} />
-                            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} required className="input-field pl-10" />
+                            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} required className={`input-field pl-10 ${errors.phone ? 'border-red-400' : ''}`} />
                         </div>
+                        {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone}</p>}
                     </div>
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Alt Mobile No.</label>
                         <input type="tel" name="alternateMobile" value={formData.alternateMobile} onChange={handleChange} className="input-field" />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Email ID</label>
+                        <label className="text-sm font-semibold text-gray-700">Email ID <span className="text-red-500">*</span></label>
                         <div className="relative">
                             <Mail className="absolute left-3 top-2.5 text-gray-400" size={18} />
-                            <input type="email" name="email" value={formData.email} onChange={handleChange} required className="input-field pl-10" />
+                            <input type="email" name="email" value={formData.email} onChange={handleChange} required className={`input-field pl-10 ${errors.email ? 'border-red-400' : ''}`} />
                         </div>
+                        {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
                     </div>
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Alt Email ID</label>

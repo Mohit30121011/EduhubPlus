@@ -212,6 +212,17 @@ const AddStudent = () => {
             submissionData.append('department', formData.department);
             submissionData.append('course', formData.course);
 
+            // Append missing top-level fields
+            submissionData.append('previousName', formData.previousName || '');
+            submissionData.append('placeOfBirth', formData.placeOfBirth || '');
+            submissionData.append('domicileState', formData.domicileState || '');
+            submissionData.append('subCategory', formData.subCategory || '');
+            submissionData.append('aadharNumber', formData.aadharNumber || '');
+            submissionData.append('passportNumber', formData.passportNumber || '');
+            submissionData.append('abcId', formData.abcId || '');
+            submissionData.append('place', formData.place || ''); // Declaration place
+            submissionData.append('date', formData.date || ''); // Declaration date
+
             // 2. Append Nested Objects as JSON Strings
             const nestedObjects = {
                 contactDetails: {

@@ -29,6 +29,10 @@ const StepPersonal = ({ formData, handleChange, errors = {} }) => {
                         <label className="text-sm font-semibold text-gray-700">Regional Name</label>
                         <input type="text" name="regionalName" value={formData.regionalName} onChange={handleChange} className="input-field" placeholder="In native language" />
                     </div>
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Previous Name</label>
+                        <input type="text" name="previousName" value={formData.previousName} onChange={handleChange} className="input-field" placeholder="If applicable" />
+                    </div>
 
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Date of Birth</label>
@@ -68,11 +72,19 @@ const StepPersonal = ({ formData, handleChange, errors = {} }) => {
                         <input type="text" name="subCategory" value={formData.subCategory} onChange={handleChange} className="input-field" placeholder="e.g. PwD, Defence" />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Aaadhar Number</label>
+                        <label className="text-sm font-semibold text-gray-700">Aadhar Number</label>
                         <div className="relative">
                             <Shield className="absolute left-3 top-2.5 text-gray-400" size={18} />
                             <input type="text" name="aadharNumber" value={formData.aadharNumber} onChange={handleChange} className="input-field pl-10" maxLength={12} placeholder="12 Digit UID" />
                         </div>
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Passport Number</label>
+                        <input type="text" name="passportNumber" value={formData.passportNumber} onChange={handleChange} className="input-field" placeholder="Optional" />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">ABC ID</label>
+                        <input type="text" name="abcId" value={formData.abcId} onChange={handleChange} className="input-field" placeholder="Academic Bank of Credits" />
                     </div>
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Religion</label>
@@ -85,6 +97,14 @@ const StepPersonal = ({ formData, handleChange, errors = {} }) => {
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Nationality</label>
                         <input type="text" name="nationality" value={formData.nationality} onChange={handleChange} className="input-field" defaultValue="Indian" />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Place of Birth</label>
+                        <input type="text" name="placeOfBirth" value={formData.placeOfBirth} onChange={handleChange} className="input-field" />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Domicile State</label>
+                        <input type="text" name="domicileState" value={formData.domicileState} onChange={handleChange} className="input-field" />
                     </div>
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Marital Status</label>

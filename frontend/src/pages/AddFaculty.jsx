@@ -22,6 +22,7 @@ const FACULTY_STEPS = [
 
 const AddFaculty = () => {
     const navigate = useNavigate();
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
     const [currentStep, setCurrentStep] = useState(1);
     const { token } = useSelector((state) => state.auth);
 
@@ -215,7 +216,7 @@ const AddFaculty = () => {
                 });
             }
 
-            const response = await axios.post('http://localhost:5000/api/faculty', submissionData, {
+            const response = await axios.post(`${API_URL}/faculty`, submissionData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`

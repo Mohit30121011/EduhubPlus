@@ -23,12 +23,14 @@ const AddStudent = () => {
     const [departments, setDepartments] = useState([]);
     const [courses, setCourses] = useState([]);
 
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
     // Fetch master data on mount
     useEffect(() => {
         const fetchMasterData = async () => {
             try {
                 console.log('Fetching master data...');
-                const res = await axios.get('http://localhost:5000/api/academic/all', {
+                const res = await axios.get(`${API_URL}/academic/all`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 console.log('Master Data Response:', res.data);
@@ -266,7 +268,7 @@ const AddStudent = () => {
             }
 
             const token = localStorage.getItem('token');
-            const response = await axios.post('http://localhost:5000/api/students', submissionData, {
+            const response = await axios.post(`${API_URL}/students`, submissionData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`

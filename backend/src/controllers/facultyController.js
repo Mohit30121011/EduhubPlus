@@ -66,7 +66,7 @@ const createFaculty = async (req, res) => {
             contactDetails: parseJSON(contactDetails),
             identityDetails: parseJSON(identityDetails),
             academicQualifications: parseJSON(academicQualifications),
-            professionalDetails: parsedProfessionalDetails,
+            ...parsedProfessionalDetails, // Spread flat fields: designation, department, etc.
             experienceDetails: parseJSON(experienceDetails),
             researchDetails: parseJSON(researchDetails),
             bankDetails: parseJSON(bankDetails),

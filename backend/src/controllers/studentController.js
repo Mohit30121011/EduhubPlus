@@ -115,4 +115,102 @@ const getStudentById = async (req, res) => {
     }
 };
 
-module.exports = { getStudents, createStudent, getStudentById };
+// @desc    Update student
+// @route   PUT /api/students/:id
+// @access  Private/Admin
+const updateStudent = async (req, res) => {
+    const t = await sequelize.transaction();
+    try {
+        const student = await Student.findByPk(req.params.id);
+        if (!student) {
+            await t.rollback();
+            return res.status(404).json({ message: 'Student not found' });
+        }
+
+        // 1. Process Files (Append to existing or replace)
+        let documents = student.documents || {};
+        if (req.files) {
+            Object.keys(req.files).forEach(key => {
+                const file = req.files[key][0];
+                documents[key] = {
+                    name: file.originalname,
+                    url: file.path,
+                    publicId: file.filename
+                };
+            });
+        }
+
+        // 2. Parse Body Data
+        const parseJSON = (field) => {
+            try { return typeof field === 'string' ? JSON.parse(field) : field; } catch (e) { return field; }
+        };
+
+        const {
+            email, enrollmentNo, firstName, lastName,
+            contactDetails, familyDetails, academicHistory,
+            admissionDetails, hostelTransport, medicalInfo,
+            feeDetails, entranceExam, ...otherData
+        } = req.body;
+
+        const studentData = {
+            ...otherData,
+            email, enrollmentNo, firstName, lastName,
+            contactDetails: parseJSON(contactDetails),
+            familyDetails: parseJSON(familyDetails),
+            academicHistory: parseJSON(academicHistory),
+            admissionDetails: parseJSON(admissionDetails),
+            hostelTransport: parseJSON(hostelTransport),
+            medicalInfo: parseJSON(medicalInfo),
+            feeDetails: parseJSON(feeDetails),
+            entranceExam: parseJSON(entranceExam),
+            documents
+        };
+
+        // 3. Update Student
+        await student.update(studentData, { transaction: t });
+
+        // 4. Update User (Email & Password)
+        const userUpdates = {};
+        if (email) userUpdates.email = email;
+        if (req.body.password && req.body.password.trim() !== '') {
+            userUpdates.password = req.body.password;
+        }
+
+        if (Object.keys(userUpdates).length > 0) {
+            await User.update(userUpdates, { where: { id: student.userId }, individualHooks: true, transaction: t });
+        }
+
+        await t.commit();
+        res.json(student);
+    } catch (error) {
+        await t.rollback();
+        console.error('Update Error:', error);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+// @desc    Delete student
+// @route   DELETE /api/students/:id
+// @access  Private/Admin
+const deleteStudent = async (req, res) => {
+    const t = await sequelize.transaction();
+    try {
+        const student = await Student.findByPk(req.params.id);
+
+        if (student) {
+            // Delete associated User (Cascade should delete Student)
+            await User.destroy({ where: { id: student.userId }, transaction: t });
+
+            await t.commit();
+            res.json({ message: 'Student removed' });
+        } else {
+            await t.rollback();
+            res.status(404).json({ message: 'Student not found' });
+        }
+    } catch (error) {
+        await t.rollback();
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { getStudents, createStudent, getStudentById, updateStudent, deleteStudent };

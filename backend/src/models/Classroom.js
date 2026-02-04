@@ -1,31 +1,31 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
 
-const Subject = sequelize.define('Subject', {
+const Classroom = sequelize.define('Classroom', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true
     },
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    code: {
+    roomNumber: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true
     },
-    credits: {
+    capacity: {
         type: DataTypes.INTEGER,
-        defaultValue: 3
+        defaultValue: 30
     },
     type: {
-        type: DataTypes.ENUM('CORE', 'ELECTIVE', 'LAB'),
-        defaultValue: 'CORE'
+        type: DataTypes.ENUM('LECTURE_HALL', 'LAB', 'SEMINAR_ROOM'),
+        defaultValue: 'LECTURE_HALL'
+    },
+    resources: {
+        type: DataTypes.JSON, // e.g. ["Projector", "AC", "Whiteboard"]
+        defaultValue: []
     }
 }, {
     timestamps: true
 });
 
-module.exports = Subject;
+module.exports = Classroom;

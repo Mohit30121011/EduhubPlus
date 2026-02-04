@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
 
-const Subject = sequelize.define('Subject', {
+const Role = sequelize.define('Role', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -9,23 +9,22 @@ const Subject = sequelize.define('Subject', {
     },
     name: {
         type: DataTypes.STRING,
-        allowNull: false
-    },
-    code: {
-        type: DataTypes.STRING,
         allowNull: false,
         unique: true
     },
-    credits: {
-        type: DataTypes.INTEGER,
-        defaultValue: 3
+    description: {
+        type: DataTypes.STRING
     },
-    type: {
-        type: DataTypes.ENUM('CORE', 'ELECTIVE', 'LAB'),
-        defaultValue: 'CORE'
+    permissions: {
+        type: DataTypes.JSON, // Array of permission strings e.g. ["USER_CREATE", "USER_DELETE"]
+        defaultValue: []
+    },
+    isActive: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
     }
 }, {
     timestamps: true
 });
 
-module.exports = Subject;
+module.exports = Role;

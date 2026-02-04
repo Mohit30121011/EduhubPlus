@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
 
-const Subject = sequelize.define('Subject', {
+const Program = sequelize.define('Program', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -16,16 +16,20 @@ const Subject = sequelize.define('Subject', {
         allowNull: false,
         unique: true
     },
-    credits: {
-        type: DataTypes.INTEGER,
-        defaultValue: 3
+    departmentId: {
+        type: DataTypes.UUID,
+        allowNull: false
     },
-    type: {
-        type: DataTypes.ENUM('CORE', 'ELECTIVE', 'LAB'),
-        defaultValue: 'CORE'
+    duration: {
+        type: DataTypes.INTEGER, // e.g. 4 years
+        defaultValue: 4
+    },
+    totalSemesters: {
+        type: DataTypes.INTEGER,
+        defaultValue: 8
     }
 }, {
     timestamps: true
 });
 
-module.exports = Subject;
+module.exports = Program;

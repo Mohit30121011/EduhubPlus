@@ -1,0 +1,149 @@
+<svg width="1400" height="1000" viewBox="0 0 1400 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .text-title { font-family: 'Arial', sans-serif; font-weight: bold; font-size: 24px; fill: #333; }
+    .text-header { font-family: 'Arial', sans-serif; font-weight: bold; font-size: 18px; fill: #444; }
+    .text-body { font-family: 'Arial', sans-serif; font-size: 14px; fill: #555; }
+    .box-bg { fill: #ffffff; stroke: #e0e0e0; stroke-width: 2; rx: 10; filter: url(#shadow); }
+    .header-bg { fill: #f5f5f5; rx: 10 10 0 0; }
+    .line-separator { stroke: #eeeeee; stroke-width: 2; }
+    .arrow { stroke: #666; stroke-width: 2; marker-end: url(#arrowhead); }
+    .center-db-fill { fill: #e3f2fd; stroke: #2196f3; stroke-width: 3; }
+    .center-text { font-family: 'Arial', sans-serif; font-weight: bold; font-size: 32px; fill: #1565c0; text-anchor: middle; }
+  </style>
+  
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
+      <feOffset dx="2" dy="2" result="offsetblur" />
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.2" />
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="700" y="40" text-anchor="middle" class="text-title" font-size="30">ICMS Context &amp; I/O Design</text>
+
+  <!-- Central System (ICMS) -->
+  <g transform="translate(600, 400)">
+    <!-- Database Cylinder Representation -->
+    <ellipse cx="100" cy="40" rx="80" ry="20" class="center-db-fill" />
+    <path d="M20,40 v120 a80,20 0 0,0 160,0 v-120" class="center-db-fill" />
+    <ellipse cx="100" cy="160" rx="80" ry="20" fill="none" stroke="#2196f3" stroke-width="3" />
+    <path d="M20,80 a80,20 0 0,0 160,0" fill="none" stroke="#2196f3" stroke-width="2" />
+    <path d="M20,120 a80,20 0 0,0 160,0" fill="none" stroke="#2196f3" stroke-width="2" />
+    <text x="100" y="110" class="center-text">ICMS</text>
+  </g>
+
+  <!-- MODULE 1: Administrator (Top Left) -->
+  <g transform="translate(50, 100)">
+    <rect width="450" height="380" class="box-bg" />
+    <rect width="450" height="50" class="header-bg" />
+    <text x="20" y="32" class="text-header">1. Administrator &amp; System Config</text>
+    
+    <!-- Inputs -->
+    <text x="20" y="80" class="text-header" font-size="14" fill="#2196f3">INPUTS (Setup/Config)</text>
+    <line x1="20" y1="90" x2="430" y2="90" class="line-separator" />
+    <text x="30" y="115" class="text-body">• Setup RBAC (Roles/Permissions)</text>
+    <text x="30" y="135" class="text-body">• Configure Depts, Programs &amp; Credits</text>
+    <text x="30" y="155" class="text-body">• Set Academic Calendar (Year/Sem)</text>
+    <text x="30" y="175" class="text-body">• System Integrity (SSL, Backups)</text>
+    
+    <!-- Outputs -->
+    <text x="20" y="230" class="text-header" font-size="14" fill="#4caf50">OUTPUTS (Views)</text>
+    <line x1="20" y1="240" x2="430" y2="240" class="line-separator" />
+    <text x="30" y="265" class="text-body">• System Health Status</text>
+    <text x="30" y="285" class="text-body">• User Role Matrix</text>
+    <text x="30" y="305" class="text-body">• Academic Structure Tree</text>
+    <text x="30" y="325" class="text-body">• Audit Logs</text>
+    
+    <!-- Arrow to Center -->
+    <path d="M450,190 L580,450" fill="none" stroke="#2196f3" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)" />
+  </g>
+
+  <!-- MODULE 2: Academic & Library (Top Right) -->
+  <g transform="translate(900, 100)">
+    <rect width="450" height="380" class="box-bg" />
+     <rect width="450" height="50" class="header-bg" />
+    <text x="20" y="32" class="text-header">2. Academic &amp; Library Ops</text>
+
+    <!-- Inputs -->
+    <text x="20" y="80" class="text-header" font-size="14" fill="#2196f3">INPUTS (Ops/Mgmt)</text>
+     <line x1="20" y1="90" x2="430" y2="90" class="line-separator" />
+    <text x="30" y="115" class="text-body">• Timetable (Slots/Rooms/Faculty)</text>
+    <text x="30" y="135" class="text-body">• Classroom &amp; Resource Usage</text>
+    <text x="30" y="155" class="text-body">• LMS: Upload Notes, Creates Quizzes</text>
+    <text x="30" y="175" class="text-body">• Library: Issue/Return (RFID)</text>
+
+     <!-- Outputs -->
+    <text x="20" y="230" class="text-header" font-size="14" fill="#4caf50">OUTPUTS (Reports)</text>
+     <line x1="20" y1="240" x2="430" y2="240" class="line-separator" />
+    <text x="30" y="265" class="text-body">• Master Timetables</text>
+    <text x="30" y="285" class="text-body">• LMS Analytics &amp; Quiz Scores</text>
+    <text x="30" y="305" class="text-body">• Library Defaulters List</text>
+    <text x="30" y="325" class="text-body">• Resource Utilization</text>
+
+    <!-- Arrow to Center -->
+    <path d="M900,190 L820,450" fill="none" stroke="#2196f3" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)" />
+  </g>
+
+  <!-- MODULE 3: Finance & Resources (Bottom Left) -->
+  <g transform="translate(50, 550)">
+    <rect width="450" height="380" class="box-bg" />
+     <rect width="450" height="50" class="header-bg" />
+    <text x="20" y="32" class="text-header">3. Finance &amp; Resource Mgmt</text>
+
+    <!-- Inputs -->
+    <text x="20" y="80" class="text-header" font-size="14" fill="#2196f3">INPUTS (Finance/Logistics)</text>
+     <line x1="20" y1="90" x2="430" y2="90" class="line-separator" />
+    <text x="30" y="115" class="text-body">• Define Fee Structures</text>
+    <text x="30" y="135" class="text-body">• Process Payroll (Staff/Faculty)</text>
+    <text x="30" y="155" class="text-body">• Asset Registration (IT/Infra)</text>
+    <text x="30" y="175" class="text-body">• Transport Routes &amp; Vehicles</text>
+
+    <!-- Outputs -->
+    <text x="20" y="230" class="text-header" font-size="14" fill="#4caf50">OUTPUTS (Statements)</text>
+     <line x1="20" y1="240" x2="430" y2="240" class="line-separator" />
+    <text x="30" y="265" class="text-body">• Fee Reconciliation Reports</text>
+    <text x="30" y="285" class="text-body">• Monthly Payroll Slips</text>
+    <text x="30" y="305" class="text-body">• Asset Inventory Status</text>
+    <text x="30" y="325" class="text-body">• Transport Manifests</text>
+
+    <!-- Arrow to Center -->
+    <path d="M450,600 L600,550" fill="none" stroke="#2196f3" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)" />
+  </g>
+
+  <!-- MODULE 4: Student Lifecycle (Bottom Right) -->
+   <g transform="translate(900, 550)">
+    <rect width="450" height="380" class="box-bg" />
+     <rect width="450" height="50" class="header-bg" />
+    <text x="20" y="32" class="text-header">4. Student Lifecycle Services</text>
+
+    <!-- Inputs -->
+    <text x="20" y="80" class="text-header" font-size="14" fill="#2196f3">INPUTS (Student Actions)</text>
+     <line x1="20" y1="90" x2="430" y2="90" class="line-separator" />
+    <text x="30" y="115" class="text-body">• Admission Inquiry &amp; Form</text>
+    <text x="30" y="135" class="text-body">• Pay Fees (Online)</text>
+    <text x="30" y="155" class="text-body">• Submit Assignments/Quizzes</text>
+    <text x="30" y="175" class="text-body">• Apply for Placements/Alumni</text>
+
+    <!-- Outputs -->
+    <text x="20" y="230" class="text-header" font-size="14" fill="#4caf50">OUTPUTS (Portal Views)</text>
+     <line x1="20" y1="240" x2="430" y2="240" class="line-separator" />
+    <text x="30" y="265" class="text-body">• Digital Student Profile</text>
+    <text x="30" y="285" class="text-body">• Exam Results &amp; Marks</text>
+    <text x="30" y="305" class="text-body">• Placement/Job Status</text>
+    <text x="30" y="325" class="text-body">• Fee Receipts &amp; History</text>
+
+    <!-- Arrow to Center -->
+    <path d="M900,600 L800,550" fill="none" stroke="#2196f3" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)" />
+  </g>
+
+</svg>

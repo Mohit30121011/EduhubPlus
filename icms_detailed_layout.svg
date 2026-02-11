@@ -1,0 +1,133 @@
+<svg width="1600" height="1200" viewBox="0 0 1600 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .text-title { font-family: 'Arial', sans-serif; font-weight: bold; font-size: 28px; fill: #000; text-decoration: underline; }
+    .text-header { font-family: 'Arial', sans-serif; font-weight: bold; font-size: 20px; fill: #222; }
+    .text-item { font-family: 'Arial', sans-serif; font-size: 16px; fill: #333; }
+    .arrow { stroke: #000; stroke-width: 1.5; marker-end: url(#arrowhead); }
+    .box { fill: none; stroke: #333; stroke-width: 2; }
+    .center-db { fill: #f0f0f0; stroke: #000; stroke-width: 3; }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#000" />
+    </marker>
+  </defs>
+
+  <text x="800" y="50" text-anchor="middle" class="text-title">ICMS Context Design / I/P - O/P Design</text>
+
+  <!-- CENTER ICMS -->
+  <g transform="translate(650, 450)">
+    <text x="150" y="-50" text-anchor="middle" font-size="40" font-weight="bold">ICMS</text>
+    <ellipse cx="150" cy="30" rx="100" ry="30" class="center-db" />
+    <path d="M50,30 v200 a100,30 0 0,0 200,0 v-200" class="center-db" fill="none" />
+    <path d="M50,80 a100,30 0 0,0 200,0" stroke="#000" stroke-width="2" fill="none" />
+    <path d="M50,130 a100,30 0 0,0 200,0" stroke="#000" stroke-width="2" fill="none" />
+    <path d="M50,180 a100,30 0 0,0 200,0" stroke="#000" stroke-width="2" fill="none" />
+  </g>
+
+  <!-- 1. ADMIN (Top Left) -->
+  <g transform="translate(50, 100)">
+    <rect x="0" y="0" width="550" height="400" class="box" />
+    <text x="20" y="30" class="text-header">1. Administrator &amp; System Config</text>
+    
+    <!-- Inputs (Pointing Right) -->
+    <g transform="translate(10, 60)">
+        <text x="0" y="0" class="text-item">Setup RBAC / Permissions &amp; Roles</text> <line x1="300" y1="-5" x2="520" y2="-5" class="arrow" />
+        <text x="0" y="30" class="text-item">Config Departments &amp; Structure</text> <line x1="300" y1="25" x2="520" y2="25" class="arrow" />
+        <text x="0" y="60" class="text-item">Config Programs &amp; Credit System</text> <line x1="300" y1="55" x2="520" y2="55" class="arrow" />
+        <text x="0" y="90" class="text-item">Set Academic Calendar (Year/Sem)</text> <line x1="300" y1="85" x2="520" y2="85" class="arrow" />
+        <text x="0" y="120" class="text-item">Setup Grading Rules</text> <line x1="300" y1="115" x2="520" y2="115" class="arrow" />
+        <text x="0" y="150" class="text-item">Manage Payment API Keys</text> <line x1="300" y1="145" x2="520" y2="145" class="arrow" />
+        <text x="0" y="180" class="text-item">System Integrity (SSL, Backups)</text> <line x1="300" y1="175" x2="520" y2="175" class="arrow" />
+    </g>
+
+    <!-- Outputs (Pointing Left) -->
+    <g transform="translate(10, 260)">
+        <line x1="520" y1="-5" x2="200" y2="-5" class="arrow" /> <text x="0" y="0" class="text-item">View System Health Status</text>
+        <line x1="520" y1="25" x2="200" y2="25" class="arrow" /> <text x="0" y="30" class="text-item">View All Departments Tree</text>
+        <line x1="520" y1="55" x2="200" y2="55" class="arrow" /> <text x="0" y="60" class="text-item">View All Faculty List</text>
+        <line x1="520" y1="85" x2="200" y2="85" class="arrow" /> <text x="0" y="90" class="text-item">View Reports &amp; Analysis</text>
+        <line x1="520" y1="115" x2="200" y2="115" class="arrow" /> <text x="0" y="120" class="text-item">View Faculty Performance</text>
+    </g>
+  </g>
+
+  <!-- 2. ACADEMIC OPS (Top Right) -->
+  <g transform="translate(1000, 100)">
+    <rect x="0" y="0" width="550" height="400" class="box" />
+    <text x="20" y="30" class="text-header">2. Academic &amp; Library Operations</text>
+
+    <!-- Inputs (Pointing Left) -->
+    <g transform="translate(20, 60)">
+        <line x1="220" y1="-5" x2="0" y2="-5" class="arrow" /> <text x="230" y="0" class="text-item">Create / Edit Timetables</text>
+        <line x1="220" y1="25" x2="0" y2="25" class="arrow" /> <text x="230" y="30" class="text-item">Add Courses &amp; Subjects</text>
+        <line x1="220" y1="55" x2="0" y2="55" class="arrow" /> <text x="230" y="60" class="text-item">Allocate Classrooms</text>
+        <line x1="220" y1="85" x2="0" y2="85" class="arrow" /> <text x="230" y="90" class="text-item">Give Faculty Attendance Access</text>
+        <line x1="220" y1="115" x2="0" y2="115" class="arrow" /> <text x="230" y="120" class="text-item">Manage Book Catalog (Library)</text>
+        <line x1="220" y1="145" x2="0" y2="145" class="arrow" /> <text x="230" y="150" class="text-item">Integration with Barcode/RFID</text>
+        <line x1="220" y1="175" x2="0" y2="175" class="arrow" /> <text x="230" y="180" class="text-item">Send Notifications to Faculty</text>
+        <line x1="220" y1="205" x2="0" y2="205" class="arrow" /> <text x="230" y="210" class="text-item">LMS: Upload Notes/Quizzes</text>
+    </g>
+
+    <!-- Outputs (Pointing Right) -->
+    <g transform="translate(20, 290)">
+        <line x1="0" y1="-5" x2="300" y2="-5" class="arrow" /> <text x="310" y="0" class="text-item">Generate Academic Reports</text>
+        <line x1="0" y1="25" x2="300" y2="25" class="arrow" /> <text x="310" y="30" class="text-item">View Academic History</text>
+        <line x1="0" y1="55" x2="300" y2="55" class="arrow" /> <text x="310" y="60" class="text-item">View Book Catalog (Library)</text>
+        <line x1="0" y1="85" x2="300" y2="85" class="arrow" /> <text x="310" y="90" class="text-item">Calculate Late Fees/Fines</text>
+        <line x1="0" y1="115" x2="300" y2="115" class="arrow" /> <text x="310" y="120" class="text-item">View Master Timetable</text>
+    </g>
+  </g>
+
+  <!-- 3. FINANCE (Bottom Left) -->
+  <g transform="translate(50, 600)">
+    <rect x="0" y="0" width="550" height="400" class="box" />
+    <text x="20" y="30" class="text-header">3. Finance &amp; Resource Mgmt</text>
+
+    <!-- Inputs (Pointing Right) -->
+    <g transform="translate(10, 60)">
+        <text x="0" y="0" class="text-item">Setup Fee Structures</text> <line x1="300" y1="-5" x2="520" y2="-5" class="arrow" />
+        <text x="0" y="30" class="text-item">Setup Scholarships / Concessions</text> <line x1="300" y1="25" x2="520" y2="25" class="arrow" />
+        <text x="0" y="60" class="text-item">Manage Staff Payroll</text> <line x1="300" y1="55" x2="520" y2="55" class="arrow" />
+        <text x="0" y="90" class="text-item">Create Budget / Dashboard</text> <line x1="300" y1="85" x2="520" y2="85" class="arrow" />
+        <text x="0" y="120" class="text-item">Add Dues, Audits, Assets</text> <line x1="300" y1="115" x2="520" y2="115" class="arrow" />
+        <text x="0" y="150" class="text-item">Manage Bus Routes (Logistics)</text> <line x1="300" y1="145" x2="520" y2="145" class="arrow" />
+        <text x="0" y="180" class="text-item">Track Physical Assets (IT)</text> <line x1="300" y1="175" x2="520" y2="175" class="arrow" />
+    </g>
+
+    <!-- Outputs (Pointing Left) -->
+    <g transform="translate(10, 270)">
+        <line x1="520" y1="-5" x2="200" y2="-5" class="arrow" /> <text x="0" y="0" class="text-item">Check Fee Collections</text>
+        <line x1="520" y1="25" x2="200" y2="25" class="arrow" /> <text x="0" y="30" class="text-item">View Financial Status</text>
+        <line x1="520" y1="55" x2="200" y2="55" class="arrow" /> <text x="0" y="60" class="text-item">View All Assets Inventory</text>
+        <line x1="520" y1="85" x2="200" y2="85" class="arrow" /> <text x="0" y="90" class="text-item">View Vehicle Maintenance Logs</text>
+        <line x1="520" y1="115" x2="200" y2="115" class="arrow" /> <text x="0" y="120" class="text-item">View Dues &amp; Pending Records</text>
+    </g>
+  </g>
+
+  <!-- 4. STUDENT (Bottom Right) -->
+  <g transform="translate(1000, 600)">
+    <rect x="0" y="0" width="550" height="400" class="box" />
+    <text x="20" y="30" class="text-header">4. Student Lifecycle Services</text>
+
+    <!-- Inputs (Pointing Left) -->
+    <g transform="translate(20, 60)">
+        <line x1="220" y1="-5" x2="0" y2="-5" class="arrow" /> <text x="230" y="0" class="text-item">View Result / Marks</text>
+        <line x1="220" y1="25" x2="0" y2="25" class="arrow" /> <text x="230" y="30" class="text-item">Check Attendance</text>
+        <line x1="220" y1="55" x2="0" y2="55" class="arrow" /> <text x="230" y="60" class="text-item">Download Fee Receipts</text>
+        <line x1="220" y1="85" x2="0" y2="85" class="arrow" /> <text x="230" y="90" class="text-item">Check Announcements</text>
+        <line x1="220" y1="115" x2="0" y2="115" class="arrow" /> <text x="230" y="120" class="text-item">Manage Fee Records/Pay</text>
+        <line x1="220" y1="145" x2="0" y2="145" class="arrow" /> <text x="230" y="150" class="text-item">Download Notes (LMS)</text>
+        <line x1="220" y1="175" x2="0" y2="175" class="arrow" /> <text x="230" y="180" class="text-item">View Defaulters Status</text>
+    </g>
+
+    <!-- Outputs (Pointing Right) -->
+    <g transform="translate(20, 270)">
+        <line x1="0" y1="-5" x2="300" y2="-5" class="arrow" /> <text x="310" y="0" class="text-item">Pay Fees (Gateway)</text>
+        <line x1="0" y1="25" x2="300" y2="25" class="arrow" /> <text x="310" y="30" class="text-item">Submit Complaints/Feedback</text>
+        <line x1="0" y1="55" x2="300" y2="55" class="arrow" /> <text x="310" y="60" class="text-item">Upload Assignments</text>
+        <line x1="0" y1="85" x2="300" y2="85" class="arrow" /> <text x="310" y="90" class="text-item">Edit/Add Student Details</text>
+        <line x1="0" y1="115" x2="300" y2="115" class="arrow" /> <text x="310" y="120" class="text-item">Check Fee Records</text>
+    </g>
+  </g>
+
+</svg>

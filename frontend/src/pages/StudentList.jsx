@@ -323,10 +323,10 @@ const StudentList = () => {
                                             {visibleColumns.actions && (
                                                 <td className="px-4 py-4 text-right">
                                                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <motion.button whileHover={{ scale: 1.1 }} className="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100">
+                                                        <motion.button onClick={() => navigate(`/dashboard/students/view/${student.id}`)} whileHover={{ scale: 1.1 }} className="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100" title="View Student">
                                                             <Eye size={16} />
                                                         </motion.button>
-                                                        <motion.button whileHover={{ scale: 1.1 }} className="p-2 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-100">
+                                                        <motion.button onClick={() => navigate(`/dashboard/students/edit/${student.id}`)} whileHover={{ scale: 1.1 }} className="p-2 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-100" title="Edit Student">
                                                             <Edit size={16} />
                                                         </motion.button>
                                                         <motion.button

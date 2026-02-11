@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Check, ChevronRight, ChevronLeft, Save } from 'lucide-react';
 import axios from 'axios';
 import EnrollmentStepper from '../components/EnrollmentStepper';
@@ -17,6 +17,8 @@ import { motion } from 'framer-motion';
 
 const AddStudent = () => {
     const navigate = useNavigate();
+    const { id } = useParams();
+    const isEditMode = !!id;
     const [currentStep, setCurrentStep] = useState(1);
     const { token } = useSelector((state) => state.auth);
     const [showImportModal, setShowImportModal] = useState(false);
@@ -51,6 +53,67 @@ const AddStudent = () => {
         };
         if (token) fetchMasterData();
     }, [token]);
+
+    // Fetch student data for Edit mode
+    useEffect(() => {
+        if (isEditMode && token) {
+            const fetchStudent = async () => {
+                const toastId = toast.loading('Loading student details...');
+                try {
+                    const res = await axios.get(`${API_URL}/students/${id}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    const data = res.data;
+                    const contact = data.contactDetails || {};
+                    setFormData(prev => ({
+                        ...prev,
+                        firstName: data.firstName || '',
+                        middleName: data.middleName || '',
+                        lastName: data.lastName || '',
+                        regionalName: data.regionalName || '',
+                        previousName: data.previousName || '',
+                        dateOfBirth: data.dateOfBirth || '',
+                        gender: data.gender || 'MALE',
+                        nationality: data.nationality || 'Indian',
+                        placeOfBirth: data.placeOfBirth || '',
+                        domicileState: data.domicileState || '',
+                        category: data.category || 'GENERAL',
+                        subCategory: data.subCategory || '',
+                        religion: data.religion || '',
+                        aadharNumber: data.aadharNumber || '',
+                        passportNumber: data.passportNumber || '',
+                        motherTongue: data.motherTongue || '',
+                        maritalStatus: data.maritalStatus || 'Unmarried',
+                        abcId: data.abcId || '',
+                        phone: data.phone || '',
+                        email: data.User?.email || data.email || '',
+                        enrollmentNo: data.enrollmentNo || '',
+                        permanentAddress: contact.permanentAddress || { street: '', city: '', state: '', pincode: '', country: 'India' },
+                        correspondenceAddress: contact.correspondenceAddress || { street: '', city: '', state: '', pincode: '', country: 'India' },
+                        alternateMobile: contact.alternateMobile || '',
+                        alternateEmail: contact.alternateEmail || '',
+                        emergencyContact: contact.emergencyContact || {},
+                        familyDetails: data.familyDetails || { father: {}, mother: {}, guardian: {}, localGuardian: {} },
+                        academicHistory: data.academicHistory || { classX: {}, classXII: {}, graduation: {} },
+                        course: data.course || '',
+                        department: data.department || '',
+                        admissionDetails: data.admissionDetails || { programLevel: 'UG', admissionType: 'Regular', modeOfStudy: 'Full-time' },
+                        entranceExam: data.entranceExam || {},
+                        hostelTransport: data.hostelTransport || { hostelRequired: false, transportRequired: false },
+                        medicalInfo: data.medicalInfo || {},
+                        feeDetails: data.feeDetails || {},
+                        documents: data.documents || {}
+                    }));
+                    toast.success('Loaded', { id: toastId });
+                } catch (error) {
+                    console.error('Error fetching student:', error);
+                    toast.error('Failed to load student details', { id: toastId });
+                    navigate('/dashboard/students');
+                }
+            };
+            fetchStudent();
+        }
+    }, [id, token, isEditMode]);
 
     // Huge initial state for all 13 sections
     const [formData, setFormData] = useState({
@@ -201,7 +264,7 @@ const AddStudent = () => {
         }
 
         setSaving(true);
-        const toastId = toast.loading('Submitting application...');
+        const toastId = toast.loading(isEditMode ? 'Updating student...' : 'Submitting application...');
 
         try {
             // Construct FormData for multipart/form-data submission
@@ -267,15 +330,25 @@ const AddStudent = () => {
                 });
             }
 
-            const token = localStorage.getItem('token');
-            const response = await axios.post(`${API_URL}/students`, submissionData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const authToken = token || localStorage.getItem('token');
+            let response;
+            if (isEditMode) {
+                response = await axios.put(`${API_URL}/students/${id}`, submissionData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+            } else {
+                response = await axios.post(`${API_URL}/students`, submissionData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+            }
 
-            toast.success('Application Submitted Successfully!', { id: toastId });
+            toast.success(isEditMode ? 'Student Updated Successfully!' : 'Application Submitted Successfully!', { id: toastId });
             navigate('/dashboard/students');
         } catch (error) {
             console.error('Submission Error:', error);
@@ -314,8 +387,8 @@ const AddStudent = () => {
                             <ArrowLeft size={20} className="text-gray-600" />
                         </button>
                         <div>
-                            <h1 className="text-2xl font-black text-gray-900 tracking-tight">Student Enrollment</h1>
-                            <p className="text-gray-500 font-medium text-sm mt-1">New Admission Application • Phase {currentStep} of 5</p>
+                            <h1 className="text-2xl font-black text-gray-900 tracking-tight">{isEditMode ? 'Edit Student' : 'Student Enrollment'}</h1>
+                            <p className="text-gray-500 font-medium text-sm mt-1">{isEditMode ? 'Update student details' : 'New Admission Application'} • Phase {currentStep} of 5</p>
                         </div>
                     </div>
 

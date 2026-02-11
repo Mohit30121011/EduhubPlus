@@ -1,0 +1,58 @@
+# Ultra-Detailed Mega Prompt for ICMS Use Case Diagram
+
+**INSTRUCTIONS:**
+Act as a **Senior Systems Analyst**. I need a comprehensive **UML Use Case Diagram** for an **Intelligent Campus Management System (ICMS)**.
+
+**CONTEXT:**
+The user has provided a reference image showing **Actors** (Stick Figures) interacting with **Use Cases** (Ovals) inside a **System Boundary** (Rectangle). You must replicate this "Use Case" style but populate it with the *actual* deep functionality of our 4-module backend.
+
+**ACTORS (The Users):**
+1.  **Super Admin** (The "God" user, manages config).
+2.  **Faculty / Tutor** (Manages academics, LMS).
+3.  **Student** (Consumer of education/services).
+4.  **Finance Officer** (Manages fees, payroll).
+5.  **Librarian** (Manages books).
+
+---
+
+### **SYSTEM USE CASES (The Bubbles)**
+*Map these actions inside the System Boundary.*
+
+#### **1. Core System (Admin)**
+*   **Manage RBAC:** Create Role, Assign Permission.
+*   **Setup Academic Config:** Add Department, Add Program, Set Academic Year.
+*   **System Maintenance:** Check Server Status, Schedule Backups.
+
+#### **2. Academic Module (Faculty)**
+*   **Manage Classrooms:** View Capacity, Allocation.
+*   **Timetable Operations:** Create Slots, View Daily Routine.
+*   **LMS Actions:** Upload Notes (PDF/Video), Create Quiz, Publish Results.
+*   **Student Mgmt:** Mark Attendance, View Student Profile.
+
+#### **3. Student Services (Student)**
+*   **Learning:** Download Notes, Attempt Quiz, View Result.
+*   **Financial:** Pay Semester Fee (Gateway), Download Receipt.
+*   **Library:** Search Book, Check Due Date.
+*   **Placement:** Apply for Job Drive, Update Resume.
+
+#### **4. Finance & Resources (Finance Officer / Admin)**
+*   **Fee Mgmt:** Define Fee Structure, Collect Offline Payment.
+*   **Payroll:** Generate Salary Slip, Process Deductions.
+*   **Asset Mgmt:** Register IT Asset, Track Vehicle.
+
+---
+
+### **RELATIONSHIPS (The Lines)**
+*   **Admin** --- (Manage RBAC)
+*   **Admin** --- (Setup Academic Config)
+*   **Faculty** --- (LMS Actions)
+*   **Faculty** --- (Timetable Operations)
+*   **Student** --- (Pay Semester Fee)
+*   **Student** --- (Attempt Quiz)
+*   **Finance Officer** --- (Fee Mgmt)
+*   **Finance Officer** --- (Payroll)
+*   *Include <<include>> relationships where logical (e.g., "Pay Fee" <<include>> "Verify Transaction").*
+
+**OUTPUT:**
+Generate the **Mermaid.js code** (using `graph LR` or `usecase` syntax if supported, or clear structure description) for this diagram.
+**Visual Style:** Ensure distinct Actors on the left/right and Use Cases in the center System Box.

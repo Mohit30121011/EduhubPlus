@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './components/layout/DashboardLayout';
 import StudentList from './pages/StudentList';
 import AddStudent from './pages/AddStudent';
+import ViewStudent from './pages/ViewStudent';
 import FacultyList from './pages/FacultyList';
 import AddFaculty from './pages/AddFaculty';
 import Attendance from './pages/Attendance';
@@ -52,6 +53,8 @@ function App() {
 
                     <Route path="students" element={<StudentList />} />
                     <Route path="students/add" element={<AddStudent />} />
+                    <Route path="students/view/:id" element={<ViewStudent />} />
+                    <Route path="students/edit/:id" element={<AddStudent />} />
 
                     <Route path="faculty" element={<FacultyList />} />
                     <Route path="faculty/add" element={<AddFaculty />} />

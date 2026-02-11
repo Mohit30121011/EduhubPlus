@@ -1,0 +1,64 @@
+# Ultra-Detailed Mega Prompt for ICMS Data Flow Diagram (DFD)
+
+**INSTRUCTIONS:**
+Act as a **Senior Systems Architect** and **Database Engineer**. Your goal is to generate the logic for a **Level 2 Data Flow Diagram (DFD)** that is **completely exhaustive**. The system is a massive **Intelligent Campus Management System (ICMS)** with 4 interconnected modules.
+
+**DATA SOURCES:**
+You must map the following **Entities**, **Processes**, **Data Stores**, and **Data Flows** precisely. Do not generalize—be specific about the *data* moving (attributes).
+
+---
+
+### 1. Administrative & Security Module (The "Brain")
+*   **External Entities:** Super Admin, System Auditor.
+*   **Processes:**
+    *   **1.1 Manage RBAC:** Admin sends `RoleData` {Name, Permissions[]} -> Process validates -> Updates `Role Store`.
+    *   **1.2 Configure Academics:** Admin sends `DeptData` / `ProgramData` -> Process updates `AcademicStructure Store`.
+    *   **1.3 Set Calendar:** Admin inputs `Year/Sem Dates` -> Process activates `AcademicYear Store`.
+    *   **1.4 System Audit:** Scheduler triggers Backup -> Process reads `All DBs` -> Writes to `Backup Log`.
+*   **Data Dependencies:** `Role Store` is checked by ALL other modules for permission validation.
+
+### 2. Academic Operations & Library (The "Engine")
+*   **External Entities:** Faculty, Librarian, Student.
+*   **Processes:**
+    *   **2.1 Timetable Mgmt:** Faculty inputs `PrefSlots` -> Process checks `Classroom Capacity` -> Allocates `TimeSlot` -> Updates `Timetable Store`.
+    *   **2.2 LMS Content:** Faculty uploads `File` -> Process generates `URL` -> Updates `LMSMaterial Store`.
+    *   **2.3 Library Issue:** Student scans `RFID` -> Process checks `Book Status` AND `Student Fee Status` (Cross-Module Check) -> Updates `LibraryTransaction Store` -> Updates `Book Inventory`.
+    *   **2.4 Library Return:** Student returns `Book` -> Process calculates `Fine` (if overdue) -> Updates `LibraryTransaction Store`. (If Fine > 0, trigger alert to Finance).
+*   **Data Stores:** `Timetable DB`, `Classroom DB`, `LMS DB`, `Book Catalog`, `Transaction DB`.
+
+### 3. Finance & Resource Management (The "Treasury")
+*   **External Entities:** Accountant, Transport Manager, Payment Gateway.
+*   **Processes:**
+    *   **3.1 Fee Collection:** Student selects `FeeType` -> Process initiates `Payment` -> Gateway sends `TransactionID` -> Update `FeePayment Store`.
+    *   **3.2 Payroll Engine:** Process reads `Faculty Attendance` -> Calculates `Basic + Allowances - Deductions` -> Generates `Payroll Slip` -> Updates `Payroll Store`.
+    *   **3.3 Asset Tracking:** Admin registers `Asset` {Tag, Value, Location} -> Update `Asset Inventory`.
+    *   **3.4 Transport Logistics:** Manager assigns `Driver` to `Route` -> Update `Transport DB`.
+*   **Data Stores:** `Fee Structure DB`, `Payment Records`, `Payroll DB`, `Asset Registry`.
+
+### 4. Student Cycle Linkage (The "User Journey")
+*   **External Entities:** Applicant, Student, Recruiter (Placement).
+*   **Processes:**
+    *   **4.1 Admission:** Applicant submits `Form Data` -> Process validates docs -> Creates `Student Record` -> Assigns `Roll No`.
+    *   **4.2 Placement Drive:** Recruiter posts `Drive Details` -> Student applies (`Student Profile` read) -> Process filters `Eligibility` -> Updates `JobApplication Store`.
+    *   **4.3 Alumni Connect:** Graduated Student updates `Current Job` -> Process updates `Alumni Store`.
+*   **Data Stores:** `Student Master DB`, `Placement DB`, `Alumni DB`.
+
+---
+
+**OUTPUT REQUIRED:**
+
+1.  **Strict DFD Notation Logic:**
+    *   Define every **Entity** (Rectangles).
+    *   Define every **Process** (Rounded Nodes) with ID (1.1, 1.2...).
+    *   Define every **Data Store** (Open Rectangles).
+    *   Define every **Data Flow** (Arrows) with specific labels (e.g., "Verified Payment Token", "Overdue Fine Alert").
+
+2.  **Mermaid.js Code:**
+    *   Generate a COMPLETE, SYNTAX-CORRECT `graph TD` or `flowchart LR` in Mermaid.js.
+    *   Use subgraphs to group the 4 Modules visually.
+    *   Style the nodes to distinguish Entities (Blue), Processes (Yellow), Stores (Green).
+
+3.  **Complexity Check:**
+    *   Ensure "Cross-Module" lines are visible (e.g., Library checking Finance, Placement checking Academic Marks).
+
+**Make it massive. Make it detailed.**

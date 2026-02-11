@@ -1,0 +1,96 @@
+# Ultra-Detailed Mega Prompt for ICMS Class Diagram
+
+**INSTRUCTIONS:**
+Act as a **Senior Software Architect**. Generate the code/structure for a comprehensive **UML Class Diagram** for an **Intelligent Campus Management System (ICMS)**.
+
+**CONTEXT:**
+The system is built with a Node.js/Sequelize backend. You must represent the system components as Classes with **Attributes** (Data Fields) and **Methods** (Operations).
+
+**REQUIREMENT:**
+1.  **Strict UML Notation:** Classes with 3 sections: Name, Attributes, Methods.
+2.  **Scope:** Cover all 4 Modules (Admin, Academic, Finance, Student).
+3.  **Relationships:** Show Associations (`-->`), Aggregations (`o--`), and Inheritance if applicable.
+4.  **Format:** Provide **Mermaid.js `classDiagram` code** so I can render it.
+
+---
+
+### **CLASS SPECIFICATIONS**
+*Include EXACTLY these classes and attributes. Add standard methods (CRUD + relevant logic).*
+
+#### **Module 1: Core & Administrative**
+*   **User**
+    *   *Attributes:* `UUID id`, `String email`, `String password`, `Boolean isActive`, `UUID roleId`
+    *   *Methods:* `login()`, `logout()`, `changePassword()`, `verifyToken()`
+*   **Role**
+    *   *Attributes:* `UUID id`, `String name`, `JSON permissions`, `String description`
+    *   *Methods:* `assignPermission()`, `revokePermission()`
+*   **Department**
+    *   *Attributes:* `UUID id`, `String name`, `String code`, `String hodName`
+    *   *Methods:* `addProgram()`, `viewFaculty()`
+*   **Program** (e.g., B.Tech)
+    *   *Attributes:* `UUID id`, `String name`, `Integer duration`, `Integer totalSemesters`
+    *   *Methods:* `calculateCredits()`, `generateCurriculum()`
+*   **AcademicYear**
+    *   *Attributes:* `UUID id`, `String name` (2025-26), `Date startDate`, `Date endDate`
+    *   *Methods:* `activate()`, `archive()`
+
+#### **Module 2: Academic & Library**
+*   **Faculty**
+    *   *Attributes:* `UUID id`, `String designation`, `String qualification`, `Date joiningDate`, `UUID userId`
+    *   *Methods:* `markAttendance()`, `uploadMarks()`, `viewTimetable()`
+*   **Student**
+    *   *Attributes:* `UUID id`, `String rollNumber`, `String batch`, `UUID currentSemesterId`, `UUID userId`
+    *   *Methods:* `viewResult()`, `payFee()`, `registerCourse()`
+*   **Timetable**
+    *   *Attributes:* `UUID id`, `String section`, `UUID semesterId`
+    *   *Methods:* `assignSlot()`, `checkConflict()`
+*   **TimeSlot**
+    *   *Attributes:* `Time startTime`, `Time endTime`, `Enum day`, `UUID roomId`
+    *   *Methods:* `getDuration()`
+*   **LMSMaterial**
+    *   *Attributes:* `UUID id`, `String title`, `Enum type` (Note/Quiz), `String url`
+    *   *Methods:* `download()`, `streamVideo()`
+*   **Book**
+    *   *Attributes:* `UUID id`, `String isbn`, `String title`, `String author`, `String status`, `String barcodeId`
+    *   *Methods:* `issue()`, `return()`, `calculateFine()`
+
+#### **Module 3: Finance & Resources**
+*   **FeeStructure**
+    *   *Attributes:* `UUID id`, `Enum category`, `Float amount`, `Date dueDate`
+    *   *Methods:* `applyLateFee()`
+*   **FeePayment**
+    *   *Attributes:* `UUID id`, `Float amountPaid`, `String transactionId`, `Enum status`, `Date paymentDate`
+    *   *Methods:* `verifyTransaction()`, `generateReceipt()`
+*   **Payroll**
+    *   *Attributes:* `UUID id`, `String month`, `Integer year`, `Float basicSalary`, `Float netSalary`
+    *   *Methods:* `calculateDeductions()`, `processPayment()`
+*   **Asset**
+    *   *Attributes:* `UUID id`, `String name`, `Enum category` (IT/Infra), `Float value`, `Enum status`
+    *   *Methods:* `allocate()`, `markDamaged()`
+*   **Vehicle**
+    *   *Attributes:* `UUID id`, `String regNumber`, `Integer capacity`, `String driverName`
+    *   *Methods:* `scheduleMaintenance()`, `assignRoute()`
+
+#### **Module 4: Student Lifecycle**
+*   **AdmissionInquiry**
+    *   *Attributes:* `UUID id`, `String applicantName`, `String phone`, `Enum status`
+    *   *Methods:* `followUp()`, `convertToStudent()`
+*   **PlacementDrive**
+    *   *Attributes:* `UUID id`, `String companyName`, `String package`, `Date driveDate`
+    *   *Methods:* `shortlistCandidates()`, `publishResults()`
+*   **Alumni**
+    *   *Attributes:* `UUID id`, `Integer gradYear`, `String currentJob`, `String designation`
+    *   *Methods:* `updateProfile()`, `donate()`
+
+---
+
+### **RELATIONSHIPS**
+*   `Department` "1" --> "*" `Program`
+*   `Program` "1" --> "*" `Semester`
+*   `Student` "1" --> "*" `FeePayment`
+*   `Faculty` "1" --> "*" `Timetable` (via TimeSlot)
+*   `Student` "1" --> "*" `LibraryTransaction`
+*   `Vehicle` "1" --> "*" `TransportRoute`
+
+**OUTPUT:**
+Generate the **Mermaid.js classDiagram** code block only. Ensure all classes above are included with full details.

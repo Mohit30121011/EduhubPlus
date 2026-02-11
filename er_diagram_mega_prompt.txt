@@ -1,0 +1,86 @@
+# Ultra-Detailed Mega Prompt for ICMS ER Diagram
+
+**INSTRUCTIONS:**
+Act as a **Database Architect**. I need you to generate the structure for a massive **Entity-Relationship (ER) Diagram** using **Chen's Notation** (Entities in Rectangles, Attributes in Ovals, Relationships in Diamonds).
+
+**CONTEXT:**
+The system is an **Intelligent Campus Management System (ICMS)** with 4 interconnected modules. You must map these *exact* Entities, Attributes, and Relationships based on the actual backend schema.
+
+---
+
+### 1. ENTITIES & ATTRIBUTES (The Nodes)
+*List these exactly with Ovals connected to Rectangles.*
+
+**Module 1: Administrative (Core)**
+*   **User:** `id`, `email`, `password`, `role`, `isActive`.
+*   **Role:** `id`, `name`, `permissions` (JSON), `description`.
+*   **Department:** `id`, `name`, `code`, `hodName`.
+*   **Program:** `id`, `name`, `duration`, `totalSemesters`.
+*   **AcademicYear:** `id`, `name` (e.g. 2025-26), `startDate`, `endDate`.
+*   **Semester:** `id`, `name`, `startDate`, `endDate`.
+
+**Module 2: Academic & Library**
+*   **Faculty:** `id`, `employeeId`, `designation`, `qualification`, `joiningDate`.
+*   **Student:** `id`, `rollNumber`, `batch`, `currentSemester`, `guardianDetails`.
+*   **Timetable:** `id`, `name`, `section`.
+*   **TimeSlot:** `id`, `day`, `startTime`, `endTime`, `roomNumber`.
+*   **Course:** `id`, `name`, `code`, `credits`.
+*   **Book:** `id`, `isbn`, `title`, `author`, `barcodeId` (RFID), `status`.
+*   **LMSMaterial:** `id`, `title`, `type` (Notes/Video), `url`.
+*   **Quiz:** `id`, `title`, `totalMarks`.
+
+**Module 3: Finance & Resources**
+*   **FeeStructure:** `id`, `category` (Tuition/Hostel), `amount`, `dueDate`.
+*   **FeePayment:** `id`, `amountPaid`, `paymentDate`, `transactionId`, `status`.
+*   **Payroll:** `id`, `month`, `year`, `basicSalary`, `deductions`, `netSalary`.
+*   **Asset:** `id`, `name`, `category` (IT/Infra), `value`, `status`.
+*   **Vehicle:** `id`, `numberPlate`, `capacity`, `driverName`.
+*   **TransportRoute:** `id`, `routeName`, `startPoint`, `endPoint`.
+
+**Module 4: Lifecycle & Career**
+*   **AdmissionInquiry:** `id`, `applicantName`, `phone`, `status` (Lead/Converted).
+*   **PlacementDrive:** `id`, `companyName`, `package` (LPA), `criteria`.
+*   **JobApplication:** `id`, `status` (Applied/Selected).
+*   **Alumni:** `id`, `gradYear`, `currentCompany`, `designation`.
+
+---
+
+### 2. RELATIONSHIPS (The Diamonds)
+*Connect these Entities with Diamond shapes describing the action.*
+
+**Administrative Relationships:**
+*   **User** *Has* **Role** (Many-to-One).
+*   **Department** *Offers* **Program** (One-to-Many).
+*   **Program** *Contains* **Semester** (One-to-Many).
+*   **Department** *Employs* **Faculty** (One-to-Many).
+
+**Academic Relationships:**
+*   **Faculty** *Teaches* **Course** (One-to-Many).
+*   **Student** *Enrolls_In* **Program** (Many-to-One).
+*   **Timetable** *Has* **TimeSlot** (One-to-Many).
+*   **TimeSlot** *Assigned_To* **Faculty** (Many-to-One).
+*   **Faculty** *Uploads* **LMSMaterial** (One-to-Many).
+
+**Library & Exam Relationships:**
+*   **Student** *Borrows* **Book** (Many-to-Many via `LibraryTransaction`).
+*   **Student** *Attempts* **Quiz** (Many-to-Many via `QuizResult`).
+
+**Financial Relationships:**
+*   **Student** *Pays* **FeePayment** (One-to-Many).
+*   **FeePayment** *Linked_To* **FeeStructure** (Many-to-One).
+*   **Faculty** *Receives* **Payroll** (One-to-Many).
+
+**Resource & Career Relationships:**
+*   **Vehicle** *Runs_On* **TransportRoute** (One-to-Many).
+*   **Student** *Applies_For* **PlacementDrive** (Many-to-Many via `JobApplication`).
+*   **Student** *Becomes* **Alumni** (One-to-One).
+
+---
+
+### 3. OUTPUT FORMAT
+Please provide:
+1.  **A Mermaid.js `erDiagram` code block** that visualizes these exact entities and relationships.
+2.  **Ensure Attributes appear** on the diagram (or listed clearly inside the Entity boxes if strictly Mermaid ER, as bubbles are hard in Mermaid).
+    *   *Note: If you can generate Graphviz/DOT code for the "Bubble Attribute" style (Chen's Notation), please do so.*
+
+**Make it extremely detailed. Do not miss any field listed above.**

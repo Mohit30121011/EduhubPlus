@@ -1,0 +1,54 @@
+# Ultra-Detailed Mega Prompt for ICMS System Architecture
+
+**INSTRUCTIONS:**
+Act as a **Chief Technology Officer (CTO)**. I need a High-Level **System Architecture Diagram** for our **Intelligent Campus Management System (ICMS)**.
+
+**TECHNICAL STACK (The "Truth"):**
+The system is built on a modern **MERN-like Stack** (PostgreSQL instead of Mongo). You must represent these exact technologies and layers.
+
+**LAYERS TO MODEL:**
+
+### 1. Client Layer (Frontend)
+*   **Technologies:** React.js (Vite), Redux Toolkit (State), Tailwind CSS (Glassmorphism UI).
+*   **Actors:** Student, Faculty, Admin, Finance Officer.
+*   **Components:**
+    *   Auth Portal (Login/Reset).
+    *   Dashboards (Role-Based).
+    *   Forms (Dynamic Input).
+    *   Visualization (Charts/Grids).
+
+### 2. API Gateway / Server Layer (Backend)
+*   **Technologies:** Node.js, Express.js.
+*   **Core Components:**
+    *   **REST API Controllers:** distinct controllers for `Student`, `Faculty`, `Finance`, `Admin`.
+    *   **Middleware:** `AuthMiddleware` (JWT Verification), `RoleMiddleware` (RBAC Check), `uploadMiddleware` (Multer for LMS/Docs).
+    *   **Services:** Logic for Fee Calculation, Payroll Processing, Result Generation.
+
+### 3. Application Modules (Business Logic)
+*   **Administrative Module:** Config, User Mgmt, Audit.
+*   **Academic Module:** Timetable Engine, LMS Logic, Library Rules.
+*   **Student Lifecycle:** Admission Flow, Placement Matching, Alumni Network.
+*   **Finance Module:** Fee Reconciliation, Salary Computation, Asset Tracking.
+
+### 4. Data Persistence Layer (Database)
+*   **Technology:** PostgreSQL.
+*   **ORM:** Sequelize (Models & Associations).
+*   **Data Stores:**
+    *   `Identity Store` (Users, Roles).
+    *   `Academic Store` (Depts, Courses, Timetables).
+    *   `Financial Store` (Fees, Payroll, Assets).
+    *   `Transaction Store` (Logs, Library Issues).
+
+### 5. External Integrations
+*   **Payment Gateway:** (For Online Fee Collection).
+*   **File Storage:** (Local/Cloud for LMS Notes, Resumes).
+*   **Notification Service:** (Email/SMS Alerts).
+
+---
+
+**OUTPUT:**
+1.  **Visual Structure:** A layered "Stack" diagram showing data flow from Top (Client) to Bottom (DB).
+2.  **Mermaid.js Code:** Generate using `graph TD` (Top-Down) or `C4 Architecture` syntax if possible.
+3.  **Detail Level:** Show the specific "Express Middleware" box and "Sequelize ORM" box to reflect our actual implementation.
+
+**Make it professional, layered, and representative of a production-grade system.**

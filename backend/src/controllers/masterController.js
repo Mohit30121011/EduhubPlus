@@ -1,4 +1,44 @@
-const { Course, Subject, Department } = require('../models');
+const { Course, Subject, Department, User, Attendance, FeePayment } = require('../models');
+const { Op } = require('sequelize');
+
+// @desc    Get Dashboard Stats
+// @route   GET /api/academic/dashboard-stats
+// @access  Private
+const getDashboardStats = async (req, res) => {
+    try {
+        // 1. User Counts
+        const studentCount = await User.count({ where: { role: 'STUDENT', isActive: true } });
+        const facultyCount = await User.count({ where: { role: 'FACULTY', isActive: true } });
+
+        // 2. Today's Attendance
+        const today = new Date().toISOString().split('T')[0];
+        const attendanceCount = await Attendance.count({ where: { date: today, status: 'PRESENT' } });
+        const totalAttendanceMarked = await Attendance.count({ where: { date: today } });
+        const attendancePercentage = totalAttendanceMarked > 0
+            ? Math.round((attendanceCount / totalAttendanceMarked) * 100)
+            : 0;
+
+        // 3. Fee Collection (Total)
+        const payments = await FeePayment.findAll({ where: { status: 'SUCCESS' }, attributes: ['amountPaid'] });
+        const totalFeesCollected = payments.reduce((sum, p) => sum + Number(p.amountPaid), 0);
+
+        res.json({
+            studentCount,
+            facultyCount,
+            attendance: {
+                present: attendanceCount,
+                total: totalAttendanceMarked,
+                percentage: attendancePercentage
+            },
+            fees: {
+                totalCollected: totalFeesCollected
+            }
+        });
+    } catch (error) {
+        console.error('Dashboard Stats Error:', error);
+        res.status(500).json({ message: 'Server Error fetching dashboard stats' });
+    }
+};
 
 // @desc    Get All Academic Data (Courses, Subjects, Departments)
 // @route   GET /api/master/all
@@ -121,6 +161,7 @@ const deleteCourse = async (req, res) => {
 
 module.exports = {
     getAllMasterData,
+    getDashboardStats,
     createCourse,
     createSubject,
     createDepartment,

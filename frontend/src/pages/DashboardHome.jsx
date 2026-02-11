@@ -1,16 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import {
     Search, Bell, MapPin, ChevronDown,
     Calendar, BookOpen, GraduationCap,
     FileText, UserCheck, CreditCard,
     Zap, Clock, ArrowRight, Library, Monitor,
-    Utensils, Sparkles, AlertCircle, Scissors, Hammer, Truck, Camera, Bug
+    Utensils, Sparkles, AlertCircle, Scissors, Hammer, Truck, Camera, Bug,
+    Users, TrendingUp, DollarSign
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const DashboardHome = () => {
     const { user } = useSelector((state) => state.auth);
+    const [stats, setStats] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const token = user?.token || localStorage.getItem('token');
+                const { data } = await axios.get(`${API_URL}/academic/dashboard-stats`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setStats(data);
+            } catch (error) {
+                console.error('Error fetching dashboard stats:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (user) {
+            fetchStats();
+        }
+    }, [user]);
 
     // Quick Actions
     const quickActions = [
@@ -28,29 +54,41 @@ const DashboardHome = () => {
         { subject: 'Database Systems', time: '02:00 PM', room: 'Lab 1', teacher: 'Ms. Johnson', color: 'from-indigo-500 to-violet-500' },
     ];
 
-    // Reference-style Cards (Exact NeedFul Props)
-    const deals = [
+    // Dynamic Stats Cards
+    const statsCards = [
         {
-            title: 'Mid-Sem Exams',
-            subtitle: 'Schedule Released for Fall 2024',
-            icon: FileText,
-            btnText: 'View Dates',
-            gradient: "from-orange-600/90 via-orange-600/60 to-transparent"
-        },
-        {
-            title: 'Tech Fest 2024',
-            subtitle: 'Register for Hackathons & Events',
-            icon: Sparkles,
-            btnText: 'Register Now',
-            gradient: "from-pink-600/90 via-pink-600/60 to-transparent"
-        },
-        {
-            title: 'Library Due',
-            subtitle: 'Return Books by Friday 5 PM',
-            icon: BookOpen,
-            btnText: 'Check Books',
+            title: 'Total Students',
+            value: stats?.studentCount || 0,
+            icon: Users,
+            btnText: 'View All',
+            link: '/dashboard/students',
             gradient: "from-blue-600/90 via-blue-600/60 to-transparent"
         },
+        {
+            title: 'Faculty Members',
+            value: stats?.facultyCount || 0,
+            icon: GraduationCap,
+            btnText: 'View Staff',
+            link: '/dashboard/faculty',
+            gradient: "from-purple-600/90 via-purple-600/60 to-transparent"
+        },
+        {
+            title: 'Today\'s Attendance',
+            value: `${stats?.attendance?.percentage || 0}%`,
+            subtitle: `${stats?.attendance?.present || 0} / ${stats?.attendance?.total || 0} Present`,
+            icon: UserCheck,
+            btnText: 'Mark Now',
+            link: '/dashboard/attendance',
+            gradient: "from-green-600/90 via-green-600/60 to-transparent"
+        },
+        {
+            title: 'Fees Collected',
+            value: `₹${(stats?.fees?.totalCollected || 0).toLocaleString()}`,
+            icon: DollarSign,
+            btnText: 'Manage Fees',
+            link: '/dashboard/finances',
+            gradient: "from-amber-600/90 via-amber-600/60 to-transparent"
+        }
     ];
 
     return (
@@ -61,7 +99,7 @@ const DashboardHome = () => {
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col">
                         <h1 className="text-3xl font-black text-gray-900 leading-none tracking-tight">
-                            Hello, <span className="text-blue-600">{user?.name?.split(' ')[0] || 'Student'}!</span>
+                            Hello, <span className="text-blue-600">{user?.name?.split(' ')[0] || 'User'}!</span>
                         </h1>
                         <p className="text-gray-500 text-sm font-medium mt-1">Welcome back to campus.</p>
                     </div>
@@ -85,48 +123,44 @@ const DashboardHome = () => {
                 </div>
             </div>
 
-            {/* 2. Premium Cards (Exact NeedFul Replica) */}
+            {/* 2. Stats Cards (Replaces Static Deals) */}
             <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-6 px-6 pb-4">
-                {deals.map((deal, index) => (
+                {statsCards.map((stat, index) => (
                     <div
                         key={index}
                         className={`
-                            relative flex-shrink-0 w-[85vw] sm:w-[340px] h-[300px] rounded-[32px] overflow-hidden snap-center group cursor-pointer shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-500 ease-out
+                            relative flex-shrink-0 w-[85vw] sm:w-[300px] h-[220px] rounded-[32px] overflow-hidden snap-center group cursor-pointer shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-500 ease-out
                         `}
                     >
-                        {/* Background Image Placeholder (Abstract) */}
+                        {/* Background & Overlays */}
                         <div className="absolute inset-0 bg-white z-0" />
-
-                        {/* Gradient Overlay for Translucency */}
-                        <div className={`absolute inset-0 bg-gradient-to-r ${deal.gradient} z-10`} />
-
-                        {/* Decorative Glass Reflection */}
+                        <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} z-10`} />
                         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/10 to-transparent pointer-events-none z-20 opacity-30" />
 
                         {/* Content */}
-                        <div className="relative z-30 h-full flex flex-col justify-between p-8 text-white w-full">
+                        <div className="relative z-30 h-full flex flex-col justify-between p-6 text-white w-full">
                             <div className="flex flex-col gap-4">
-                                {/* Category Icon */}
-                                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/20 shadow-sm">
-                                    <deal.icon className="w-6 h-6 text-white" strokeWidth={2} />
+                                <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/20 shadow-sm">
+                                    <stat.icon className="w-5 h-5 text-white" strokeWidth={2} />
                                 </div>
 
-                                {/* Title & Subtitle */}
                                 <div>
-                                    <h3 className="text-4xl font-extrabold leading-[1.1] tracking-tight mb-2 text-white drop-shadow-sm">
-                                        {deal.title}
+                                    <h3 className="text-3xl font-extrabold leading-[1.1] tracking-tight mb-1 text-white drop-shadow-sm">
+                                        {stat.value}
                                     </h3>
-                                    <p className="text-white/90 text-sm font-medium line-clamp-2 leading-relaxed tracking-wide opacity-95">
-                                        {deal.subtitle}
+                                    <p className="text-white/90 text-sm font-medium opacity-95">
+                                        {stat.title}
                                     </p>
+                                    {stat.subtitle && (
+                                        <p className="text-xs text-white/70 mt-1">{stat.subtitle}</p>
+                                    )}
                                 </div>
                             </div>
 
-                            {/* Button */}
-                            <button className="self-start px-8 py-3.5 bg-white/20 backdrop-blur-xl border border-white/40 text-white rounded-full text-sm font-bold flex items-center gap-2 group-hover:bg-white group-hover:text-black transition-all duration-300 shadow-md">
-                                {deal.btnText}
-                                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                            </button>
+                            <Link to={stat.link} className="self-start px-6 py-2.5 bg-white/20 backdrop-blur-xl border border-white/40 text-white rounded-full text-xs font-bold flex items-center gap-2 group-hover:bg-white group-hover:text-black transition-all duration-300 shadow-md">
+                                {stat.btnText}
+                                <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-1" />
+                            </Link>
                         </div>
                     </div>
                 ))}
@@ -140,11 +174,11 @@ const DashboardHome = () => {
                     </h3>
                     <span className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full cursor-pointer hover:bg-blue-100 transition-colors">Explore</span>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
                     {quickActions.map((action, idx) => (
                         <Link to={action.link} key={idx} className="flex flex-col items-center gap-3 p-4 bg-white rounded-2xl border border-gray-100/50 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:shadow-lg hover:border-blue-100 hover:-translate-y-1 transition-all duration-300">
-                            <div className={`w-14 h-14 rounded-2xl ${action.color} flex items-center justify-center shadow-sm`}>
-                                <action.icon size={26} strokeWidth={2.5} />
+                            <div className={`w-12 h-12 rounded-2xl ${action.color} flex items-center justify-center shadow-sm`}>
+                                <action.icon size={22} strokeWidth={2.5} />
                             </div>
                             <span className="text-xs font-bold text-gray-600 text-center leading-tight">{action.label}</span>
                         </Link>
@@ -154,7 +188,7 @@ const DashboardHome = () => {
 
             {/* 4. Horizontal Scroll (Class Schedule) */}
             <div>
-                <div className="flex items-center gap-2 mb-4 px-1 mt-2">
+                <div className="flex items-center gap-2 mb-4 px-1 mt-6">
                     <Clock size={20} className="text-blue-600" fill="currentColor" />
                     <h3 className="font-extrabold text-gray-900 text-lg tracking-tight">Today's Classes</h3>
                 </div>

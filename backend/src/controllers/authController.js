@@ -115,6 +115,8 @@ const updateProfile = async (req, res) => {
     }
 };
 
+const sendEmail = require('../utils/sendEmail');
+
 // @desc    Forgot Password - Generate OTP
 // @route   POST /api/auth/forgot-password
 // @access  Public
@@ -141,15 +143,29 @@ const forgotPassword = async (req, res) => {
             resetOtpExpiry: otpExpiry
         });
 
-        console.log(`[PASSWORD RESET] OTP for ${email}: ${otp}`);
+        // Create reset URL (optional, but good for context)
+        const message = `Your Password Reset OTP is: ${otp}\n\nThis OTP is valid for 10 minutes.`;
 
-        res.json({
-            message: 'OTP has been generated. Check console/logs for the OTP.',
-            otp: process.env.NODE_ENV === 'development' ? otp : undefined
-        });
+        try {
+            await sendEmail({
+                email: user.email,
+                subject: 'Password Reset OTP - EduhubPlus',
+                message
+            });
+
+            res.status(200).json({ success: true, data: 'Email sent' });
+        } catch (err) {
+            console.error(err);
+            await user.update({
+                resetOtp: null,
+                resetOtpExpiry: null
+            });
+
+            return res.status(500).json({ message: 'Email could not be sent' });
+        }
     } catch (error) {
-        console.error('[FORGOT PASSWORD ERROR]', error);
-        res.status(500).json({ message: 'Server error processing request' });
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
     }
 };
 

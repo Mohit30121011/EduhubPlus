@@ -44,6 +44,8 @@ app.use('/api/academic', require('./routes/masterRoutes')); // Master Data Route
 app.use('/api/upload', require('./routes/uploadRoutes')); // File Upload Routes
 app.use('/api/import', require('./routes/importRoutes')); // Excel Import Routes
 app.use('/api/admin', require('./routes/adminRoutes')); // Admin Management Routes
+app.use('/api/fees', require('./routes/feeRoutes')); // Fee Management Routes
+app.use('/api/notifications', require('./routes/notificationRoutes')); // Notification Routes
 
 // Global Error Handler
 app.use((err, req, res, next) => {

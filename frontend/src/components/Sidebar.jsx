@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard, Users, GraduationCap, CalendarCheck,
     FileText, BookOpen, Settings, LogOut, ChevronRight, TrendingUp, AlertCircle,
-    FolderCog, Shield
+    FolderCog, Shield, Bell, ClipboardCheck
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, reset } from '../redux/features/authSlice';
@@ -34,6 +34,8 @@ const getNavItems = (userRole, userPermissions = []) => {
         { href: '/dashboard/staff', icon: Users, label: 'Staff', permissionId: 'staff' },
         { href: '/dashboard/tasks', icon: CalendarCheck, label: 'Tasks', permissionId: 'tasks' },
         { href: '/dashboard/master', icon: FolderCog, label: 'Academic Data', permissionId: 'master' },
+        { href: '/dashboard/attendance', icon: ClipboardCheck, label: 'Attendance', permissionId: 'attendance', alwaysShow: true },
+        { href: '/dashboard/notifications', icon: Bell, label: 'Notifications', permissionId: 'notifications', alwaysShow: true },
     ];
 
     // SUPER_ADMIN sees everything
@@ -42,9 +44,9 @@ const getNavItems = (userRole, userPermissions = []) => {
         return allItems;
     }
 
-    // Filter items based on permissions for ADMIN
+    // Filter items based on permissions for ADMIN, but always show items flagged as alwaysShow
     const permissions = userPermissions || [];
-    const filteredItems = allItems.filter(item => permissions.includes(item.permissionId));
+    const filteredItems = allItems.filter(item => item.alwaysShow || permissions.includes(item.permissionId));
 
     return filteredItems;
 };

@@ -22,6 +22,7 @@ import Tasks from './pages/Tasks';
 import Master from './pages/Master';
 import Admin from './pages/Admin';
 import Settings from './pages/Settings';
+import Notifications from './pages/Notifications';
 
 
 
@@ -68,6 +69,7 @@ function App() {
                     <Route path="settings" element={<Settings />} />
 
                     <Route path="attendance" element={<Attendance />} />
+                    <Route path="notifications" element={<Notifications />} />
                 </Route>
 
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />

@@ -80,6 +80,14 @@ const User = sequelize.define('User', {
         type: DataTypes.JSON,
         allowNull: true,
         defaultValue: []
+    },
+    resetOtp: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    resetOtpExpiry: {
+        type: DataTypes.DATE,
+        allowNull: true
     }
 }, {
     timestamps: true,

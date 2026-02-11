@@ -115,4 +115,84 @@ const updateProfile = async (req, res) => {
     }
 };
 
-module.exports = { loginUser, registerUser, updateProfile };
+// @desc    Forgot Password - Generate OTP
+// @route   POST /api/auth/forgot-password
+// @access  Public
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        if (!email) {
+            return res.status(400).json({ message: 'Email is required' });
+        }
+
+        const user = await User.findOne({ where: { email } });
+
+        if (!user) {
+            return res.status(404).json({ message: 'No account found with that email' });
+        }
+
+        // Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+        await user.update({
+            resetOtp: otp,
+            resetOtpExpiry: otpExpiry
+        });
+
+        console.log(`[PASSWORD RESET] OTP for ${email}: ${otp}`);
+
+        res.json({
+            message: 'OTP has been generated. Check console/logs for the OTP.',
+            otp: process.env.NODE_ENV === 'development' ? otp : undefined
+        });
+    } catch (error) {
+        console.error('[FORGOT PASSWORD ERROR]', error);
+        res.status(500).json({ message: 'Server error processing request' });
+    }
+};
+
+// @desc    Reset Password using OTP
+// @route   POST /api/auth/reset-password
+// @access  Public
+const resetPassword = async (req, res) => {
+    const { email, otp, newPassword } = req.body;
+
+    try {
+        if (!email || !otp || !newPassword) {
+            return res.status(400).json({ message: 'Email, OTP, and new password are required' });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({ message: 'Password must be at least 6 characters' });
+        }
+
+        const user = await User.findOne({ where: { email } });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (!user.resetOtp || user.resetOtp !== otp) {
+            return res.status(400).json({ message: 'Invalid OTP' });
+        }
+
+        if (new Date() > new Date(user.resetOtpExpiry)) {
+            return res.status(400).json({ message: 'OTP has expired. Please request a new one.' });
+        }
+
+        await user.update({
+            password: newPassword,
+            resetOtp: null,
+            resetOtpExpiry: null
+        });
+
+        res.json({ message: 'Password reset successful. You can now log in with your new password.' });
+    } catch (error) {
+        console.error('[RESET PASSWORD ERROR]', error);
+        res.status(500).json({ message: 'Server error resetting password' });
+    }
+};
+
+module.exports = { loginUser, registerUser, updateProfile, forgotPassword, resetPassword };

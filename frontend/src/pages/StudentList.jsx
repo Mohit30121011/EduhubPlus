@@ -109,7 +109,7 @@ const StudentList = () => {
                             Students <span className="text-gray-400 font-medium">({getFilteredData().length})</span>
                         </h2>
 
-                        <div className="flex items-center gap-2 justify-end flex-nowrap overflow-x-auto pb-1 sm:pb-0 scrollbar-hide">
+                        <div className="flex items-center gap-2 justify-end flex-wrap">
                             {/* Search */}
                             {showSearchInput && (
                                 <motion.input

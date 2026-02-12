@@ -136,6 +136,16 @@ export const updateDepartment = createAsyncThunk(
 
 // ... (Create/Update/Delete thunks will automatically use the new API_URL) ...
 
+const initialState = {
+    courses: [],
+    subjects: [],
+    departments: [],
+    isLoading: false,
+    isSuccess: false,
+    isError: false,
+    message: '',
+};
+
 export const academicSlice = createSlice({
     name: 'academic',
     initialState,

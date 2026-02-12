@@ -18,7 +18,7 @@ const permissionRouteMap = {
     'insights': ['/dashboard/insights'],
     'staff': ['/dashboard/staff'],
     'tasks': ['/dashboard/tasks'],
-    'tasks': ['/dashboard/tasks'],
+
     'academic': ['/dashboard/academic'],
 };
 

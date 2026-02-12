@@ -96,20 +96,20 @@ const DashboardHome = () => {
     ];
 
     return (
-        <div className="flex flex-col gap-8 pb-24 lg:pb-0">
+        <div className="flex flex-col gap-5 pb-20 lg:pb-0">
             {/* 1. Header Section */}
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-4">
                 {/* Top Bar: Clean Name Only */}
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col">
-                        <h1 className="text-3xl font-black text-gray-900 leading-none tracking-tight">
+                        <h1 className="text-2xl font-black text-gray-900 leading-none tracking-tight">
                             Hello, <span className="text-blue-600">{user?.name?.split(' ')[0] || 'User'}!</span>
                         </h1>
-                        <p className="text-gray-500 text-sm font-medium mt-1">Welcome back to campus.</p>
+                        <p className="text-gray-500 text-xs font-medium mt-1">Welcome back.</p>
                     </div>
-                    <button className="p-2.5 relative bg-white rounded-2xl shadow-sm border border-gray-100 hover:bg-gray-50 transition-colors">
-                        <Bell size={22} className="text-gray-700" />
-                        <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                    <button className="p-2 relative bg-white rounded-xl shadow-sm border border-gray-100 hover:bg-gray-50 transition-colors">
+                        <Bell size={20} className="text-gray-700" />
+                        <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-red-500 rounded-full ring-2 ring-white"></span>
                     </button>
                 </div>
 
@@ -117,23 +117,23 @@ const DashboardHome = () => {
                 <div className="relative group">
                     <input
                         type="text"
-                        placeholder="Search for 'assignments'..."
-                        className="w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-2xl shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm font-semibold placeholder:text-gray-400 group-hover:shadow-md"
+                        placeholder="Search..."
+                        className="w-full pl-10 pr-4 py-3 bg-white border border-gray-100 rounded-xl shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm font-semibold placeholder:text-gray-400 group-hover:shadow-md"
                     />
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors" size={20} />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 border-l border-gray-200 pl-3">
-                        <Zap size={18} className="text-blue-500" fill="currentColor" />
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors" size={18} />
+                    <div className="absolute right-3.5 top-1/2 -translate-y-1/2 border-l border-gray-200 pl-2.5">
+                        <Zap size={16} className="text-blue-500" fill="currentColor" />
                     </div>
                 </div>
             </div>
 
-            {/* 2. Stats Cards (Replaces Static Deals) */}
-            <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-6 px-6 pb-4">
+            {/* 2. Stats Cards */}
+            <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-5 px-5 pb-2">
                 {statsCards.map((stat, index) => (
                     <div
                         key={index}
                         className={`
-                            relative flex-shrink-0 w-[72vw] sm:w-[260px] h-[160px] rounded-[24px] overflow-hidden snap-center group cursor-pointer shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-300 ease-out
+                            relative flex-shrink-0 w-[85vw] sm:w-[260px] h-[150px] rounded-[24px] overflow-hidden snap-center group cursor-pointer shadow-sm hover:shadow-lg hover:scale-[1.01] transition-all duration-300 ease-out
                         `}
                     >
                         {/* Background & Overlays */}
@@ -141,11 +141,11 @@ const DashboardHome = () => {
                             <img
                                 src={stat.bgImage}
                                 alt=""
-                                className="w-full h-full object-cover opacity-50 mix-blend-overlay transition-transform duration-700 group-hover:scale-110"
+                                className="w-full h-full object-cover opacity-60 mix-blend-overlay transition-transform duration-700 group-hover:scale-110"
                             />
                         </div>
-                        <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} z-10 opacity-90`} />
-                        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/10 to-transparent pointer-events-none z-20 opacity-30" />
+                        <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} z-10 opacity-95`} />
+                        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/10 to-transparent pointer-events-none z-20 opacity-20" />
 
                         {/* Content */}
                         <div className="relative z-30 h-full flex flex-col justify-between p-5 text-white w-full">
@@ -158,10 +158,10 @@ const DashboardHome = () => {
                                         {stat.title}
                                     </p>
                                     {stat.subtitle && (
-                                        <p className="text-[10px] text-white/80 mt-1 font-semibold">{stat.subtitle}</p>
+                                        <p className="text-[10px] text-white/80 mt-0.5 font-medium">{stat.subtitle}</p>
                                     )}
                                 </div>
-                                <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center shrink-0 ml-3">
+                                <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center shrink-0 ml-2">
                                     <stat.icon className="w-4 h-4 text-white" strokeWidth={2.5} />
                                 </div>
                             </div>

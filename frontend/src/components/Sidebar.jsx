@@ -18,7 +18,8 @@ const permissionRouteMap = {
     'insights': ['/dashboard/insights'],
     'staff': ['/dashboard/staff'],
     'tasks': ['/dashboard/tasks'],
-    'master': ['/dashboard/master'],
+    'tasks': ['/dashboard/tasks'],
+    'academic': ['/dashboard/academic'],
 };
 
 const getNavItems = (userRole, userPermissions = []) => {
@@ -33,7 +34,7 @@ const getNavItems = (userRole, userPermissions = []) => {
         { href: '/dashboard/insights', icon: AlertCircle, label: 'Insights', permissionId: 'insights' },
         { href: '/dashboard/staff', icon: Users, label: 'Staff', permissionId: 'staff' },
         { href: '/dashboard/tasks', icon: CalendarCheck, label: 'Tasks', permissionId: 'tasks' },
-        { href: '/dashboard/master', icon: FolderCog, label: 'Academic Data', permissionId: 'master' },
+        { href: '/dashboard/academic', icon: FolderCog, label: 'Academic Data', permissionId: 'academic' },
         { href: '/dashboard/attendance', icon: ClipboardCheck, label: 'Attendance', permissionId: 'attendance', alwaysShow: true },
         { href: '/dashboard/notifications', icon: Bell, label: 'Notifications', permissionId: 'notifications', alwaysShow: true },
     ];

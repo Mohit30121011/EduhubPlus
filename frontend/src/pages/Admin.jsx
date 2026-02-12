@@ -78,7 +78,7 @@ const permissionModules = [
     { id: 'insights', label: 'Insights' },
     { id: 'staff', label: 'Staff' },
     { id: 'tasks', label: 'Tasks' },
-    { id: 'master', label: 'Academic Data' },
+    { id: 'academic', label: 'Academic Data' },
 ];
 
 const Admin = () => {

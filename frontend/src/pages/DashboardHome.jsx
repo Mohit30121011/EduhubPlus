@@ -62,7 +62,8 @@ const DashboardHome = () => {
             icon: Users,
             btnText: 'View All',
             link: '/dashboard/students',
-            gradient: "from-blue-600/90 via-blue-600/60 to-transparent"
+            gradient: "from-blue-600/90 via-blue-600/60 to-transparent",
+            bgImage: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80"
         },
         {
             title: 'Faculty Members',
@@ -70,7 +71,8 @@ const DashboardHome = () => {
             icon: GraduationCap,
             btnText: 'View Staff',
             link: '/dashboard/faculty',
-            gradient: "from-purple-600/90 via-purple-600/60 to-transparent"
+            gradient: "from-purple-600/90 via-purple-600/60 to-transparent",
+            bgImage: "https://images.unsplash.com/photo-1544531586-fde5298cdd40?auto=format&fit=crop&q=80"
         },
         {
             title: 'Today\'s Attendance',
@@ -79,7 +81,8 @@ const DashboardHome = () => {
             icon: UserCheck,
             btnText: 'Mark Now',
             link: '/dashboard/attendance',
-            gradient: "from-green-600/90 via-green-600/60 to-transparent"
+            gradient: "from-green-600/90 via-green-600/60 to-transparent",
+            bgImage: "https://images.unsplash.com/photo-1606761568499-6d2451b23c66?auto=format&fit=crop&q=80"
         },
         {
             title: 'Fees Collected',
@@ -87,7 +90,8 @@ const DashboardHome = () => {
             icon: DollarSign,
             btnText: 'Manage Fees',
             link: '/dashboard/finances',
-            gradient: "from-amber-600/90 via-amber-600/60 to-transparent"
+            gradient: "from-amber-600/90 via-amber-600/60 to-transparent",
+            bgImage: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&q=80"
         }
     ];
 
@@ -133,8 +137,14 @@ const DashboardHome = () => {
                         `}
                     >
                         {/* Background & Overlays */}
-                        <div className="absolute inset-0 bg-white z-0" />
-                        <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} z-10`} />
+                        <div className="absolute inset-0 bg-gray-900 z-0">
+                            <img
+                                src={stat.bgImage}
+                                alt=""
+                                className="w-full h-full object-cover opacity-40 mix-blend-overlay transition-transform duration-700 group-hover:scale-110"
+                            />
+                        </div>
+                        <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} z-10 opacity-90`} />
                         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/10 to-transparent pointer-events-none z-20 opacity-30" />
 
                         {/* Content */}

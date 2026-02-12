@@ -1,12 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './features/authSlice';
 import settingsReducer from './features/settingsSlice';
-import masterReducer from './features/masterSlice';
+import academicReducer from './features/academicSlice';
 
 export const store = configureStore({
     reducer: {
         auth: authReducer,
         settings: settingsReducer,
-        master: masterReducer,
+        auth: authReducer,
+        settings: settingsReducer,
+        academic: academicReducer,
     },
 });

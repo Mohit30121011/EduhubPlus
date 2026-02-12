@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BookOpen, FolderPlus, Layers, Plus, ArrowRight, ArrowLeft, X, ChevronDown, Check, Sparkles, Trash2, AlertTriangle, Upload, Download, FileSpreadsheet, Search, SlidersHorizontal, Columns3, Eye, EyeOff } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllMasterData, createCourse, deleteCourse, createSubject, createDepartment, updateCourse, updateSubject, updateDepartment } from '../redux/features/masterSlice';
+import { getAllAcademicData, createCourse, deleteCourse, createSubject, createDepartment, updateCourse, updateSubject, updateDepartment } from '../redux/features/academicSlice';
 import { toast } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
@@ -431,7 +431,7 @@ const LegacyImportModal = ({ isOpen, onClose, category, token, onSuccess }) => {
 
 const MasterData = () => {
     const dispatch = useDispatch();
-    const { courses, subjects, departments, isLoading } = useSelector((state) => state.master);
+    const { courses, subjects, departments, isLoading } = useSelector((state) => state.academic);
     const { token } = useSelector((state) => state.auth);
     const [view, setView] = useState('grid'); // grid, courses, subjects, departments
 
@@ -492,7 +492,7 @@ const MasterData = () => {
     };
 
     useEffect(() => {
-        dispatch(getAllMasterData());
+        dispatch(getAllAcademicData());
     }, [dispatch]);
 
     // Open Modal

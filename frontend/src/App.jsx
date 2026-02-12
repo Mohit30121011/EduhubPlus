@@ -19,7 +19,7 @@ import Finances from './pages/Finances';
 import Content from './pages/Content';
 import Insights from './pages/Insights';
 import Tasks from './pages/Tasks';
-import Master from './pages/Master';
+import AcademicMaster from './pages/AcademicMaster';
 import Admin from './pages/Admin';
 import Settings from './pages/Settings';
 import Notifications from './pages/Notifications';
@@ -64,7 +64,7 @@ function App() {
                     <Route path="staff/add" element={<AddFaculty />} />
 
                     <Route path="tasks" element={<Tasks />} />
-                    <Route path="master" element={<Master />} />
+                    <Route path="academic" element={<AcademicMaster />} />
                     <Route path="admin" element={<Admin />} />
                     <Route path="settings" element={<Settings />} />
 

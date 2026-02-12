@@ -1,0 +1,66 @@
+# Ultra-Detailed Mega Prompt for ICMS Activity Diagram
+
+**INSTRUCTIONS:**
+Act as a **Business Process Analyst**. I need a detailed **Activity Diagram** (with Swimlanes) for the core workflows of our **Intelligent Campus Management System (ICMS)**.
+
+**CONTEXT:**
+The system handles complex, multi-step processes involving different users (Actors) and the System Database. You must represent these flows using **Activity Diagrams**.
+
+**KEY WORKFLOWS TO MODEL:**
+*Choose one comprehensive flow or combine them into a High-Level Activity Map.*
+
+### **Workflow 1: Student Admission & Fee Payment**
+*   **Swimlanes:** Applicant | System | Admin | Finance
+*   **Steps:**
+    1.  Applicant fills `Admission Form`.
+    2.  System validates `Documents`.
+    3.  **Decision Node:** Documents Valid?
+        *   *No:* Notify Applicant (End).
+        *   *Yes:* Admin approves & generates `Merit List`.
+    4.  Applicant pays `Admission Fee`.
+    5.  System updates `Fee Status` -> Generates `Roll Number`.
+    6.  System sends `Welcome Email`.
+
+### **Workflow 2: Examination & Result Processing**
+*   **Swimlanes:** Faculty | System | Student
+*   **Steps:**
+    1.  Faculty creates `Quiz/Exam`.
+    2.  Student attempts `Quiz`.
+    3.  **Fork Node:**
+        *   *Path A:* System auto-grades (if MCQ).
+        *   *Path B:* Faculty manually grades (if Subjective).
+    4.  **Join Node:** Grades finalized.
+    5.  System calculates `GPA/CGPA`.
+    6.  Student views `Result`.
+
+### **Workflow 3: Library Book Issue/Return**
+*   **Swimlanes:** Student | Librarian | System Database
+*   **Steps:**
+    1.  Student requests `Book`.
+    2.  Librarian scans `RFID Tag`.
+    3.  **Decision Node:** Student has pending fines?
+        *   *Yes:* Collect Fine -> Update Record.
+        *   *No:* Proceed.
+    4.  System checks `Book Availability`.
+    5.  Librarian issues Book -> System updates `Inventory` (Decrease count).
+
+### **Workflow 4: Usage of LMS (Learning Management)**
+*   **Swimlanes:** Faculty | System | Student
+*   **Steps:**
+    1.  Faculty uploads `LMS Material` (PDF/Video).
+    2.  System notifies `Student Class Group`.
+    3.  Student logs in -> Accesses `Course Material`.
+    4.  Student downloads `Notes`.
+
+---
+
+**OUTPUT:**
+1.  **Mermaid.js Code:** Generate the diagram using `graph TD` (flowchart) or specific UML Activity syntax if supported.
+2.  **Swimlanes/Partitions:** Use `subgraph` in Mermaid to visually separate "Student", "System", "Admin", etc.
+3.  **Notation:** Use standard shapes:
+    *   `([Start])` / `([End])` - Stadium shape.
+    *   `{Decision?}` - Diamond shape.
+    *   `[Action/Activity]` - Rectangle.
+    *   `-->|Yes|` - Labeled Arrows.
+
+**Focus on the logic and flow of data between the user and the backend system.**

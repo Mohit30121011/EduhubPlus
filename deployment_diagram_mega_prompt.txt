@@ -1,0 +1,56 @@
+# Ultra-Detailed Mega Prompt for ICMS Deployment Diagram
+
+**INSTRUCTIONS:**
+Act as a **Cloud Solutions Architect**. I need a comprehensive **UML Deployment Diagram** for our **Intelligent Campus Management System (ICMS)**.
+
+**CONTEXT:**
+The system is a modern web application with a **Separated Frontend & Backend** architecture (Microservices style). We use a **Cloud-Native** deployment strategy.
+
+**NODES & ARTIFACTS TO MODEL:**
+
+### 1. Client Tier (The Users)
+*   **Node:** `User Device` (PC / Laptop / Smartphone).
+*   **Artifact:** `Web Browser` (Chrome/Safari).
+*   **Component:** `React SPA (Frontend Logic)` runs here.
+*   **Users:** Student, Faculty, Admin, Finance Officer.
+
+### 2. Frontend Server Tier (CDN / Static Host)
+*   **Node:** `Vercel / Netlify Cloud` (or Nginx Server).
+*   **Artifact:** `Build Artifacts` (HTML/CSS/JS Bundles).
+*   **Protocol:** Serves content via **HTTPS** (SSL).
+
+### 3. Application Server Tier (The Backend)
+*   **Node:** `Node.js Runtime Environment` (e.g., AWS EC2 / Render / Railway).
+*   **Artifact:** `Express API Server`.
+*   **Components:**
+    *   `Auth Service` (JWT Handling).
+    *   `Business Logic Layer` (Modules: Admin, Academic, Finance).
+    *   `File Upload Service` (Multer).
+*   **Protocol:** Receives **REST API Requests (JSON)** via **HTTPS**.
+
+### 4. Data Persistence Tier (The Database)
+*   **Node:** `PostgreSQL Database Cluster` (e.g., AWS RDS / Supabase).
+*   **Artifact:** `ICMS Schema` (Tables: Users, Fees, Marks, etc.).
+*   **Protocol:** Connected via **TCP/IP (Sequelize ORM Connection)**.
+
+### 5. Third-Party Integrations (External Systems)
+*   **Node:** `Payment Gateway Server` (e.g., Razorpay/Stripe).
+    *   *Connection:* HTTPS API Call during Fee Payment.
+*   **Node:** `Cloud Storage Bucket` (e.g., AWS S3 / Cloudinary).
+    *   *Connection:* HTTPS for storing/retrieving LMS Documents.
+
+---
+
+**RELATIONSHIPS (The Lines):**
+1.  **User Device** --(HTTPS/443)--> **Frontend Server** (Downloads App).
+2.  **User Device** --(HTTPS/443 API Calls)--> **Backend Server** (Data).
+3.  **Backend Server** --(SQL/5432)--> **Database Server**.
+4.  **Backend Server** --(HTTPS API)--> **Payment Gateway**.
+5.  **Backend Server** --(HTTPS API)--> **Cloud Storage**.
+
+**OUTPUT:**
+Generate the **Mermaid.js code** (using `graph TD` or `C4 Deployment` diagram syntax).
+*   Use `subgraph` to group "Client Side", "Server Side", and "External Services".
+*   Use accurate icons/shapes if possible (e.g., Database Cylinder, Cloud Shape).
+
+**Make it detailed, showing the actual flow of code and data in a production environment.**

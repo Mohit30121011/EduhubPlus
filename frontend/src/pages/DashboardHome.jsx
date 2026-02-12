@@ -133,7 +133,7 @@ const DashboardHome = () => {
                     <div
                         key={index}
                         className={`
-                            relative flex-shrink-0 w-[85vw] sm:w-[300px] h-[220px] rounded-[32px] overflow-hidden snap-center group cursor-pointer shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-500 ease-out
+                            relative flex-shrink-0 w-[72vw] sm:w-[260px] h-[160px] rounded-[24px] overflow-hidden snap-center group cursor-pointer shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-300 ease-out
                         `}
                     >
                         {/* Background & Overlays */}
@@ -141,35 +141,34 @@ const DashboardHome = () => {
                             <img
                                 src={stat.bgImage}
                                 alt=""
-                                className="w-full h-full object-cover opacity-40 mix-blend-overlay transition-transform duration-700 group-hover:scale-110"
+                                className="w-full h-full object-cover opacity-50 mix-blend-overlay transition-transform duration-700 group-hover:scale-110"
                             />
                         </div>
                         <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} z-10 opacity-90`} />
                         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/10 to-transparent pointer-events-none z-20 opacity-30" />
 
                         {/* Content */}
-                        <div className="relative z-30 h-full flex flex-col justify-between p-6 text-white w-full">
-                            <div className="flex flex-col gap-4">
-                                <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/20 shadow-sm">
-                                    <stat.icon className="w-5 h-5 text-white" strokeWidth={2} />
-                                </div>
-
+                        <div className="relative z-30 h-full flex flex-col justify-between p-5 text-white w-full">
+                            <div className="flex justify-between items-start">
                                 <div>
-                                    <h3 className="text-3xl font-extrabold leading-[1.1] tracking-tight mb-1 text-white drop-shadow-sm">
+                                    <h3 className="text-3xl font-black leading-none tracking-tight mb-1 text-white drop-shadow-sm">
                                         {stat.value}
                                     </h3>
-                                    <p className="text-white/90 text-sm font-medium opacity-95">
+                                    <p className="text-white/90 text-xs font-bold uppercase tracking-wider opacity-90">
                                         {stat.title}
                                     </p>
                                     {stat.subtitle && (
-                                        <p className="text-xs text-white/70 mt-1">{stat.subtitle}</p>
+                                        <p className="text-[10px] text-white/80 mt-1 font-semibold">{stat.subtitle}</p>
                                     )}
+                                </div>
+                                <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center shrink-0 ml-3">
+                                    <stat.icon className="w-4 h-4 text-white" strokeWidth={2.5} />
                                 </div>
                             </div>
 
-                            <Link to={stat.link} className="self-start px-6 py-2.5 bg-white/20 backdrop-blur-xl border border-white/40 text-white rounded-full text-xs font-bold flex items-center gap-2 group-hover:bg-white group-hover:text-black transition-all duration-300 shadow-md">
+                            <Link to={stat.link} className="self-start px-4 py-1.5 bg-white/20 backdrop-blur-md border border-white/30 text-white rounded-full text-[10px] font-bold flex items-center gap-1.5 group-hover:bg-white group-hover:text-black transition-all duration-300">
                                 {stat.btnText}
-                                <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-1" />
+                                <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                             </Link>
                         </div>
                     </div>

@@ -4,6 +4,8 @@ import {
     MoreHorizontal, Search, Filter, Plus, ChevronRight, Download
 } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 // Mock Data
 const applications = [
@@ -56,7 +58,22 @@ const PipelineCard = ({ title, count, color, percentage }) => (
     </div>
 );
 
+const exportAdmissionsCSV = () => {
+    const header = 'ID,Name,Applied For,Date,Status,Score,Documents\n';
+    const rows = applications.map(a => `${a.id},${a.name},${a.class},${a.date},${a.status},${a.score},${a.docs}`).join('\n');
+    const blob = new Blob([header + rows], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'admissions_data.csv';
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('Admissions data exported!');
+};
+
 const Admissions = () => {
+    const navigate = useNavigate();
+
     return (
         <div className="space-y-8 pb-10">
             {/* Header */}
@@ -66,10 +83,16 @@ const Admissions = () => {
                     <p className="text-gray-500 text-sm mt-1">Track applications, manage workflows, and approve enrollments.</p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="px-4 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 shadow-sm flex items-center gap-2">
+                    <button
+                        onClick={exportAdmissionsCSV}
+                        className="px-4 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 shadow-sm flex items-center gap-2"
+                    >
                         <Download size={16} /> Export Data
                     </button>
-                    <button className="px-4 py-2 bg-primary-600 text-white rounded-xl text-sm font-medium hover:bg-primary-700 shadow-lg shadow-primary-500/20 flex items-center gap-2">
+                    <button
+                        onClick={() => navigate('/dashboard/students/add')}
+                        className="px-4 py-2 bg-primary-600 text-white rounded-xl text-sm font-medium hover:bg-primary-700 shadow-lg shadow-primary-500/20 flex items-center gap-2"
+                    >
                         <Plus size={18} /> New Application
                     </button>
                 </div>

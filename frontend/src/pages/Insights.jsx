@@ -218,14 +218,14 @@ const Insights = () => {
                 if (statsRes?.data) {
                     const real = statsRes.data;
                     setStats({
-                        studentCount: real.studentCount || MOCK_STATS.studentCount,
-                        facultyCount: real.facultyCount || MOCK_STATS.facultyCount,
+                        studentCount: Math.max(real.studentCount || 0, MOCK_STATS.studentCount),
+                        facultyCount: Math.max(real.facultyCount || 0, MOCK_STATS.facultyCount),
                         attendance: {
-                            present: real.attendance?.present ?? MOCK_STATS.attendance.present,
-                            total: real.attendance?.total ?? MOCK_STATS.attendance.total,
-                            percentage: real.attendance?.percentage ?? MOCK_STATS.attendance.percentage,
+                            present: Math.max(real.attendance?.present ?? 0, MOCK_STATS.attendance.present),
+                            total: Math.max(real.attendance?.total ?? 0, MOCK_STATS.attendance.total),
+                            percentage: Math.max(real.attendance?.percentage ?? 0, MOCK_STATS.attendance.percentage),
                         },
-                        fees: { totalCollected: real.fees?.totalCollected || MOCK_STATS.fees.totalCollected },
+                        fees: { totalCollected: Math.max(real.fees?.totalCollected || 0, MOCK_STATS.fees.totalCollected) },
                     });
                     if (real.studentCount > 0 || real.facultyCount > 0) hasRealData = true;
                 }

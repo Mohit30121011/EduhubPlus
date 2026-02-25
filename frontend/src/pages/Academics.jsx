@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     BookOpen, Users, Clock, Calendar, MoreHorizontal,
     Plus, Search, ChevronRight, Layers, FileText
 } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 
 // Mock Data for Classes
 const classes = [
@@ -34,7 +35,15 @@ const StatCard = ({ title, count, icon: Icon, color }) => (
 );
 
 const Academics = () => {
-    const [activeTab, setActiveTab] = useState(() => localStorage.getItem('academicsTab') || 'classes');
+    const [searchParams] = useSearchParams();
+    const tabFromUrl = searchParams.get('tab');
+    const [activeTab, setActiveTab] = useState(() => tabFromUrl || localStorage.getItem('academicsTab') || 'classes');
+
+    useEffect(() => {
+        if (tabFromUrl && ['classes', 'subjects', 'timetables'].includes(tabFromUrl)) {
+            setActiveTab(tabFromUrl);
+        }
+    }, [tabFromUrl]);
 
     return (
         <div className="space-y-8 pb-10">

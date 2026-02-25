@@ -41,9 +41,9 @@ const DashboardHome = () => {
     // Quick Actions
     const quickActions = [
         { icon: UserCheck, label: 'Attendance', color: 'bg-blue-50 text-blue-600', link: '/dashboard/attendance' },
-        { icon: FileText, label: 'Results', color: 'bg-indigo-50 text-indigo-600', link: '/dashboard/academics' },
+        { icon: FileText, label: 'Results', color: 'bg-indigo-50 text-indigo-600', link: '/dashboard/academics?tab=subjects' },
         { icon: Library, label: 'Library', color: 'bg-sky-50 text-sky-600', link: '/dashboard/content' },
-        { icon: Calendar, label: 'Timetable', color: 'bg-violet-50 text-violet-600', link: '/dashboard/academics' },
+        { icon: Calendar, label: 'Timetable', color: 'bg-violet-50 text-violet-600', link: '/dashboard/academics?tab=timetables' },
         { icon: CreditCard, label: 'Fees', color: 'bg-blue-50 text-blue-600', link: '/dashboard/finances' },
         { icon: Monitor, label: 'LMS', color: 'bg-indigo-50 text-indigo-600', link: '/dashboard/content' },
     ];
@@ -181,7 +181,7 @@ const DashboardHome = () => {
                     <h3 className="font-extrabold text-gray-900 text-lg tracking-tight">
                         <span className="bolt-underline">Academics</span>
                     </h3>
-                    <span className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full cursor-pointer hover:bg-blue-100 transition-colors">Explore</span>
+                    <Link to="/dashboard/academics" className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full cursor-pointer hover:bg-blue-100 transition-colors">Explore</Link>
                 </div>
                 <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
                     {quickActions.map((action, idx) => (
@@ -217,9 +217,9 @@ const DashboardHome = () => {
                                     <span className="flex items-center gap-1.5"><UserCheck size={12} className="text-blue-400" /> {item.teacher}</span>
                                 </div>
                             </div>
-                            <button className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-all transform group-hover:rotate-[-45deg]">
+                            <Link to="/dashboard/academics?tab=timetables" className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-all transform group-hover:rotate-[-45deg]">
                                 <ArrowRight size={18} />
-                            </button>
+                            </Link>
                         </div>
                     ))}
                 </div>

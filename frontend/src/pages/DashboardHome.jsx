@@ -8,7 +8,7 @@ import {
     Utensils, Sparkles, AlertCircle, Scissors, Hammer, Truck, Camera, Bug,
     Users, TrendingUp, DollarSign
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const DashboardHome = () => {
@@ -58,6 +58,46 @@ const DashboardHome = () => {
             fetchStats();
         }
     }, [user]);
+
+    const navigate = useNavigate();
+    const [searchQuery, setSearchQuery] = useState('');
+    const [showSearchResults, setShowSearchResults] = useState(false);
+
+    // All searchable pages
+    const searchablePages = [
+        { label: 'Students', link: '/dashboard/students', keywords: 'student list enroll' },
+        { label: 'Add Student', link: '/dashboard/students/add', keywords: 'add new student admission' },
+        { label: 'Faculty', link: '/dashboard/faculty', keywords: 'faculty staff teacher professor' },
+        { label: 'Add Faculty', link: '/dashboard/faculty/add', keywords: 'add new faculty hire' },
+        { label: 'Attendance', link: '/dashboard/attendance', keywords: 'attendance mark present absent' },
+        { label: 'Academics', link: '/dashboard/academics', keywords: 'academic department course subject' },
+        { label: 'Finances', link: '/dashboard/finances', keywords: 'fee payment finance money collect' },
+        { label: 'Tasks', link: '/dashboard/tasks', keywords: 'task manager kanban todo' },
+        { label: 'Notifications', link: '/dashboard/notifications', keywords: 'notification alert message' },
+        { label: 'Analytics', link: '/dashboard/analytics', keywords: 'analytics chart graph insight report' },
+        { label: 'Admissions', link: '/dashboard/admissions', keywords: 'admission enquiry enroll' },
+        { label: 'Content / LMS', link: '/dashboard/content', keywords: 'content library lms learning' },
+        { label: 'Settings', link: '/dashboard/settings', keywords: 'settings config profile account' },
+        { label: 'Admin Panel', link: '/dashboard/admin', keywords: 'admin panel backup manage' },
+    ];
+
+    const filteredPages = searchQuery.trim()
+        ? searchablePages.filter(p =>
+            `${p.label} ${p.keywords}`.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        : [];
+
+    const handleSearchSelect = (link) => {
+        setSearchQuery('');
+        setShowSearchResults(false);
+        navigate(link);
+    };
+
+    const handleSearchKeyDown = (e) => {
+        if (e.key === 'Enter' && filteredPages.length > 0) {
+            handleSearchSelect(filteredPages[0].link);
+        }
+    };
 
     // Quick Actions
     const quickActions = [
@@ -128,7 +168,10 @@ const DashboardHome = () => {
                         </h1>
                         <p className="text-gray-500 text-xs font-medium mt-1">Welcome back.</p>
                     </div>
-                    <button className="p-2 relative bg-white rounded-xl shadow-sm border border-gray-100 hover:bg-gray-50 transition-colors">
+                    <button
+                        onClick={() => navigate('/dashboard/notifications')}
+                        className="p-2 relative bg-white rounded-xl shadow-sm border border-gray-100 hover:bg-gray-50 transition-colors"
+                    >
                         <Bell size={20} className="text-gray-700" />
                         <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-red-500 rounded-full ring-2 ring-white"></span>
                     </button>
@@ -138,13 +181,41 @@ const DashboardHome = () => {
                 <div className="relative group">
                     <input
                         type="text"
-                        placeholder="Search..."
+                        placeholder="Search pages..."
+                        value={searchQuery}
+                        onChange={(e) => { setSearchQuery(e.target.value); setShowSearchResults(true); }}
+                        onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
+                        onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
+                        onKeyDown={handleSearchKeyDown}
                         className="w-full pl-10 pr-4 py-3 bg-white border border-gray-100 rounded-xl shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm font-semibold placeholder:text-gray-400 group-hover:shadow-md"
                     />
                     <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors" size={18} />
                     <div className="absolute right-3.5 top-1/2 -translate-y-1/2 border-l border-gray-200 pl-2.5">
                         <Zap size={16} className="text-blue-500" fill="currentColor" />
                     </div>
+
+                    {/* Search Results Dropdown */}
+                    {showSearchResults && filteredPages.length > 0 && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
+                            {filteredPages.map((page, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => handleSearchSelect(page.link)}
+                                    className="w-full px-4 py-3 text-left text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-3 transition-colors border-b border-gray-50 last:border-0"
+                                >
+                                    <Search size={14} className="text-gray-400" />
+                                    {page.label}
+                                    <ArrowRight size={14} className="ml-auto text-gray-300" />
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
+                    {showSearchResults && searchQuery.trim() && filteredPages.length === 0 && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-50 p-4 text-center text-sm text-gray-400">
+                            No pages found for "{searchQuery}"
+                        </div>
+                    )}
                 </div>
             </div>
 

@@ -62,7 +62,7 @@ const DashboardHome = () => {
     // Quick Actions
     const quickActions = [
         { icon: UserCheck, label: 'Attendance', color: 'bg-blue-50 text-blue-600', link: '/dashboard/attendance' },
-        { icon: FileText, label: 'Results', color: 'bg-indigo-50 text-indigo-600', link: '/dashboard/academics?tab=subjects' },
+        { icon: FileText, label: 'Data', color: 'bg-indigo-50 text-indigo-600', link: '/dashboard/academics?tab=subjects' },
         { icon: Library, label: 'Library', color: 'bg-sky-50 text-sky-600', link: '/dashboard/content' },
         { icon: Calendar, label: 'Timetable', color: 'bg-violet-50 text-violet-600', link: '/dashboard/academics?tab=timetables' },
         { icon: CreditCard, label: 'Fees', color: 'bg-blue-50 text-blue-600', link: '/dashboard/finances' },

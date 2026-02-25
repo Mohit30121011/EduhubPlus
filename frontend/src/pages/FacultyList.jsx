@@ -10,6 +10,31 @@ import { Shield, Users, Plus, X, Search, SlidersHorizontal, Columns3, Phone, Bri
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+// ─── Mock / Sample Faculty (120 generated) ──────────────────────────
+const FAC_TITLES = ['Dr.', 'Prof.', 'Dr.', 'Prof.', 'Dr.'];
+const FAC_FIRST = ['Rajesh', 'Sunita', 'Anil', 'Meena', 'Suresh', 'Kavitha', 'Deepak', 'Lakshmi', 'Ramesh', 'Geeta', 'Sanjay', 'Anita', 'Prakash', 'Neelam', 'Vijay', 'Seema', 'Ashok', 'Rekha', 'Manoj', 'Savita', 'Sunil', 'Vandana', 'Ravi', 'Usha', 'Hemant', 'Jyoti', 'Dinesh', 'Bharti', 'Girish', 'Sushma'];
+const FAC_LAST = ['Kumar', 'Mehta', 'Deshmukh', 'Iyer', 'Patil', 'Rao', 'Tiwari', 'Narayan', 'Chauhan', 'Mishra', 'Saxena', 'Bansal', 'Agarwal', 'Chopra', 'Malhotra', 'Kapoor', 'Bhat', 'Dubey', 'Pandey', 'Soni', 'Shah', 'Jain', 'Verma', 'Nair', 'Sharma'];
+const FAC_DEPTS = ['Computer Science', 'Electronics', 'Mechanical', 'Civil', 'Electrical', 'Mathematics', 'Physics', 'Chemistry'];
+const FAC_DESIG = ['Professor', 'Associate Professor', 'Assistant Professor', 'HOD', 'Lecturer'];
+
+const MOCK_FACULTY = Array.from({ length: 120 }, (_, i) => {
+    const title = FAC_TITLES[i % FAC_TITLES.length];
+    const fn = FAC_FIRST[i % FAC_FIRST.length];
+    const ln = FAC_LAST[(i * 3 + 2) % FAC_LAST.length];
+    return {
+        id: `mock-f${i + 1}`,
+        firstName: `${title} ${fn}`,
+        lastName: ln,
+        email: `${fn.toLowerCase()}.${ln.toLowerCase()}${i + 1}@campus.edu`,
+        employeeId: `FAC${String(i + 1).padStart(4, '0')}`,
+        designation: FAC_DESIG[i % FAC_DESIG.length],
+        department: FAC_DEPTS[i % FAC_DEPTS.length],
+        phone: `98${String(76543210 + i).padStart(8, '0')}`,
+        User: { isActive: i % 8 !== 0 },
+        isMock: true
+    };
+});
+
 const FacultyList = () => {
     const { token } = useSelector((state) => state.auth);
     const navigate = useNavigate();
@@ -44,10 +69,14 @@ const FacultyList = () => {
             const res = await axios.get(`${API_URL}/faculty`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setFaculty(res.data || []);
+            const realData = (res.data || []).map(f => ({ ...f, isMock: false }));
+            // Merge: real data first, then mock items not already present
+            const realIds = new Set(realData.map(f => f.employeeId));
+            const mockToAdd = MOCK_FACULTY.filter(m => !realIds.has(m.employeeId));
+            setFaculty([...realData, ...mockToAdd]);
         } catch (error) {
-            toast.error('Failed to fetch faculty list');
             console.error(error);
+            setFaculty(MOCK_FACULTY);
         } finally {
             setIsLoading(false);
         }
@@ -269,7 +298,10 @@ const FacultyList = () => {
                                             {visibleColumns.name && (
                                                 <td className="px-4 py-4">
                                                     <div>
-                                                        <span className="font-bold text-gray-700 block">{f.firstName} {f.lastName}</span>
+                                                        <span className="font-bold text-gray-700 block">
+                                                            {f.firstName} {f.lastName}
+                                                            {f.isMock && <span className="ml-2 px-1.5 py-0.5 bg-amber-100 text-amber-600 text-[9px] font-black rounded-md uppercase">Sample</span>}
+                                                        </span>
                                                         <span className="text-xs text-gray-400">{f.employeeId}</span>
                                                     </div>
                                                 </td>
@@ -302,7 +334,9 @@ const FacultyList = () => {
                                             <td className="px-4 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <button onClick={() => navigate(`edit/${f.id}`)} className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold hover:bg-blue-100 transition-colors">Edit</button>
-                                                    <button onClick={() => { setItemToDelete(f); setShowDeleteModal(true); }} className="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-bold hover:bg-red-100 transition-colors">Delete</button>
+                                                    {!f.isMock && (
+                                                        <button onClick={() => { setItemToDelete(f); setShowDeleteModal(true); }} className="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-bold hover:bg-red-100 transition-colors">Delete</button>
+                                                    )}
                                                 </div>
                                             </td>
                                         </motion.tr>

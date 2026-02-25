@@ -14,6 +14,29 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+// ─── Mock / Sample Students (550 generated) ────────────────────────
+const FIRST_NAMES = ['Aarav', 'Priya', 'Rohan', 'Ananya', 'Vikram', 'Sneha', 'Arjun', 'Kavya', 'Aditya', 'Meera', 'Rahul', 'Pooja', 'Karan', 'Nisha', 'Harsh', 'Divya', 'Manish', 'Ritu', 'Saurabh', 'Tanvi', 'Nikhil', 'Shreya', 'Vivek', 'Sonal', 'Deepak', 'Ankita', 'Varun', 'Megha', 'Amit', 'Swati', 'Raj', 'Neha', 'Yash', 'Sakshi', 'Ishaan', 'Pallavi', 'Dev', 'Komal', 'Tushar', 'Riya', 'Akash', 'Simran', 'Jay', 'Bhavna', 'Kunal', 'Tanya', 'Mohit', 'Parul', 'Gaurav', 'Kajal'];
+const LAST_NAMES = ['Sharma', 'Patel', 'Gupta', 'Singh', 'Reddy', 'Joshi', 'Verma', 'Nair', 'Kumar', 'Mehta', 'Deshmukh', 'Iyer', 'Patil', 'Rao', 'Tiwari', 'Narayan', 'Chauhan', 'Mishra', 'Saxena', 'Bansal', 'Agarwal', 'Chopra', 'Malhotra', 'Kapoor', 'Bhat', 'Dubey', 'Pandey', 'Soni', 'Shah', 'Jain'];
+const DEPARTMENTS = ['Computer Science', 'Electronics', 'Mechanical', 'Civil', 'Electrical', 'Information Technology'];
+const STATUSES = ['APPROVED', 'APPROVED', 'APPROVED', 'APPROVED', 'PENDING', 'REJECTED'];
+const SEMESTERS = [1, 2, 3, 4, 5, 6, 7, 8];
+
+const MOCK_STUDENTS = Array.from({ length: 550 }, (_, i) => {
+    const fn = FIRST_NAMES[i % FIRST_NAMES.length];
+    const ln = LAST_NAMES[(i * 7 + 3) % LAST_NAMES.length];
+    return {
+        id: `mock-s${i + 1}`,
+        firstName: fn,
+        lastName: ln,
+        email: `${fn.toLowerCase()}.${ln.toLowerCase()}${i + 1}@campus.edu`,
+        enrollmentNo: `EN${2023 + Math.floor(i / 200)}${String(i + 1).padStart(4, '0')}`,
+        department: DEPARTMENTS[i % DEPARTMENTS.length],
+        currentSemester: SEMESTERS[i % SEMESTERS.length],
+        applicationStatus: STATUSES[i % STATUSES.length],
+        isMock: true
+    };
+});
+
 const StudentList = () => {
     const navigate = useNavigate();
     const { token } = useSelector((state) => state.auth);
@@ -51,10 +74,14 @@ const StudentList = () => {
             const response = await axios.get(`${API_URL}/students`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setStudents(response.data);
+            const realData = (response.data || []).map(s => ({ ...s, isMock: false }));
+            // Merge: real data first, then mock items not already present
+            const realIds = new Set(realData.map(s => s.enrollmentNo));
+            const mockToAdd = MOCK_STUDENTS.filter(m => !realIds.has(m.enrollmentNo));
+            setStudents([...realData, ...mockToAdd]);
         } catch (error) {
             console.error('Error fetching students:', error);
-            toast.error('Failed to load students');
+            setStudents(MOCK_STUDENTS);
         } finally {
             setLoading(false);
         }
@@ -282,7 +309,10 @@ const StudentList = () => {
                                                             </div>
                                                         )}
                                                         <div>
-                                                            <div className="font-bold text-gray-900">{student.firstName} {student.lastName}</div>
+                                                            <div className="font-bold text-gray-900">
+                                                                {student.firstName} {student.lastName}
+                                                                {student.isMock && <span className="ml-2 px-1.5 py-0.5 bg-amber-100 text-amber-600 text-[9px] font-black rounded-md uppercase">Sample</span>}
+                                                            </div>
                                                             <div className="text-xs text-gray-500">{student.email}</div>
                                                         </div>
                                                     </div>
@@ -329,13 +359,15 @@ const StudentList = () => {
                                                         <motion.button onClick={() => navigate(`/dashboard/students/edit/${student.id}`)} whileHover={{ scale: 1.1 }} className="p-2 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-100" title="Edit Student">
                                                             <Edit size={16} />
                                                         </motion.button>
-                                                        <motion.button
-                                                            onClick={() => { setStudentToDelete(student); setShowDeleteModal(true); }}
-                                                            whileHover={{ scale: 1.1 }}
-                                                            className="p-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100"
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </motion.button>
+                                                        {!student.isMock && (
+                                                            <motion.button
+                                                                onClick={() => { setStudentToDelete(student); setShowDeleteModal(true); }}
+                                                                whileHover={{ scale: 1.1 }}
+                                                                className="p-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </motion.button>
+                                                        )}
                                                     </div>
                                                 </td>
                                             )}

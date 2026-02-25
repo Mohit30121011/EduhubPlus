@@ -93,21 +93,21 @@ const tooltipStyle = { borderRadius: '12px', border: 'none', boxShadow: '0 4px 1
 
 // ─── Stat Card ──────────────────────────────────────────────────────
 const FinanceCard = ({ title, amount, icon: Icon, iconBg, iconColor, sub, trend, loading }) => (
-    <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm p-5 pr-14 relative overflow-hidden group hover:shadow-md transition-all">
-        <div className={`absolute right-0 top-0 p-3 ${iconBg} rounded-bl-2xl`}>
-            <Icon size={20} className={iconColor} />
+    <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm p-4 sm:p-5 pr-11 relative overflow-hidden group hover:shadow-md transition-all">
+        <div className={`absolute right-0 top-0 p-2.5 ${iconBg} rounded-bl-2xl`}>
+            <Icon size={18} className={iconColor} />
         </div>
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{title}</p>
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider truncate">{title}</p>
         {loading ? (
             <div className="h-8 w-28 bg-gray-100 rounded-lg animate-pulse mt-2" />
         ) : (
             <>
-                <h3 className="text-2xl font-black text-gray-900 mt-2">{amount}</h3>
+                <h3 className="text-xl sm:text-2xl font-black text-gray-900 mt-2 truncate">{amount}</h3>
                 {sub && (
-                    <p className={`text-xs font-bold mt-2 flex items-center gap-1 ${trend === 'up' ? 'text-emerald-500' : trend === 'down' ? 'text-rose-500' : 'text-gray-400'}`}>
+                    <p className={`text-[10px] sm:text-xs font-bold mt-1.5 flex items-center gap-1 ${trend === 'up' ? 'text-emerald-500' : trend === 'down' ? 'text-rose-500' : 'text-gray-400'}`}>
                         {trend === 'up' && <TrendingUp size={12} />}
                         {trend === 'down' && <TrendingDown size={12} />}
-                        {sub}
+                        <span className="truncate">{sub}</span>
                     </p>
                 )}
             </>

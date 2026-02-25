@@ -125,21 +125,21 @@ const downloadChartAsPNG = (containerRef, filename = 'chart') => {
 
 // ─── KPI Card ───────────────────────────────────────────────────────
 const KPICard = ({ title, value, subtitle, icon: Icon, iconBg, iconColor, trend, loading }) => (
-    <div className="bg-white/80 backdrop-blur-xl p-5 pr-14 rounded-2xl shadow-sm border border-white/60 relative overflow-hidden group hover:shadow-md transition-all">
-        <div className={`absolute right-0 top-0 p-3 ${iconBg} rounded-bl-2xl`}>
-            <Icon size={20} className={iconColor} />
+    <div className="bg-white/80 backdrop-blur-xl p-4 sm:p-5 pr-11 rounded-2xl shadow-sm border border-white/60 relative overflow-hidden group hover:shadow-md transition-all">
+        <div className={`absolute right-0 top-0 p-2.5 ${iconBg} rounded-bl-2xl`}>
+            <Icon size={18} className={iconColor} />
         </div>
-        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{title}</p>
+        <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider truncate">{title}</p>
         {loading ? (
             <div className="h-10 w-24 bg-gray-100 rounded-lg animate-pulse mt-2" />
         ) : (
             <>
-                <h3 className="text-3xl font-black text-gray-900 mt-2">{value}</h3>
+                <h3 className="text-xl sm:text-3xl font-black text-gray-900 mt-2 truncate">{value}</h3>
                 {subtitle && (
-                    <p className={`text-xs font-bold mt-2 flex items-center gap-1 ${trend === 'up' ? 'text-emerald-500' : trend === 'down' ? 'text-rose-500' : 'text-gray-400'}`}>
+                    <p className={`text-[10px] sm:text-xs font-bold mt-1.5 flex items-center gap-1 ${trend === 'up' ? 'text-emerald-500' : trend === 'down' ? 'text-rose-500' : 'text-gray-400'}`}>
                         {trend === 'up' && <TrendingUp size={12} />}
                         {trend === 'down' && <TrendingDown size={12} />}
-                        {subtitle}
+                        <span className="truncate">{subtitle}</span>
                     </p>
                 )}
             </>

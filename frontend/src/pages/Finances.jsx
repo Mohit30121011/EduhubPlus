@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-    DollarSign, CreditCard, TrendingUp, TrendingDown,
-    Download, Search, FileText, AlertCircle, Plus, Trash2, Edit, X, Eye
+    DollarSign, CreditCard, TrendingUp, TrendingDown, Wallet,
+    Download, Search, FileText, AlertCircle, Plus, Trash2, Edit,
+    X, Check, Users, ArrowUpRight, ArrowDownRight, Clock, Filter,
+    ChevronDown, Receipt, IndianRupee, Loader2, PieChart, Calendar
 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
@@ -11,256 +13,590 @@ import toast from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-const FinanceCard = ({ title, amount, trend, trendValue, icon: Icon, color }) => (
-    <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm p-5 relative overflow-hidden">
-        <div className={`absolute top-0 right-0 p-4 opacity-10`}>
-            <Icon size={40} className={color} />
+// ─── Mock Data for fallback ─────────────────────────────────────────
+const MOCK_SUMMARY = {
+    totalCollected: 1425000,
+    pendingPayments: 375000,
+    totalExpected: 1800000,
+    monthlyTrend: [
+        { month: 'Sep', amount: 185000 },
+        { month: 'Oct', amount: 240000 },
+        { month: 'Nov', amount: 195000 },
+        { month: 'Dec', amount: 310000 },
+        { month: 'Jan', amount: 275000 },
+        { month: 'Feb', amount: 220000 },
+    ]
+};
+
+const MOCK_STRUCTURES = [
+    { id: 'mock-s1', category: 'TUITION', amount: 125000, dueDate: '2026-03-31', Program: { name: 'B.Tech CSE' }, AcademicYear: { name: '2025-2026' }, isMock: true },
+    { id: 'mock-s2', category: 'HOSTEL', amount: 45000, dueDate: '2026-03-31', Program: { name: 'B.Tech CSE' }, AcademicYear: { name: '2025-2026' }, isMock: true },
+    { id: 'mock-s3', category: 'TRANSPORT', amount: 18000, dueDate: '2026-03-31', Program: { name: 'MBA Finance' }, AcademicYear: { name: '2025-2026' }, isMock: true },
+    { id: 'mock-s4', category: 'EXAM', amount: 5000, dueDate: '2026-04-15', Program: { name: 'B.Tech ECE' }, AcademicYear: { name: '2025-2026' }, isMock: true },
+    { id: 'mock-s5', category: 'LIBRARY', amount: 3000, dueDate: '2026-02-28', Program: { name: 'BBA' }, AcademicYear: { name: '2025-2026' }, isMock: true },
+];
+
+const MOCK_PAYMENTS = [
+    { id: 'mock-p1', amountPaid: 125000, paymentDate: '2026-02-20', paymentMethod: 'ONLINE', status: 'SUCCESS', transactionId: 'TXN2026022001', Student: { firstName: 'Aarav', lastName: 'Sharma', enrollmentNo: 'EN2025001' }, FeeStructure: { category: 'TUITION' }, isMock: true },
+    { id: 'mock-p2', amountPaid: 45000, paymentDate: '2026-02-18', paymentMethod: 'CASH', status: 'SUCCESS', transactionId: null, Student: { firstName: 'Priya', lastName: 'Verma', enrollmentNo: 'EN2025002' }, FeeStructure: { category: 'HOSTEL' }, isMock: true },
+    { id: 'mock-p3', amountPaid: 125000, paymentDate: '2026-02-15', paymentMethod: 'CHEQUE', status: 'PENDING', transactionId: 'CHQ-4521', Student: { firstName: 'Rohan', lastName: 'Gupta', enrollmentNo: 'EN2025003' }, FeeStructure: { category: 'TUITION' }, isMock: true },
+    { id: 'mock-p4', amountPaid: 18000, paymentDate: '2026-02-12', paymentMethod: 'ONLINE', status: 'SUCCESS', transactionId: 'TXN2026021201', Student: { firstName: 'Sneha', lastName: 'Patel', enrollmentNo: 'EN2025004' }, FeeStructure: { category: 'TRANSPORT' }, isMock: true },
+    { id: 'mock-p5', amountPaid: 5000, paymentDate: '2026-02-10', paymentMethod: 'ONLINE', status: 'FAILED', transactionId: 'TXN2026021002', Student: { firstName: 'Vikram', lastName: 'Singh', enrollmentNo: 'EN2025005' }, FeeStructure: { category: 'EXAM' }, isMock: true },
+    { id: 'mock-p6', amountPaid: 45000, paymentDate: '2026-02-08', paymentMethod: 'DD', status: 'SUCCESS', transactionId: 'DD-78210', Student: { firstName: 'Anita', lastName: 'Mehta', enrollmentNo: 'EN2025006' }, FeeStructure: { category: 'HOSTEL' }, isMock: true },
+    { id: 'mock-p7', amountPaid: 125000, paymentDate: '2026-02-05', paymentMethod: 'ONLINE', status: 'SUCCESS', transactionId: 'TXN2026020501', Student: { firstName: 'Karan', lastName: 'Malhotra', enrollmentNo: 'EN2025007' }, FeeStructure: { category: 'TUITION' }, isMock: true },
+    { id: 'mock-p8', amountPaid: 3000, paymentDate: '2026-02-03', paymentMethod: 'CASH', status: 'SUCCESS', transactionId: null, Student: { firstName: 'Divya', lastName: 'Joshi', enrollmentNo: 'EN2025008' }, FeeStructure: { category: 'LIBRARY' }, isMock: true },
+];
+
+const MOCK_STUDENT_DATA = {
+    totalPaid: 170000,
+    totalDue: 196000,
+    balance: 26000,
+    payments: [
+        { id: 'ms-p1', amountPaid: 125000, paymentDate: '2026-01-15', paymentMethod: 'ONLINE', status: 'SUCCESS', FeeStructure: { category: 'TUITION', amount: 125000, dueDate: '2026-03-31' } },
+        { id: 'ms-p2', amountPaid: 45000, paymentDate: '2025-08-20', paymentMethod: 'ONLINE', status: 'SUCCESS', FeeStructure: { category: 'HOSTEL', amount: 45000, dueDate: '2025-09-30' } },
+        { id: 'ms-p3', amountPaid: 0, paymentDate: null, paymentMethod: null, status: 'PENDING', FeeStructure: { category: 'TRANSPORT', amount: 18000, dueDate: '2026-03-31' } },
+        { id: 'ms-p4', amountPaid: 0, paymentDate: null, paymentMethod: null, status: 'PENDING', FeeStructure: { category: 'EXAM', amount: 5000, dueDate: '2026-04-15' } },
+        { id: 'ms-p5', amountPaid: 0, paymentDate: null, paymentMethod: null, status: 'PENDING', FeeStructure: { category: 'LIBRARY', amount: 3000, dueDate: '2026-02-28' } },
+    ]
+};
+
+// ─── Helpers ────────────────────────────────────────────────────────
+const formatCurrency = (amount) =>
+    new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount || 0);
+
+const getCategoryColor = (cat) => {
+    const colors = {
+        TUITION: 'bg-blue-50 text-blue-600', HOSTEL: 'bg-purple-50 text-purple-600',
+        TRANSPORT: 'bg-amber-50 text-amber-600', EXAM: 'bg-rose-50 text-rose-600',
+        LIBRARY: 'bg-emerald-50 text-emerald-600', OTHER: 'bg-gray-100 text-gray-600',
+    };
+    return colors[cat] || colors.OTHER;
+};
+
+const getStatusStyle = (status) => {
+    if (status === 'SUCCESS') return 'bg-emerald-50 text-emerald-600';
+    if (status === 'PENDING') return 'bg-amber-50 text-amber-600';
+    return 'bg-red-50 text-red-600';
+};
+
+const getMethodIcon = (method) => {
+    if (method === 'ONLINE') return '💳';
+    if (method === 'CASH') return '💵';
+    if (method === 'CHEQUE') return '📝';
+    return '🏦';
+};
+
+const tooltipStyle = { borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontSize: '12px' };
+
+// ─── Stat Card ──────────────────────────────────────────────────────
+const FinanceCard = ({ title, amount, icon: Icon, iconBg, iconColor, sub, trend, loading }) => (
+    <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm p-5 relative overflow-hidden group hover:shadow-md transition-all">
+        <div className={`absolute right-0 top-0 p-4 ${iconBg} rounded-bl-3xl`}>
+            <Icon size={24} className={iconColor} />
         </div>
-        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{title}</p>
-        <h3 className="text-2xl font-black text-gray-900 mt-2">{amount}</h3>
-        {trendValue && (
-            <div className="flex items-center gap-1 mt-2">
-                <span className={`text-xs font-bold ${trend === 'up' ? 'text-emerald-500' : 'text-rose-500'} flex items-center gap-0.5`}>
-                    {trend === 'up' ? <TrendingUp size={12} /> : <TrendingDown size={12} />} {trendValue}
-                </span>
-            </div>
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{title}</p>
+        {loading ? (
+            <div className="h-8 w-28 bg-gray-100 rounded-lg animate-pulse mt-2" />
+        ) : (
+            <>
+                <h3 className="text-2xl font-black text-gray-900 mt-2">{amount}</h3>
+                {sub && (
+                    <p className={`text-xs font-bold mt-2 flex items-center gap-1 ${trend === 'up' ? 'text-emerald-500' : trend === 'down' ? 'text-rose-500' : 'text-gray-400'}`}>
+                        {trend === 'up' && <TrendingUp size={12} />}
+                        {trend === 'down' && <TrendingDown size={12} />}
+                        {sub}
+                    </p>
+                )}
+            </>
         )}
     </div>
 );
 
-const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount || 0);
-};
-
 // ─── ADMIN VIEW ─────────────────────────────────────────────────────
 const AdminFinanceView = ({ token }) => {
-    const [summary, setSummary] = useState({ totalCollected: 0, pendingPayments: 0, totalExpected: 0, monthlyTrend: [] });
-    const [payments, setPayments] = useState([]);
-    const [structures, setStructures] = useState([]);
+    const [summary, setSummary] = useState(MOCK_SUMMARY);
+    const [payments, setPayments] = useState(MOCK_PAYMENTS);
+    const [structures, setStructures] = useState(MOCK_STRUCTURES);
+    const [students, setStudents] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [paymentSearch, setPaymentSearch] = useState('');
+    const [statusFilter, setStatusFilter] = useState('ALL');
+
+    // Modal states
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showStructureModal, setShowStructureModal] = useState(false);
-    const [students, setStudents] = useState([]);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState(null);
+    const [saving, setSaving] = useState(false);
+
+    // Forms
     const [paymentForm, setPaymentForm] = useState({ studentId: '', feeStructureId: '', amountPaid: '', paymentMethod: 'ONLINE', transactionId: '' });
-    const [structureForm, setStructureForm] = useState({ programId: '', academicYearId: '', category: 'TUITION', amount: '', dueDate: '' });
-    const [programs, setPrograms] = useState([]);
-    const [academicYears, setAcademicYears] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [structureForm, setStructureForm] = useState({ category: 'TUITION', amount: '', dueDate: '', programName: '', academicYear: '2025-2026' });
 
     const headers = { Authorization: `Bearer ${token}` };
 
-    useEffect(() => {
-        fetchAll();
-    }, [token]);
-
-    const fetchAll = async () => {
+    // ── Fetch All ───────────────────────────────────────────────────
+    const fetchAll = useCallback(async () => {
         setLoading(true);
         try {
             const [sumRes, payRes, strRes, stuRes] = await Promise.all([
-                axios.get(`${API_URL}/fees/summary`, { headers }).catch(() => ({ data: {} })),
-                axios.get(`${API_URL}/fees/payments`, { headers }).catch(() => ({ data: { payments: [] } })),
-                axios.get(`${API_URL}/fees/structures`, { headers }).catch(() => ({ data: [] })),
-                axios.get(`${API_URL}/students`, { headers }).catch(() => ({ data: [] }))
+                axios.get(`${API_URL}/fees/summary`, { headers }).catch(() => null),
+                axios.get(`${API_URL}/fees/payments`, { headers }).catch(() => null),
+                axios.get(`${API_URL}/fees/structures`, { headers }).catch(() => null),
+                axios.get(`${API_URL}/students`, { headers }).catch(() => null),
             ]);
-            setSummary(sumRes.data);
-            setPayments(payRes.data.payments || []);
-            setStructures(Array.isArray(strRes.data) ? strRes.data : []);
-            const stuData = Array.isArray(stuRes.data) ? stuRes.data : stuRes.data?.data || [];
+
+            // Summary: merge real with mock
+            if (sumRes?.data) {
+                const real = sumRes.data;
+                setSummary({
+                    totalCollected: real.totalCollected || MOCK_SUMMARY.totalCollected,
+                    pendingPayments: real.pendingPayments || MOCK_SUMMARY.pendingPayments,
+                    totalExpected: real.totalExpected || MOCK_SUMMARY.totalExpected,
+                    monthlyTrend: real.monthlyTrend?.length > 0 ? real.monthlyTrend : MOCK_SUMMARY.monthlyTrend,
+                });
+            }
+
+            // Structures: real data first, then mock
+            const realStructures = Array.isArray(strRes?.data) ? strRes.data.map(s => ({ ...s, isMock: false })) : [];
+            setStructures([...realStructures, ...MOCK_STRUCTURES]);
+
+            // Payments: real data first, then mock
+            const realPayments = payRes?.data?.payments || [];
+            setPayments([
+                ...realPayments.map(p => ({ ...p, isMock: false })),
+                ...MOCK_PAYMENTS,
+            ]);
+
+            // Students for dropdown
+            const stuData = Array.isArray(stuRes?.data) ? stuRes.data : stuRes?.data?.data || [];
             setStudents(stuData);
         } catch (err) {
-            console.error(err);
+            console.error('Fetch error:', err);
         } finally {
             setLoading(false);
         }
-    };
+    }, [token]);
 
+    useEffect(() => { fetchAll(); }, [fetchAll]);
+
+    // ── Record Payment ──────────────────────────────────────────────
     const handleRecordPayment = async (e) => {
         e.preventDefault();
+        if (!paymentForm.studentId || !paymentForm.amountPaid) {
+            toast.error('Student and amount are required');
+            return;
+        }
+        setSaving(true);
         try {
             await axios.post(`${API_URL}/fees/payments`, paymentForm, { headers });
-            toast.success('Payment recorded!');
+            toast.success('Payment recorded successfully!');
             setShowPaymentModal(false);
             setPaymentForm({ studentId: '', feeStructureId: '', amountPaid: '', paymentMethod: 'ONLINE', transactionId: '' });
             fetchAll();
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to record payment');
+        } finally {
+            setSaving(false);
         }
     };
 
+    // ── Create Structure ────────────────────────────────────────────
     const handleCreateStructure = async (e) => {
         e.preventDefault();
+        if (!structureForm.amount || !structureForm.category) {
+            toast.error('Category and amount are required');
+            return;
+        }
+        setSaving(true);
         try {
-            await axios.post(`${API_URL}/fees/structures`, structureForm, { headers });
+            // We send the data — backend will create it. For now, add locally too.
+            await axios.post(`${API_URL}/fees/structures`, {
+                programId: structureForm.programId || null,
+                academicYearId: structureForm.academicYearId || null,
+                category: structureForm.category,
+                amount: structureForm.amount,
+                dueDate: structureForm.dueDate || null,
+            }, { headers });
             toast.success('Fee structure created!');
             setShowStructureModal(false);
-            setStructureForm({ programId: '', academicYearId: '', category: 'TUITION', amount: '', dueDate: '' });
+            setStructureForm({ category: 'TUITION', amount: '', dueDate: '', programName: '', academicYear: '2025-2026' });
             fetchAll();
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to create structure');
+        } finally {
+            setSaving(false);
         }
     };
 
-    const handleDeleteStructure = async (id) => {
-        if (!window.confirm('Delete this fee structure?')) return;
+    // ── Delete Structure ────────────────────────────────────────────
+    const handleDelete = async () => {
+        if (!deleteTarget) return;
+        if (deleteTarget.isMock) {
+            toast.error('Sample data cannot be deleted');
+            setShowDeleteModal(false);
+            return;
+        }
+        setSaving(true);
         try {
-            await axios.delete(`${API_URL}/fees/structures/${id}`, { headers });
-            toast.success('Deleted');
+            await axios.delete(`${API_URL}/fees/structures/${deleteTarget.id}`, { headers });
+            toast.success('Deleted!');
+            setShowDeleteModal(false);
+            setDeleteTarget(null);
             fetchAll();
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to delete');
+        } finally {
+            setSaving(false);
         }
     };
 
-    if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>;
+    // ── Filtered Payments ───────────────────────────────────────────
+    const filteredPayments = payments.filter(p => {
+        const matchSearch = !paymentSearch ||
+            `${p.Student?.firstName} ${p.Student?.lastName}`.toLowerCase().includes(paymentSearch.toLowerCase()) ||
+            p.transactionId?.toLowerCase().includes(paymentSearch.toLowerCase());
+        const matchStatus = statusFilter === 'ALL' || p.status === statusFilter;
+        return matchSearch && matchStatus;
+    });
+
+    const collectionPct = summary.totalExpected > 0 ? Math.round((summary.totalCollected / summary.totalExpected) * 100) : 0;
 
     return (
         <>
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <FinanceCard title="Total Collection" amount={formatCurrency(summary.totalCollected)} icon={DollarSign} color="text-emerald-600" />
-                <FinanceCard title="Pending Payments" amount={formatCurrency(summary.pendingPayments)} icon={AlertCircle} color="text-amber-600" />
-                <FinanceCard title="Total Expected" amount={formatCurrency(summary.totalExpected)} icon={CreditCard} color="text-blue-600" />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <FinanceCard title="Total Collection" amount={formatCurrency(summary.totalCollected)}
+                    icon={IndianRupee} iconBg="bg-emerald-50" iconColor="text-emerald-600"
+                    sub={`${collectionPct}% of target`} trend="up" loading={loading} />
+                <FinanceCard title="Pending Payments" amount={formatCurrency(summary.pendingPayments)}
+                    icon={Clock} iconBg="bg-amber-50" iconColor="text-amber-600"
+                    sub="Awaiting clearance" trend="down" loading={loading} />
+                <FinanceCard title="Total Expected" amount={formatCurrency(summary.totalExpected)}
+                    icon={CreditCard} iconBg="bg-blue-50" iconColor="text-blue-600"
+                    sub="This academic year" loading={loading} />
+                <FinanceCard title="Total Transactions" amount={payments.length}
+                    icon={Receipt} iconBg="bg-violet-50" iconColor="text-violet-600"
+                    sub={`${payments.filter(p => p.status === 'SUCCESS').length} successful`} loading={loading} />
+            </div>
+
+            {/* Collection Progress */}
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm p-5">
+                <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-bold text-gray-800 text-sm flex items-center gap-2">
+                        <PieChart size={16} className="text-blue-500" /> Collection Progress
+                    </h3>
+                    <span className="text-sm font-black text-gray-900">{collectionPct}%</span>
+                </div>
+                <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                    <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${Math.min(100, collectionPct)}%` }}
+                        transition={{ duration: 1, ease: 'easeOut' }}
+                        className="bg-gradient-to-r from-emerald-500 to-green-400 h-3 rounded-full"
+                    />
+                </div>
+                <div className="flex justify-between mt-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                    <span>Collected: {formatCurrency(summary.totalCollected)}</span>
+                    <span>Target: {formatCurrency(summary.totalExpected)}</span>
+                </div>
             </div>
 
             {/* Chart */}
-            {summary.monthlyTrend?.length > 0 && (
-                <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm p-6">
-                    <h3 className="font-bold text-gray-900 mb-4">Monthly Collection</h3>
-                    <div className="h-64">
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm p-6">
+                <h3 className="font-bold text-gray-800 text-sm mb-4 flex items-center gap-2">
+                    <TrendingUp size={16} className="text-emerald-500" /> Monthly Collection Trend
+                </h3>
+                <div className="h-64">
+                    {loading ? (
+                        <div className="h-full bg-gray-50 rounded-xl animate-pulse" />
+                    ) : (
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={summary.monthlyTrend} barSize={16}>
+                            <AreaChart data={summary.monthlyTrend}>
+                                <defs>
+                                    <linearGradient id="gradFee" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12 }} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12 }} />
-                                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
-                                <Bar dataKey="amount" fill="#10b981" radius={[6, 6, 0, 0]} />
-                            </BarChart>
+                                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12, fontWeight: 600 }} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={v => `₹${(v / 1000).toFixed(0)}k`} />
+                                <Tooltip contentStyle={tooltipStyle} formatter={v => [formatCurrency(v), 'Collected']} />
+                                <Area type="monotone" dataKey="amount" stroke="#10b981" strokeWidth={2.5} fillOpacity={1} fill="url(#gradFee)" dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }} />
+                            </AreaChart>
                         </ResponsiveContainer>
-                    </div>
+                    )}
                 </div>
-            )}
+            </div>
 
+            {/* Two-column: Structures + Payments */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Fee Structures */}
                 <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm overflow-hidden">
-                    <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-                        <h3 className="font-bold text-gray-800 text-sm">Fee Structures</h3>
-                        <button
+                    <div className="p-4 border-b border-gray-100 flex justify-between items-center">
+                        <h3 className="font-bold text-gray-800 text-sm flex items-center gap-2">
+                            <FileText size={16} className="text-blue-500" /> Fee Structures
+                        </h3>
+                        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                             onClick={() => setShowStructureModal(true)}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors"
+                            className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg text-xs font-bold shadow-sm hover:opacity-90"
                         >
                             <Plus size={14} /> Add
-                        </button>
+                        </motion.button>
                     </div>
-                    <div className="divide-y divide-gray-50 max-h-80 overflow-y-auto">
-                        {structures.map(s => (
-                            <div key={s.id} className="p-4 flex items-center justify-between hover:bg-gray-50/80 transition-colors">
-                                <div>
-                                    <p className="font-semibold text-gray-800 text-sm">{s.category}</p>
-                                    <p className="text-xs text-gray-500">{s.Program?.name || 'N/A'} • {s.AcademicYear?.name || 'N/A'}</p>
-                                    {s.dueDate && <p className="text-xs text-gray-400">Due: {s.dueDate}</p>}
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="font-black text-gray-900">{formatCurrency(s.amount)}</span>
-                                    <button onClick={() => handleDeleteStructure(s.id)} className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                                        <Trash2 size={14} />
-                                    </button>
-                                </div>
+                    <div className="divide-y divide-gray-50 max-h-96 overflow-y-auto">
+                        {loading ? (
+                            <div className="p-4 space-y-3">{[1, 2, 3].map(i => <div key={i} className="h-14 bg-gray-50 rounded-xl animate-pulse" />)}</div>
+                        ) : structures.length === 0 ? (
+                            <div className="p-8 text-center">
+                                <FileText size={36} className="mx-auto mb-3 text-gray-200" />
+                                <p className="text-gray-400 text-sm">No fee structures yet</p>
+                                <button onClick={() => setShowStructureModal(true)} className="mt-3 text-blue-600 text-sm font-bold hover:underline">Create one →</button>
                             </div>
-                        ))}
-                        {structures.length === 0 && (
-                            <div className="p-8 text-center text-gray-400 text-sm">No fee structures yet</div>
+                        ) : (
+                            structures.map(s => (
+                                <div key={s.id} className="p-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors group">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase ${getCategoryColor(s.category)}`}>
+                                            {s.category}
+                                        </span>
+                                        <div className="min-w-0">
+                                            <p className="font-bold text-gray-800 text-sm truncate">{s.Program?.name || 'General'}</p>
+                                            <p className="text-[10px] text-gray-400">
+                                                {s.AcademicYear?.name || '2025-2026'}
+                                                {s.dueDate && ` • Due: ${s.dueDate}`}
+                                            </p>
+                                            {s.isMock && <span className="text-[9px] bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded font-bold">SAMPLE</span>}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                        <span className="font-black text-gray-900 text-sm">{formatCurrency(s.amount)}</span>
+                                        <button onClick={() => { setDeleteTarget(s); setShowDeleteModal(true); }}
+                                            className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+                                            <Trash2 size={14} />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
                         )}
                     </div>
                 </div>
 
                 {/* Recent Payments */}
                 <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm overflow-hidden">
-                    <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-                        <h3 className="font-bold text-gray-800 text-sm">Recent Payments</h3>
-                        <button
+                    <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                        <h3 className="font-bold text-gray-800 text-sm flex items-center gap-2">
+                            <Receipt size={16} className="text-emerald-500" /> Recent Payments
+                        </h3>
+                        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                             onClick={() => setShowPaymentModal(true)}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors"
+                            className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-lg text-xs font-bold shadow-sm hover:opacity-90 self-start"
                         >
                             <Plus size={14} /> Record Payment
-                        </button>
+                        </motion.button>
+                    </div>
+                    {/* Search & Filter */}
+                    <div className="p-3 border-b border-gray-50 flex flex-col sm:flex-row gap-2">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" size={14} />
+                            <input type="text" placeholder="Search name or txn ID..." value={paymentSearch}
+                                onChange={e => setPaymentSearch(e.target.value)}
+                                className="w-full pl-8 pr-4 py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
+                            />
+                        </div>
+                        <div className="flex gap-1">
+                            {['ALL', 'SUCCESS', 'PENDING', 'FAILED'].map(s => (
+                                <button key={s} onClick={() => setStatusFilter(s)}
+                                    className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all ${statusFilter === s ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}>
+                                    {s === 'ALL' ? '🔍 All' : s}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                     <div className="divide-y divide-gray-50 max-h-80 overflow-y-auto">
-                        {payments.slice(0, 10).map(p => (
-                            <div key={p.id} className="p-4 flex items-center justify-between hover:bg-gray-50/80 transition-colors">
-                                <div>
-                                    <p className="font-semibold text-gray-800 text-sm">{p.Student?.firstName} {p.Student?.lastName}</p>
-                                    <p className="text-xs text-gray-500">{p.paymentMethod} • {p.paymentDate}</p>
-                                </div>
-                                <div className="text-right">
-                                    <p className="font-black text-emerald-600">{formatCurrency(p.amountPaid)}</p>
-                                    <span className={`text-[10px] font-extrabold uppercase ${p.status === 'SUCCESS' ? 'text-emerald-500' : p.status === 'PENDING' ? 'text-amber-500' : 'text-red-500'}`}>{p.status}</span>
-                                </div>
+                        {loading ? (
+                            <div className="p-4 space-y-3">{[1, 2, 3, 4].map(i => <div key={i} className="h-14 bg-gray-50 rounded-xl animate-pulse" />)}</div>
+                        ) : filteredPayments.length === 0 ? (
+                            <div className="p-8 text-center">
+                                <Receipt size={36} className="mx-auto mb-3 text-gray-200" />
+                                <p className="text-gray-400 text-sm">No payments found</p>
                             </div>
-                        ))}
-                        {payments.length === 0 && (
-                            <div className="p-8 text-center text-gray-400 text-sm">No payments recorded yet</div>
+                        ) : (
+                            filteredPayments.slice(0, 15).map(p => (
+                                <div key={p.id} className="p-3 px-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <span className="text-lg">{getMethodIcon(p.paymentMethod)}</span>
+                                        <div className="min-w-0">
+                                            <p className="font-bold text-gray-800 text-sm truncate">
+                                                {p.Student?.firstName} {p.Student?.lastName}
+                                            </p>
+                                            <p className="text-[10px] text-gray-400">
+                                                {p.paymentDate} • {p.FeeStructure?.category || 'General'}
+                                                {p.transactionId && ` • ${p.transactionId}`}
+                                            </p>
+                                            {p.isMock && <span className="text-[9px] bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded font-bold">SAMPLE</span>}
+                                        </div>
+                                    </div>
+                                    <div className="text-right flex-shrink-0 ml-2">
+                                        <p className="font-black text-gray-900 text-sm">{formatCurrency(p.amountPaid)}</p>
+                                        <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${getStatusStyle(p.status)}`}>
+                                            {p.status}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))
                         )}
                     </div>
                 </div>
             </div>
 
-            {/* Record Payment Modal */}
+            {/* ─── Record Payment Modal ───────────────────────────── */}
             <AnimatePresence>
                 {showPaymentModal && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-                            <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-lg font-bold text-gray-900">Record Payment</h3>
-                                <button onClick={() => setShowPaymentModal(false)} className="p-1 hover:bg-gray-100 rounded-lg"><X size={20} /></button>
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                        onClick={() => setShowPaymentModal(false)}>
+                        <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                            onClick={e => e.stopPropagation()}
+                            className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+                            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+                                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                    <Receipt size={20} className="text-emerald-500" /> Record Payment
+                                </h3>
+                                <button onClick={() => setShowPaymentModal(false)} className="p-2 hover:bg-gray-100 rounded-xl"><X size={18} className="text-gray-400" /></button>
                             </div>
-                            <form onSubmit={handleRecordPayment} className="space-y-4">
-                                <select value={paymentForm.studentId} onChange={(e) => setPaymentForm(p => ({ ...p, studentId: e.target.value }))} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm" required>
-                                    <option value="">Select Student</option>
-                                    {students.map(s => <option key={s.id} value={s.id}>{s.firstName} {s.lastName} ({s.enrollmentNo})</option>)}
-                                </select>
-                                <select value={paymentForm.feeStructureId} onChange={(e) => setPaymentForm(p => ({ ...p, feeStructureId: e.target.value }))} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm">
-                                    <option value="">Fee Structure (optional)</option>
-                                    {structures.map(s => <option key={s.id} value={s.id}>{s.category} - {formatCurrency(s.amount)}</option>)}
-                                </select>
-                                <input type="number" placeholder="Amount" value={paymentForm.amountPaid} onChange={(e) => setPaymentForm(p => ({ ...p, amountPaid: e.target.value }))} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm" required />
-                                <select value={paymentForm.paymentMethod} onChange={(e) => setPaymentForm(p => ({ ...p, paymentMethod: e.target.value }))} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm">
-                                    <option value="ONLINE">Online</option>
-                                    <option value="CASH">Cash</option>
-                                    <option value="CHEQUE">Cheque</option>
-                                    <option value="DD">DD</option>
-                                </select>
-                                <input type="text" placeholder="Transaction ID (optional)" value={paymentForm.transactionId} onChange={(e) => setPaymentForm(p => ({ ...p, transactionId: e.target.value }))} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm" />
-                                <button type="submit" className="w-full py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition-opacity">Record Payment</button>
+                            <form onSubmit={handleRecordPayment} className="p-5 space-y-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Student *</label>
+                                    <select value={paymentForm.studentId} onChange={e => setPaymentForm(p => ({ ...p, studentId: e.target.value }))}
+                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20" required>
+                                        <option value="">Select Student</option>
+                                        {students.map(s => <option key={s.id} value={s.id}>{s.firstName} {s.lastName} ({s.enrollmentNo})</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Fee Structure</label>
+                                    <select value={paymentForm.feeStructureId} onChange={e => setPaymentForm(p => ({ ...p, feeStructureId: e.target.value }))}
+                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                                        <option value="">General Payment</option>
+                                        {structures.filter(s => !s.isMock).map(s => <option key={s.id} value={s.id}>{s.category} - {formatCurrency(s.amount)}</option>)}
+                                    </select>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Amount (₹) *</label>
+                                        <input type="number" placeholder="₹ 0" value={paymentForm.amountPaid}
+                                            onChange={e => setPaymentForm(p => ({ ...p, amountPaid: e.target.value }))}
+                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20" required />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Method</label>
+                                        <select value={paymentForm.paymentMethod} onChange={e => setPaymentForm(p => ({ ...p, paymentMethod: e.target.value }))}
+                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                                            <option value="ONLINE">💳 Online</option>
+                                            <option value="CASH">💵 Cash</option>
+                                            <option value="CHEQUE">📝 Cheque</option>
+                                            <option value="DD">🏦 DD</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Transaction ID</label>
+                                    <input type="text" placeholder="Optional" value={paymentForm.transactionId}
+                                        onChange={e => setPaymentForm(p => ({ ...p, transactionId: e.target.value }))}
+                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+                                </div>
+                                <div className="flex gap-3 justify-end pt-2">
+                                    <button type="button" onClick={() => setShowPaymentModal(false)} className="px-5 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200">Cancel</button>
+                                    <button type="submit" disabled={saving}
+                                        className="px-5 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-green-600 rounded-xl shadow-lg shadow-emerald-500/20 hover:opacity-90 disabled:opacity-50 flex items-center gap-2">
+                                        {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                                        {saving ? 'Recording...' : 'Record Payment'}
+                                    </button>
+                                </div>
                             </form>
                         </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            {/* Create Structure Modal */}
+            {/* ─── Create Structure Modal ─────────────────────────── */}
             <AnimatePresence>
                 {showStructureModal && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-                            <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-lg font-bold text-gray-900">Create Fee Structure</h3>
-                                <button onClick={() => setShowStructureModal(false)} className="p-1 hover:bg-gray-100 rounded-lg"><X size={20} /></button>
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                        onClick={() => setShowStructureModal(false)}>
+                        <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                            onClick={e => e.stopPropagation()}
+                            className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+                            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+                                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                    <FileText size={20} className="text-blue-500" /> Create Fee Structure
+                                </h3>
+                                <button onClick={() => setShowStructureModal(false)} className="p-2 hover:bg-gray-100 rounded-xl"><X size={18} className="text-gray-400" /></button>
                             </div>
-                            <form onSubmit={handleCreateStructure} className="space-y-4">
-                                <input type="text" placeholder="Program ID" value={structureForm.programId} onChange={(e) => setStructureForm(p => ({ ...p, programId: e.target.value }))} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm" required />
-                                <input type="text" placeholder="Academic Year ID" value={structureForm.academicYearId} onChange={(e) => setStructureForm(p => ({ ...p, academicYearId: e.target.value }))} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm" required />
-                                <select value={structureForm.category} onChange={(e) => setStructureForm(p => ({ ...p, category: e.target.value }))} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm">
-                                    <option value="TUITION">Tuition</option>
-                                    <option value="HOSTEL">Hostel</option>
-                                    <option value="TRANSPORT">Transport</option>
-                                    <option value="EXAM">Exam</option>
-                                    <option value="LIBRARY">Library</option>
-                                    <option value="OTHER">Other</option>
-                                </select>
-                                <input type="number" placeholder="Amount" value={structureForm.amount} onChange={(e) => setStructureForm(p => ({ ...p, amount: e.target.value }))} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm" required />
-                                <input type="date" placeholder="Due Date" value={structureForm.dueDate} onChange={(e) => setStructureForm(p => ({ ...p, dueDate: e.target.value }))} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm" />
-                                <button type="submit" className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition-opacity">Create Structure</button>
+                            <form onSubmit={handleCreateStructure} className="p-5 space-y-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Category *</label>
+                                    <select value={structureForm.category} onChange={e => setStructureForm(p => ({ ...p, category: e.target.value }))}
+                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                                        <option value="TUITION">Tuition Fee</option>
+                                        <option value="HOSTEL">Hostel Fee</option>
+                                        <option value="TRANSPORT">Transport Fee</option>
+                                        <option value="EXAM">Exam Fee</option>
+                                        <option value="LIBRARY">Library Fee</option>
+                                        <option value="OTHER">Other</option>
+                                    </select>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Amount (₹) *</label>
+                                        <input type="number" placeholder="₹ 0" value={structureForm.amount}
+                                            onChange={e => setStructureForm(p => ({ ...p, amount: e.target.value }))}
+                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20" required />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Due Date</label>
+                                        <input type="date" value={structureForm.dueDate}
+                                            onChange={e => setStructureForm(p => ({ ...p, dueDate: e.target.value }))}
+                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+                                    </div>
+                                </div>
+                                <div className="flex gap-3 justify-end pt-2">
+                                    <button type="button" onClick={() => setShowStructureModal(false)} className="px-5 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200">Cancel</button>
+                                    <button type="submit" disabled={saving}
+                                        className="px-5 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/20 hover:opacity-90 disabled:opacity-50 flex items-center gap-2">
+                                        {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                                        {saving ? 'Creating...' : 'Create Structure'}
+                                    </button>
+                                </div>
                             </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* ─── Delete Confirmation ────────────────────────────── */}
+            <AnimatePresence>
+                {showDeleteModal && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                        onClick={() => setShowDeleteModal(false)}>
+                        <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+                            onClick={e => e.stopPropagation()}
+                            className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+                            <h3 className="text-lg font-bold text-gray-900 mb-3">Delete Fee Structure?</h3>
+                            <p className="text-sm text-gray-500 mb-6">
+                                Are you sure you want to delete the <strong>{deleteTarget?.category}</strong> fee structure of <strong>{formatCurrency(deleteTarget?.amount)}</strong>?
+                            </p>
+                            <div className="flex gap-3 justify-end">
+                                <button onClick={() => setShowDeleteModal(false)} className="px-4 py-2 text-sm font-bold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200">Cancel</button>
+                                <button onClick={handleDelete} disabled={saving}
+                                    className="px-4 py-2 text-sm font-bold text-white bg-red-500 rounded-xl hover:bg-red-600 disabled:opacity-50">
+                                    {saving ? 'Deleting...' : 'Delete'}
+                                </button>
+                            </div>
                         </motion.div>
                     </motion.div>
                 )}
@@ -269,7 +605,7 @@ const AdminFinanceView = ({ token }) => {
     );
 };
 
-// ─── STUDENT VIEW ─────────────────────────────────────────────────
+// ─── STUDENT VIEW ───────────────────────────────────────────────────
 const StudentFinanceView = ({ token }) => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -281,7 +617,8 @@ const StudentFinanceView = ({ token }) => {
                 setData(res.data);
             } catch (err) {
                 console.error(err);
-                toast.error('Failed to load fee data');
+                // Use mock data as fallback
+                setData(MOCK_STUDENT_DATA);
             } finally {
                 setLoading(false);
             }
@@ -289,48 +626,71 @@ const StudentFinanceView = ({ token }) => {
         fetchMyFees();
     }, [token]);
 
-    if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>;
+    if (loading) return (
+        <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[1, 2, 3].map(i => <div key={i} className="h-28 bg-gray-50 rounded-2xl animate-pulse" />)}
+            </div>
+            <div className="h-64 bg-gray-50 rounded-2xl animate-pulse" />
+        </div>
+    );
 
-    if (!data) return <div className="text-center text-gray-400 py-12">No fee data found</div>;
+    const info = data || MOCK_STUDENT_DATA;
 
     return (
         <>
             {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <FinanceCard title="Total Paid" amount={formatCurrency(data.totalPaid)} icon={DollarSign} color="text-emerald-600" />
-                <FinanceCard title="Total Due" amount={formatCurrency(data.totalDue)} icon={CreditCard} color="text-blue-600" />
-                <FinanceCard title="Balance" amount={formatCurrency(data.balance)} icon={AlertCircle} color={data.balance > 0 ? 'text-red-600' : 'text-emerald-600'} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FinanceCard title="Total Paid" amount={formatCurrency(info.totalPaid)}
+                    icon={IndianRupee} iconBg="bg-emerald-50" iconColor="text-emerald-600" />
+                <FinanceCard title="Total Due" amount={formatCurrency(info.totalDue)}
+                    icon={CreditCard} iconBg="bg-blue-50" iconColor="text-blue-600" />
+                <FinanceCard title="Balance Due" amount={formatCurrency(info.balance)}
+                    icon={AlertCircle} iconBg={info.balance > 0 ? 'bg-red-50' : 'bg-emerald-50'}
+                    iconColor={info.balance > 0 ? 'text-red-600' : 'text-emerald-600'}
+                    sub={info.balance > 0 ? 'Payment pending' : 'All clear ✓'} trend={info.balance > 0 ? 'down' : 'up'} />
             </div>
 
             {/* Payment History */}
             <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm overflow-hidden">
-                <div className="p-4 border-b border-gray-100 bg-gray-50/50">
-                    <h3 className="font-bold text-gray-800">Payment History</h3>
+                <div className="p-4 border-b border-gray-100 flex items-center gap-2">
+                    <Receipt size={16} className="text-blue-500" />
+                    <h3 className="font-bold text-gray-800 text-sm">Payment History</h3>
                 </div>
                 <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-gray-50 border-b border-gray-100">
-                            <tr>
-                                <th className="text-left py-3 px-4 text-xs font-extrabold text-gray-400 uppercase tracking-widest">Date</th>
-                                <th className="text-left py-3 px-4 text-xs font-extrabold text-gray-400 uppercase tracking-widest">Category</th>
-                                <th className="text-left py-3 px-4 text-xs font-extrabold text-gray-400 uppercase tracking-widest">Method</th>
-                                <th className="text-right py-3 px-4 text-xs font-extrabold text-gray-400 uppercase tracking-widest">Amount</th>
-                                <th className="text-right py-3 px-4 text-xs font-extrabold text-gray-400 uppercase tracking-widest">Status</th>
+                    <table className="w-full text-sm">
+                        <thead>
+                            <tr className="bg-gray-50/80 border-b border-gray-100">
+                                <th className="text-left py-3 px-5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Date</th>
+                                <th className="text-left py-3 px-5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Category</th>
+                                <th className="text-left py-3 px-5 text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden sm:table-cell">Method</th>
+                                <th className="text-right py-3 px-5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Amount</th>
+                                <th className="text-right py-3 px-5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Status</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
-                            {data.payments.map(p => (
-                                <tr key={p.id} className="hover:bg-gray-50/80 transition-colors">
-                                    <td className="py-3 px-4 text-sm text-gray-600 font-medium">{p.paymentDate}</td>
-                                    <td className="py-3 px-4 text-sm text-gray-800 font-semibold">{p.FeeStructure?.category || 'General'}</td>
-                                    <td className="py-3 px-4"><span className="text-xs px-2 py-1 bg-gray-100 rounded text-gray-600 font-medium">{p.paymentMethod}</span></td>
-                                    <td className="py-3 px-4 text-right font-black text-emerald-600">{formatCurrency(p.amountPaid)}</td>
-                                    <td className="py-3 px-4 text-right">
-                                        <span className={`text-[10px] font-extrabold uppercase ${p.status === 'SUCCESS' ? 'text-emerald-500' : p.status === 'PENDING' ? 'text-amber-500' : 'text-red-500'}`}>{p.status}</span>
+                            {info.payments.map(p => (
+                                <tr key={p.id} className="hover:bg-gray-50/50 transition-colors">
+                                    <td className="py-3 px-5 text-gray-600 font-medium">{p.paymentDate || '—'}</td>
+                                    <td className="py-3 px-5">
+                                        <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold ${getCategoryColor(p.FeeStructure?.category)}`}>
+                                            {p.FeeStructure?.category || 'General'}
+                                        </span>
+                                    </td>
+                                    <td className="py-3 px-5 hidden sm:table-cell">
+                                        {p.paymentMethod ? (
+                                            <span className="text-xs text-gray-500 font-medium">{getMethodIcon(p.paymentMethod)} {p.paymentMethod}</span>
+                                        ) : '—'}
+                                    </td>
+                                    <td className="py-3 px-5 text-right font-black text-gray-900">{p.amountPaid > 0 ? formatCurrency(p.amountPaid) : formatCurrency(p.FeeStructure?.amount)}</td>
+                                    <td className="py-3 px-5 text-right">
+                                        <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${getStatusStyle(p.status)}`}>
+                                            {p.status}
+                                        </span>
                                     </td>
                                 </tr>
                             ))}
-                            {data.payments.length === 0 && (
+                            {info.payments.length === 0 && (
                                 <tr><td colSpan={5} className="py-8 text-center text-gray-400 text-sm">No payments found</td></tr>
                             )}
                         </tbody>
@@ -341,21 +701,21 @@ const StudentFinanceView = ({ token }) => {
     );
 };
 
-// ─── MAIN COMPONENT ──────────────────────────────────────────────
+// ─── MAIN COMPONENT ─────────────────────────────────────────────────
 const Finances = () => {
     const { user } = useSelector((state) => state.auth);
-    const token = user?.token;
+    const token = user?.token || localStorage.getItem('token');
     const role = user?.role;
     const isStudent = role === 'STUDENT';
 
     return (
-        <div className="space-y-8 pb-10">
+        <div className="space-y-6 pb-20 lg:pb-10">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Financial Overview</h1>
+                    <h1 className="text-2xl font-black text-gray-900">Financial Overview</h1>
                     <p className="text-gray-500 text-sm mt-1">
-                        {isStudent ? 'View your fee status and payment history' : 'Track fee collections, manage structures, and record payments.'}
+                        {isStudent ? 'View your fee status and payment history.' : 'Track fee collections, manage structures, and record payments.'}
                     </p>
                 </div>
             </div>

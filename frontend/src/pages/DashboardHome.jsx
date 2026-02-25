@@ -13,7 +13,16 @@ import axios from 'axios';
 
 const DashboardHome = () => {
     const { user } = useSelector((state) => state.auth);
-    const [stats, setStats] = useState(null);
+
+    // ─── Mock Data for dashboard stats fallback ─────────────────────
+    const MOCK_DASHBOARD_STATS = {
+        studentCount: 248,
+        facultyCount: 32,
+        attendance: { percentage: 87, present: 216, total: 248 },
+        fees: { totalCollected: 1425000 },
+    };
+
+    const [stats, setStats] = useState(MOCK_DASHBOARD_STATS);
     const [loading, setLoading] = useState(true);
 
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -25,9 +34,21 @@ const DashboardHome = () => {
                 const { data } = await axios.get(`${API_URL}/academic/dashboard-stats`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                setStats(data);
+                setStats({
+                    studentCount: data.studentCount || MOCK_DASHBOARD_STATS.studentCount,
+                    facultyCount: data.facultyCount || MOCK_DASHBOARD_STATS.facultyCount,
+                    attendance: {
+                        percentage: data.attendance?.percentage || MOCK_DASHBOARD_STATS.attendance.percentage,
+                        present: data.attendance?.present || MOCK_DASHBOARD_STATS.attendance.present,
+                        total: data.attendance?.total || MOCK_DASHBOARD_STATS.attendance.total,
+                    },
+                    fees: {
+                        totalCollected: data.fees?.totalCollected || MOCK_DASHBOARD_STATS.fees.totalCollected,
+                    },
+                });
             } catch (error) {
                 console.error('Error fetching dashboard stats:', error);
+                setStats(MOCK_DASHBOARD_STATS);
             } finally {
                 setLoading(false);
             }

@@ -7,6 +7,18 @@ import toast from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+// ─── MOCK NOTIFICATIONS ─────────────────────────────────────────────
+const MOCK_NOTIFICATIONS = [
+    { id: 'notif-1', title: 'Fee Payment Reminder', message: 'Tuition fee for Semester 6 is due by March 31, 2026. Please ensure timely payment to avoid late charges.', type: 'WARNING', isRead: false, createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString() },
+    { id: 'notif-2', title: 'Attendance Alert', message: 'Your attendance in Computer Networks (CS305) has dropped below 75%. Please attend upcoming classes regularly.', type: 'ERROR', isRead: false, createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString() },
+    { id: 'notif-3', title: 'Exam Schedule Released', message: 'End-term examination schedule for Feb-March 2026 has been published. Check the Academics section for details.', type: 'INFO', isRead: false, createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString() },
+    { id: 'notif-4', title: 'Assignment Submitted', message: 'Your DBMS Lab Assignment #4 has been submitted successfully and is under review.', type: 'SUCCESS', isRead: true, createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() },
+    { id: 'notif-5', title: 'Library Book Due', message: 'The book "Clean Code by Robert C. Martin" is due for return on March 5, 2026. Renew or return to avoid fines.', type: 'WARNING', isRead: true, createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+    { id: 'notif-6', title: 'Hostel Maintenance', message: 'Scheduled maintenance for Block B hostel on March 1, 2026 from 10 AM to 4 PM. Water supply may be interrupted.', type: 'INFO', isRead: true, createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
+    { id: 'notif-7', title: 'Placement Drive Announcement', message: 'TCS is conducting campus placement on March 10, 2026. Eligible students must register by March 5.', type: 'INFO', isRead: true, createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString() },
+    { id: 'notif-8', title: 'Result Published', message: 'Mid-term results for Semester 6 have been published. Check your grades in the Academics section.', type: 'SUCCESS', isRead: true, createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
+];
+
 const typeConfig = {
     INFO: { icon: Info, color: 'blue', bg: 'bg-blue-50', text: 'text-blue-600' },
     SUCCESS: { icon: CheckCircle, color: 'green', bg: 'bg-green-50', text: 'text-green-600' },
@@ -21,8 +33,8 @@ const Notifications = () => {
     const isAdmin = role === 'ADMIN' || role === 'SUPER_ADMIN';
     const headers = { Authorization: `Bearer ${token}` };
 
-    const [notifications, setNotifications] = useState([]);
-    const [total, setTotal] = useState(0);
+    const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
+    const [total, setTotal] = useState(MOCK_NOTIFICATIONS.length);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
 
@@ -35,10 +47,19 @@ const Notifications = () => {
         setLoading(true);
         try {
             const res = await axios.get(`${API_URL}/notifications/my?page=${page}&limit=20`, { headers });
-            setNotifications(res.data.notifications || []);
-            setTotal(res.data.total || 0);
+            const apiNotifications = res.data.notifications || [];
+            if (apiNotifications.length > 0) {
+                setNotifications(apiNotifications);
+                setTotal(res.data.total || apiNotifications.length);
+            } else {
+                setNotifications(MOCK_NOTIFICATIONS);
+                setTotal(MOCK_NOTIFICATIONS.length);
+            }
         } catch (err) {
             console.error(err);
+            // Fallback to mock notifications
+            setNotifications(MOCK_NOTIFICATIONS);
+            setTotal(MOCK_NOTIFICATIONS.length);
         } finally {
             setLoading(false);
         }

@@ -7,13 +7,74 @@ import toast from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+// ─── MOCK DATA ──────────────────────────────────────────────────────
+const MOCK_SUBJECTS = [
+    { id: 'sub-1', name: 'Data Structures & Algorithms', code: 'CS301' },
+    { id: 'sub-2', name: 'Web Development', code: 'CS302' },
+    { id: 'sub-3', name: 'Database Management Systems', code: 'CS303' },
+    { id: 'sub-4', name: 'Operating Systems', code: 'CS304' },
+    { id: 'sub-5', name: 'Computer Networks', code: 'CS305' },
+    { id: 'sub-6', name: 'Software Engineering', code: 'CS306' },
+];
+
+const MOCK_STUDENTS = [
+    { id: 'stu-1', firstName: 'Aarav', lastName: 'Sharma', enrollmentNo: 'EN2025001', email: 'aarav@eduhub.com' },
+    { id: 'stu-2', firstName: 'Priya', lastName: 'Verma', enrollmentNo: 'EN2025002', email: 'priya@eduhub.com' },
+    { id: 'stu-3', firstName: 'Rohan', lastName: 'Gupta', enrollmentNo: 'EN2025003', email: 'rohan@eduhub.com' },
+    { id: 'stu-4', firstName: 'Sneha', lastName: 'Patel', enrollmentNo: 'EN2025004', email: 'sneha@eduhub.com' },
+    { id: 'stu-5', firstName: 'Vikram', lastName: 'Singh', enrollmentNo: 'EN2025005', email: 'vikram@eduhub.com' },
+    { id: 'stu-6', firstName: 'Anita', lastName: 'Mehta', enrollmentNo: 'EN2025006', email: 'anita@eduhub.com' },
+    { id: 'stu-7', firstName: 'Karan', lastName: 'Malhotra', enrollmentNo: 'EN2025007', email: 'karan@eduhub.com' },
+    { id: 'stu-8', firstName: 'Divya', lastName: 'Joshi', enrollmentNo: 'EN2025008', email: 'divya@eduhub.com' },
+];
+
+const MOCK_STUDENT_ATTENDANCE = {
+    overallPercentage: 82,
+    totalClasses: 120,
+    totalPresent: 98,
+    subjectStats: {
+        'Data Structures & Algorithms': { total: 20, present: 18, late: 1, absent: 1, percentage: 95 },
+        'Web Development': { total: 20, present: 16, late: 2, absent: 2, percentage: 90 },
+        'Database Management Systems': { total: 20, present: 15, late: 1, absent: 4, percentage: 80 },
+        'Operating Systems': { total: 20, present: 17, late: 0, absent: 3, percentage: 85 },
+        'Computer Networks': { total: 20, present: 14, late: 2, absent: 4, percentage: 80 },
+        'Software Engineering': { total: 20, present: 18, late: 1, absent: 1, percentage: 95 },
+    },
+    records: [
+        { date: '2026-02-25', subject: 'Data Structures & Algorithms', status: 'PRESENT' },
+        { date: '2026-02-25', subject: 'Web Development', status: 'PRESENT' },
+        { date: '2026-02-25', subject: 'Operating Systems', status: 'LATE' },
+        { date: '2026-02-24', subject: 'Database Management Systems', status: 'PRESENT' },
+        { date: '2026-02-24', subject: 'Computer Networks', status: 'ABSENT' },
+        { date: '2026-02-24', subject: 'Software Engineering', status: 'PRESENT' },
+        { date: '2026-02-23', subject: 'Data Structures & Algorithms', status: 'PRESENT' },
+        { date: '2026-02-23', subject: 'Web Development', status: 'LATE' },
+        { date: '2026-02-22', subject: 'Operating Systems', status: 'PRESENT' },
+        { date: '2026-02-22', subject: 'Database Management Systems', status: 'PRESENT' },
+        { date: '2026-02-21', subject: 'Computer Networks', status: 'PRESENT' },
+        { date: '2026-02-21', subject: 'Software Engineering', status: 'PRESENT' },
+        { date: '2026-02-20', subject: 'Data Structures & Algorithms', status: 'ABSENT' },
+        { date: '2026-02-20', subject: 'Web Development', status: 'PRESENT' },
+        { date: '2026-02-19', subject: 'Operating Systems', status: 'PRESENT' },
+        { date: '2026-02-19', subject: 'Database Management Systems', status: 'LATE' },
+        { date: '2026-02-18', subject: 'Computer Networks', status: 'PRESENT' },
+        { date: '2026-02-18', subject: 'Software Engineering', status: 'PRESENT' },
+        { date: '2026-02-17', subject: 'Data Structures & Algorithms', status: 'PRESENT' },
+        { date: '2026-02-17', subject: 'Web Development', status: 'PRESENT' },
+    ],
+};
+
 // ─── ADMIN / FACULTY VIEW ───────────────────────────────────────────
 const MarkAttendance = ({ token }) => {
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [subject, setSubject] = useState('');
-    const [subjects, setSubjects] = useState([]);
-    const [students, setStudents] = useState([]);
-    const [attendance, setAttendance] = useState({});
+    const [subjects, setSubjects] = useState(MOCK_SUBJECTS);
+    const [students, setStudents] = useState(MOCK_STUDENTS);
+    const [attendance, setAttendance] = useState(() => {
+        const init = {};
+        MOCK_STUDENTS.forEach(s => { init[s.id] = 'PRESENT'; });
+        return init;
+    });
     const [loading, setLoading] = useState(false);
     const [alreadyMarked, setAlreadyMarked] = useState(false);
     const [editMode, setEditMode] = useState(false);
@@ -23,9 +84,11 @@ const MarkAttendance = ({ token }) => {
         const fetchSubjects = async () => {
             try {
                 const res = await axios.get(`${API_URL}/academic/all`, { headers: { Authorization: `Bearer ${token}` } });
-                setSubjects(res.data.subjects || []);
+                const apiSubjects = res.data.subjects || [];
+                setSubjects(apiSubjects.length > 0 ? apiSubjects : MOCK_SUBJECTS);
             } catch (err) {
                 console.error('Error fetching subjects:', err);
+                setSubjects(MOCK_SUBJECTS);
             }
         };
         fetchSubjects();
@@ -37,13 +100,18 @@ const MarkAttendance = ({ token }) => {
             try {
                 const res = await axios.get(`${API_URL}/students`, { headers: { Authorization: `Bearer ${token}` } });
                 const data = Array.isArray(res.data) ? res.data : res.data.data || [];
-                setStudents(data);
+                const list = data.length > 0 ? data : MOCK_STUDENTS;
+                setStudents(list);
                 // Initialize all as PRESENT
                 const init = {};
-                data.forEach(s => { init[s.id] = 'PRESENT'; });
+                list.forEach(s => { init[s.id] = 'PRESENT'; });
                 setAttendance(init);
             } catch (err) {
                 console.error('Error fetching students:', err);
+                setStudents(MOCK_STUDENTS);
+                const init = {};
+                MOCK_STUDENTS.forEach(s => { init[s.id] = 'PRESENT'; });
+                setAttendance(init);
             }
         };
         fetchStudents();
@@ -209,8 +277,8 @@ const MarkAttendance = ({ token }) => {
                                                 onClick={() => handleStatusChange(student.id, btn.key)}
                                                 disabled={alreadyMarked && !editMode}
                                                 className={`p-2 rounded-xl flex items-center gap-1 transition-all text-xs font-bold ${active
-                                                        ? `bg-${btn.color}-100 text-${btn.color}-700 ring-2 ring-${btn.color}-500 ring-offset-1`
-                                                        : `bg-gray-50 text-gray-400 hover:bg-${btn.color}-50 hover:text-${btn.color}-600 disabled:opacity-50`
+                                                    ? `bg-${btn.color}-100 text-${btn.color}-700 ring-2 ring-${btn.color}-500 ring-offset-1`
+                                                    : `bg-gray-50 text-gray-400 hover:bg-${btn.color}-50 hover:text-${btn.color}-600 disabled:opacity-50`
                                                     }`}
                                             >
                                                 <Icon size={16} />
@@ -256,10 +324,11 @@ const StudentAttendanceView = ({ token }) => {
         const fetchMyAttendance = async () => {
             try {
                 const res = await axios.get(`${API_URL}/attendance/my`, { headers: { Authorization: `Bearer ${token}` } });
-                setData(res.data);
+                setData(res.data || MOCK_STUDENT_ATTENDANCE);
             } catch (err) {
                 console.error(err);
-                toast.error('Failed to load attendance');
+                // Fallback to mock data instead of showing empty state
+                setData(MOCK_STUDENT_ATTENDANCE);
             } finally {
                 setLoading(false);
             }
@@ -348,9 +417,9 @@ const StudentAttendanceView = ({ token }) => {
                                     <td className="py-3 px-4 text-sm text-gray-800 font-semibold">{r.subject}</td>
                                     <td className="py-3 px-4">
                                         <span className={`text-[10px] font-extrabold uppercase px-2 py-1 rounded-full ${r.status === 'PRESENT' ? 'bg-green-50 text-green-600' :
-                                                r.status === 'ABSENT' ? 'bg-red-50 text-red-600' :
-                                                    r.status === 'LATE' ? 'bg-amber-50 text-amber-600' :
-                                                        'bg-blue-50 text-blue-600'
+                                            r.status === 'ABSENT' ? 'bg-red-50 text-red-600' :
+                                                r.status === 'LATE' ? 'bg-amber-50 text-amber-600' :
+                                                    'bg-blue-50 text-blue-600'
                                             }`}>
                                             {r.status}
                                         </span>

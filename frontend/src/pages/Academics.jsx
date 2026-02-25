@@ -9,19 +9,49 @@ import toast from 'react-hot-toast';
 
 // Mock Data for Classes
 const initialClasses = [
-    { id: 1, name: 'Class 10', section: 'A', students: 42, teacher: 'Rajesh Kumar', stream: 'General' },
-    { id: 2, name: 'Class 10', section: 'B', students: 40, teacher: 'Priya Sharma', stream: 'General' },
-    { id: 3, name: 'Class 12', section: 'A', students: 38, teacher: 'Amit Singh', stream: 'Science' },
-    { id: 4, name: 'Class 12', section: 'B', students: 35, teacher: 'Sneha Gupta', stream: 'Commerce' },
-    { id: 5, name: 'Class 9', section: 'A', students: 45, teacher: 'Vikram Malhotra', stream: 'General' },
+    { id: 1, name: 'Class 10', section: 'A', students: 42, teacher: 'Dr. Rajesh Kumar', stream: 'General' },
+    { id: 2, name: 'Class 10', section: 'B', students: 40, teacher: 'Dr. Sunita Mehta', stream: 'General' },
+    { id: 3, name: 'Class 12', section: 'A', students: 38, teacher: 'Prof. Anil Deshmukh', stream: 'Science' },
+    { id: 4, name: 'Class 12', section: 'B', students: 35, teacher: 'Dr. Meena Iyer', stream: 'Commerce' },
+    { id: 5, name: 'Class 9', section: 'A', students: 45, teacher: 'Prof. Suresh Patil', stream: 'General' },
+    { id: 6, name: 'Class 9', section: 'B', students: 43, teacher: 'Dr. Kavitha Rao', stream: 'General' },
+    { id: 7, name: 'Class 11', section: 'A', students: 40, teacher: 'Prof. Deepak Tiwari', stream: 'Science' },
+    { id: 8, name: 'Class 11', section: 'B', students: 38, teacher: 'Dr. Lakshmi Narayan', stream: 'Humanities' },
+    { id: 9, name: 'Class 8', section: 'A', students: 44, teacher: 'Dr. Ramesh Kumar', stream: 'General' },
+    { id: 10, name: 'Class 8', section: 'B', students: 42, teacher: 'Dr. Geeta Mehta', stream: 'General' },
+    { id: 11, name: 'Class 10', section: 'C', students: 39, teacher: 'Dr. Sanjay Deshmukh', stream: 'General' },
+    { id: 12, name: 'Class 12', section: 'C', students: 36, teacher: 'Dr. Anita Iyer', stream: 'Science' },
+    { id: 13, name: 'Class 9', section: 'C', students: 41, teacher: 'Prof. Prakash Patil', stream: 'General' },
+    { id: 14, name: 'Class 11', section: 'C', students: 37, teacher: 'Dr. Neelam Rao', stream: 'Commerce' },
+    { id: 15, name: 'Class 7', section: 'A', students: 45, teacher: 'Dr. Vijay Tiwari', stream: 'General' },
+    { id: 16, name: 'Class 7', section: 'B', students: 43, teacher: 'Dr. Seema Narayan', stream: 'General' },
+    { id: 17, name: 'Class 10', section: 'D', students: 38, teacher: 'Dr. Ashok Kumar', stream: 'General' },
+    { id: 18, name: 'Class 12', section: 'D', students: 34, teacher: 'Dr. Rekha Mehta', stream: 'Science' },
+    { id: 19, name: 'Class 9', section: 'D', students: 40, teacher: 'Prof. Manoj Deshmukh', stream: 'General' },
+    { id: 20, name: 'Class 11', section: 'D', students: 35, teacher: 'Dr. Savita Iyer', stream: 'Science' },
+    { id: 21, name: 'Class 6', section: 'A', students: 46, teacher: 'Dr. Sunil Patil', stream: 'General' },
+    { id: 22, name: 'Class 6', section: 'B', students: 44, teacher: 'Dr. Vandana Rao', stream: 'General' },
+    { id: 23, name: 'Class 8', section: 'C', students: 41, teacher: 'Prof. Ravi Tiwari', stream: 'General' },
+    { id: 24, name: 'Class 11', section: 'E', students: 33, teacher: 'Dr. Usha Narayan', stream: 'Science' },
+    { id: 25, name: 'Class 10', section: 'E', students: 37, teacher: 'Dr. Hemant Kumar', stream: 'General' },
 ];
 
 const subjects = [
-    { id: 101, name: 'Mathematics', code: 'MATH101', teachers: 4, classes: 12 },
-    { id: 102, name: 'Physics', code: 'PHY101', teachers: 3, classes: 6 },
-    { id: 103, name: 'Chemistry', code: 'CHEM101', teachers: 3, classes: 6 },
-    { id: 104, name: 'English', code: 'ENG101', teachers: 5, classes: 12 },
-    { id: 105, name: 'Computer Science', code: 'CS101', teachers: 2, classes: 8 },
+    { id: 101, name: 'Mathematics', code: 'MATH101', teachers: 8, classes: 24 },
+    { id: 102, name: 'Physics', code: 'PHY101', teachers: 6, classes: 18 },
+    { id: 103, name: 'Chemistry', code: 'CHEM101', teachers: 6, classes: 18 },
+    { id: 104, name: 'English', code: 'ENG101', teachers: 10, classes: 30 },
+    { id: 105, name: 'Computer Science', code: 'CS101', teachers: 5, classes: 15 },
+    { id: 106, name: 'Biology', code: 'BIO101', teachers: 4, classes: 12 },
+    { id: 107, name: 'History', code: 'HIST101', teachers: 3, classes: 9 },
+    { id: 108, name: 'Geography', code: 'GEOG101', teachers: 3, classes: 9 },
+    { id: 109, name: 'Economics', code: 'ECON101', teachers: 4, classes: 12 },
+    { id: 110, name: 'Pol. Science', code: 'POL101', teachers: 3, classes: 9 },
+    { id: 111, name: 'Accountancy', code: 'ACC101', teachers: 5, classes: 15 },
+    { id: 112, name: 'Business Studies', code: 'BST101', teachers: 5, classes: 15 },
+    { id: 113, name: 'Sociology', code: 'SOC101', teachers: 3, classes: 9 },
+    { id: 114, name: 'Psychology', code: 'PSY101', teachers: 4, classes: 12 },
+    { id: 115, name: 'Physical Education', code: 'PED101', teachers: 4, classes: 20 },
 ];
 
 const StatCard = ({ title, count, icon: Icon, color }) => (
@@ -193,8 +223,8 @@ const Academics = () => {
                                         </td>
                                         <td className="px-5 py-4 text-center hidden sm:table-cell">
                                             <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${cls.stream === 'Science' ? 'bg-emerald-50 text-emerald-600' :
-                                                    cls.stream === 'Commerce' ? 'bg-amber-50 text-amber-600' :
-                                                        'bg-gray-100 text-gray-600'
+                                                cls.stream === 'Commerce' ? 'bg-amber-50 text-amber-600' :
+                                                    'bg-gray-100 text-gray-600'
                                                 }`}>
                                                 {cls.stream}
                                             </span>

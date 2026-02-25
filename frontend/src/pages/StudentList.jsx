@@ -17,7 +17,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 // ─── Mock / Sample Students (550 generated) ────────────────────────
 const FIRST_NAMES = ['Aarav', 'Priya', 'Rohan', 'Ananya', 'Vikram', 'Sneha', 'Arjun', 'Kavya', 'Aditya', 'Meera', 'Rahul', 'Pooja', 'Karan', 'Nisha', 'Harsh', 'Divya', 'Manish', 'Ritu', 'Saurabh', 'Tanvi', 'Nikhil', 'Shreya', 'Vivek', 'Sonal', 'Deepak', 'Ankita', 'Varun', 'Megha', 'Amit', 'Swati', 'Raj', 'Neha', 'Yash', 'Sakshi', 'Ishaan', 'Pallavi', 'Dev', 'Komal', 'Tushar', 'Riya', 'Akash', 'Simran', 'Jay', 'Bhavna', 'Kunal', 'Tanya', 'Mohit', 'Parul', 'Gaurav', 'Kajal'];
 const LAST_NAMES = ['Sharma', 'Patel', 'Gupta', 'Singh', 'Reddy', 'Joshi', 'Verma', 'Nair', 'Kumar', 'Mehta', 'Deshmukh', 'Iyer', 'Patil', 'Rao', 'Tiwari', 'Narayan', 'Chauhan', 'Mishra', 'Saxena', 'Bansal', 'Agarwal', 'Chopra', 'Malhotra', 'Kapoor', 'Bhat', 'Dubey', 'Pandey', 'Soni', 'Shah', 'Jain'];
-const DEPARTMENTS = ['Computer Science', 'Electronics', 'Mechanical', 'Civil', 'Electrical', 'Information Technology'];
+const DEPARTMENTS = ['Computer Science', 'Electronics', 'Mechanical', 'Civil', 'Electrical', 'Information Technology', 'Mathematics', 'Physics'];
 const STATUSES = ['APPROVED', 'APPROVED', 'APPROVED', 'APPROVED', 'PENDING', 'REJECTED'];
 const SEMESTERS = [1, 2, 3, 4, 5, 6, 7, 8];
 

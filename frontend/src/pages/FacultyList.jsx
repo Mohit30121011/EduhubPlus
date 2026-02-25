@@ -14,7 +14,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const FAC_TITLES = ['Dr.', 'Prof.', 'Dr.', 'Prof.', 'Dr.'];
 const FAC_FIRST = ['Rajesh', 'Sunita', 'Anil', 'Meena', 'Suresh', 'Kavitha', 'Deepak', 'Lakshmi', 'Ramesh', 'Geeta', 'Sanjay', 'Anita', 'Prakash', 'Neelam', 'Vijay', 'Seema', 'Ashok', 'Rekha', 'Manoj', 'Savita', 'Sunil', 'Vandana', 'Ravi', 'Usha', 'Hemant', 'Jyoti', 'Dinesh', 'Bharti', 'Girish', 'Sushma'];
 const FAC_LAST = ['Kumar', 'Mehta', 'Deshmukh', 'Iyer', 'Patil', 'Rao', 'Tiwari', 'Narayan', 'Chauhan', 'Mishra', 'Saxena', 'Bansal', 'Agarwal', 'Chopra', 'Malhotra', 'Kapoor', 'Bhat', 'Dubey', 'Pandey', 'Soni', 'Shah', 'Jain', 'Verma', 'Nair', 'Sharma'];
-const FAC_DEPTS = ['Computer Science', 'Electronics', 'Mechanical', 'Civil', 'Electrical', 'Mathematics', 'Physics', 'Chemistry'];
+const FAC_DEPTS = ['Computer Science', 'Electronics', 'Mechanical', 'Civil', 'Electrical', 'Information Technology', 'Mathematics', 'Physics'];
 const FAC_DESIG = ['Professor', 'Associate Professor', 'Assistant Professor', 'HOD', 'Lecturer'];
 
 const MOCK_FACULTY = Array.from({ length: 120 }, (_, i) => {

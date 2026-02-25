@@ -886,7 +886,12 @@ const MasterData = () => {
                                         transition={{ delay: index * 0.05 }}
                                         className="hover:bg-blue-50/50 transition-colors group"
                                     >
-                                        {visibleColumns[type]?.name && <td className="px-6 py-5 font-bold text-gray-700 leading-relaxed">{item.name}</td>}
+                                        {visibleColumns[type]?.name && (
+                                            <td className="px-6 py-5 font-bold text-gray-700 leading-relaxed">
+                                                {item.name}
+                                                {item.isMock && <span className="ml-2 px-1.5 py-0.5 bg-amber-100 text-amber-600 text-[9px] font-black rounded-md uppercase">Sample</span>}
+                                            </td>
+                                        )}
                                         {/* Show Department Column for Courses */}
                                         {type === 'courses' && visibleColumns.courses?.department && (
                                             <td className="px-6 py-5 font-medium text-gray-500 whitespace-nowrap">
@@ -916,17 +921,19 @@ const MasterData = () => {
                                                 >
                                                     Edit
                                                 </motion.button>
-                                                <motion.button
-                                                    whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                                                    onClick={() => {
-                                                        setItemToDelete(item);
-                                                        setDeleteType(type);
-                                                        setShowDeleteModal(true);
-                                                    }}
-                                                    className="text-sm font-bold text-red-600 bg-red-50 px-4 py-2 rounded-xl hover:bg-red-600 hover:text-white transition-colors"
-                                                >
-                                                    Delete
-                                                </motion.button>
+                                                {!item.isMock && (
+                                                    <motion.button
+                                                        whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                                                        onClick={() => {
+                                                            setItemToDelete(item);
+                                                            setDeleteType(type);
+                                                            setShowDeleteModal(true);
+                                                        }}
+                                                        className="text-sm font-bold text-red-600 bg-red-50 px-4 py-2 rounded-xl hover:bg-red-600 hover:text-white transition-colors"
+                                                    >
+                                                        Delete
+                                                    </motion.button>
+                                                )}
                                             </div>
                                         </td>
                                     </motion.tr>

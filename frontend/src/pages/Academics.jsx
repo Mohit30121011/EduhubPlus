@@ -292,16 +292,101 @@ const Academics = () => {
                 )}
 
                 {/* ─── TIMETABLES ─────────────────────────────────── */}
-                {activeTab === 'timetables' && (
-                    <div className="flex flex-col items-center justify-center p-12 text-center text-gray-400">
-                        <Calendar size={48} className="mb-4 text-gray-200" />
-                        <h3 className="text-lg font-semibold text-gray-600">Timetable Management</h3>
-                        <p className="max-w-xs mx-auto mt-2 text-sm text-gray-400">Select a class to view or edit its weekly schedule.</p>
-                        <button className="mt-6 px-6 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg shadow-sm hover:bg-gray-50 text-sm font-medium">
-                            Select Class
-                        </button>
-                    </div>
-                )}
+                {activeTab === 'timetables' && (() => {
+                    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    const periods = [
+                        { time: '8:00 - 8:45', slots: ['Mathematics', 'Physics', 'English', 'Chemistry', 'Computer Sc.', 'Mathematics'] },
+                        { time: '8:45 - 9:30', slots: ['Physics', 'Mathematics', 'Chemistry', 'English', 'Mathematics', 'Physics'] },
+                        { time: '9:45 - 10:30', slots: ['English', 'Computer Sc.', 'Mathematics', 'Physics', 'Chemistry', 'English'] },
+                        { time: '10:30 - 11:15', slots: ['Chemistry', 'English', 'Physics', 'Mathematics', 'English', 'P.E.'] },
+                        { time: '11:30 - 12:15', slots: ['Computer Sc.', 'Chemistry', 'P.E.', 'Computer Sc.', 'Physics', 'Chemistry'] },
+                        { time: '12:15 - 1:00', slots: ['Biology', 'Biology', 'Computer Sc.', 'P.E.', 'Biology', '—'] },
+                    ];
+                    const teachers = {
+                        'Mathematics': 'Dr. Sharma', 'Physics': 'Prof. Verma', 'Chemistry': 'Ms. Joshi',
+                        'English': 'Dr. Reddy', 'Computer Sc.': 'Dr. Patel', 'Biology': 'Dr. Gupta', 'P.E.': 'Coach Rao',
+                    };
+                    const colors = {
+                        'Mathematics': 'bg-blue-50 text-blue-700 border-blue-200',
+                        'Physics': 'bg-purple-50 text-purple-700 border-purple-200',
+                        'Chemistry': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                        'English': 'bg-rose-50 text-rose-700 border-rose-200',
+                        'Computer Sc.': 'bg-amber-50 text-amber-700 border-amber-200',
+                        'Biology': 'bg-teal-50 text-teal-700 border-teal-200',
+                        'P.E.': 'bg-orange-50 text-orange-700 border-orange-200',
+                    };
+
+                    return (
+                        <div className="p-4">
+                            {/* Class Selector */}
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+                                <div className="flex items-center gap-3">
+                                    <select className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                                        <option>Class 10 - Section A</option>
+                                        <option>Class 10 - Section B</option>
+                                        <option>Class 12 - Section A</option>
+                                        <option>Class 9 - Section A</option>
+                                        <option>Class 11 - Section A</option>
+                                    </select>
+                                    <span className="text-xs text-gray-400 font-bold">Weekly Schedule</span>
+                                </div>
+                                <div className="flex gap-2 text-[10px] font-bold">
+                                    <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded-md">6 Periods/Day</span>
+                                    <span className="px-2 py-1 bg-emerald-50 text-emerald-600 rounded-md">6 Days/Week</span>
+                                </div>
+                            </div>
+
+                            {/* Timetable Grid */}
+                            <div className="overflow-x-auto -mx-4 px-4">
+                                <table className="w-full text-sm border-collapse min-w-[700px]">
+                                    <thead>
+                                        <tr>
+                                            <th className="text-left py-2.5 px-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-24">Time</th>
+                                            {days.map(day => (
+                                                <th key={day} className="text-center py-2.5 px-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">{day}</th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {periods.map((period, pi) => (
+                                            <tr key={pi} className={pi === 2 || pi === 4 ? 'border-t-4 border-dashed border-gray-100' : ''}>
+                                                <td className="py-1.5 px-3">
+                                                    <span className="text-[11px] font-mono font-bold text-gray-500">{period.time}</span>
+                                                </td>
+                                                {period.slots.map((subj, si) => (
+                                                    <td key={si} className="py-1.5 px-1">
+                                                        {subj === '—' ? (
+                                                            <div className="text-center text-gray-300 text-xs">—</div>
+                                                        ) : (
+                                                            <div className={`p-2 rounded-lg border text-center transition-all hover:shadow-sm cursor-pointer ${colors[subj] || 'bg-gray-50 text-gray-600 border-gray-200'}`}>
+                                                                <p className="font-bold text-xs leading-tight">{subj}</p>
+                                                                <p className="text-[9px] opacity-70 mt-0.5">{teachers[subj] || ''}</p>
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Break indicators */}
+                            <div className="flex items-center gap-4 mt-4 pt-3 border-t border-gray-100">
+                                <span className="text-[10px] font-bold text-gray-400 uppercase">Breaks:</span>
+                                <span className="text-xs text-gray-500 flex items-center gap-1">
+                                    <Clock size={10} /> 9:30 - 9:45 (Short Break)
+                                </span>
+                                <span className="text-xs text-gray-500 flex items-center gap-1">
+                                    <Clock size={10} /> 11:15 - 11:30 (Short Break)
+                                </span>
+                                <span className="text-xs text-gray-500 flex items-center gap-1">
+                                    <Clock size={10} /> 1:00 - 1:45 (Lunch)
+                                </span>
+                            </div>
+                        </div>
+                    );
+                })()}
             </div>
 
             {/* ─── ADD CLASS MODAL ────────────────────────────────── */}

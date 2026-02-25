@@ -72,7 +72,7 @@ const SplashScreen = ({ onComplete }) => {
                             <img
                                 src={logo}
                                 alt="EduhubPlus"
-                                className="w-48 sm:w-56 md:w-64 relative z-10 drop-shadow-2xl"
+                                className="w-64 sm:w-72 md:w-80 relative z-10 drop-shadow-2xl"
                             />
                         </motion.div>
 

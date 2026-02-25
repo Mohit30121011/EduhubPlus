@@ -155,8 +155,7 @@ const Content = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-black text-gray-900 flex items-center gap-2">
-                        <Sparkles size={22} className="text-blue-500" />
+                    <h1 className="text-2xl font-black text-gray-900">
                         Content Library
                     </h1>
                     <p className="text-gray-500 text-sm mt-1">Manage syllabus, assignments, lectures & resources</p>
@@ -227,8 +226,8 @@ const Content = () => {
                             key={cat.id}
                             onClick={() => setSelectedCategory(cat.id)}
                             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all shrink-0 ${isActive
-                                    ? `bg-gradient-to-r ${cat.gradient} text-white shadow-lg shadow-blue-500/15`
-                                    : 'bg-white text-gray-600 border border-gray-100 hover:bg-gray-50'
+                                ? `bg-gradient-to-r ${cat.gradient} text-white shadow-lg shadow-blue-500/15`
+                                : 'bg-white text-gray-600 border border-gray-100 hover:bg-gray-50'
                                 }`}
                         >
                             <Icon size={16} />

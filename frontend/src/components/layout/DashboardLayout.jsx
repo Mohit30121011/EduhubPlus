@@ -38,7 +38,7 @@ const DashboardLayout = () => {
 
             <main className="main-content flex-1 flex flex-col min-w-0 pb-16 lg:pb-0">
                 {/* Top Header Bar */}
-                <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-100 px-4 md:px-6 lg:px-8 py-3 flex items-center justify-between">
+                <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-100 px-4 md:px-6 lg:px-8 py-3 hidden lg:flex items-center justify-between">
                     <button
                         onClick={() => setSidebarOpen(!isSidebarOpen)}
                         className="lg:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-xl transition-colors"

@@ -93,9 +93,9 @@ const tooltipStyle = { borderRadius: '12px', border: 'none', boxShadow: '0 4px 1
 
 // ─── Stat Card ──────────────────────────────────────────────────────
 const FinanceCard = ({ title, amount, icon: Icon, iconBg, iconColor, sub, trend, loading }) => (
-    <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm p-5 relative overflow-hidden group hover:shadow-md transition-all">
-        <div className={`absolute right-0 top-0 p-4 ${iconBg} rounded-bl-3xl`}>
-            <Icon size={24} className={iconColor} />
+    <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm p-5 pr-14 relative overflow-hidden group hover:shadow-md transition-all">
+        <div className={`absolute right-0 top-0 p-3 ${iconBg} rounded-bl-2xl`}>
+            <Icon size={20} className={iconColor} />
         </div>
         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{title}</p>
         {loading ? (
@@ -958,6 +958,16 @@ const Finances = () => {
     const role = user?.role;
     const isStudent = role === 'STUDENT';
 
+    // Academic Year
+    const getAcademicYear = () => localStorage.getItem('selectedAcademicYear') || `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`;
+    const [academicYear, setAcademicYear] = useState(getAcademicYear);
+
+    useEffect(() => {
+        const handler = () => setAcademicYear(getAcademicYear());
+        window.addEventListener('academicYearChanged', handler);
+        return () => window.removeEventListener('academicYearChanged', handler);
+    }, []);
+
     return (
         <div className="space-y-6 pb-20 lg:pb-10">
             {/* Header */}
@@ -968,6 +978,9 @@ const Finances = () => {
                         {isStudent ? 'View your fee status and payment history.' : 'Track fee collections, manage structures, and record payments.'}
                     </p>
                 </div>
+                <span className="self-start sm:self-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-100 text-indigo-700">
+                    📅 {academicYear}
+                </span>
             </div>
 
             {isStudent ? <StudentFinanceView token={token} /> : <AdminFinanceView token={token} />}

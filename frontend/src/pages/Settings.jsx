@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
     School, Settings, Shield, Bell, Database,
-    Save, Upload, Mail, Globe, Palette, User
+    Save, Upload, Mail, Globe, Palette, User, Calendar
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getSchoolProfile, updateSchoolProfile } from '../redux/features/settingsSlice';
@@ -16,6 +16,17 @@ const SettingsPage = () => {
     const [activeTab, setActiveTab] = useState(() => localStorage.getItem('settingsTab') || 'campus');
     const [uploadingLogo, setUploadingLogo] = useState(false);
     const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+    // Academic Year Preference
+    const currentYear = new Date().getFullYear();
+    const defaultYear = currentYear >= 7 ? `${currentYear}-${currentYear + 1}` : `${currentYear - 1}-${currentYear}`;
+    const [selectedAcademicYear, setSelectedAcademicYear] = useState(
+        () => localStorage.getItem('selectedAcademicYear') || defaultYear
+    );
+    const academicYears = Array.from({ length: 21 }, (_, i) => {
+        const y = 2020 + i;
+        return `${y}-${y + 1}`;
+    });
 
     // Redux State
     const { schoolProfile, isLoading: isSchoolLoading } = useSelector((state) => state.settings);
@@ -166,6 +177,7 @@ const SettingsPage = () => {
     const tabs = [
         { id: 'campus', label: 'Campus Info', icon: School },
         { id: 'profile', label: 'Profile Info', icon: User },
+        { id: 'preferences', label: 'Preferences', icon: Calendar },
         { id: 'roles', label: 'Roles & Permissions', icon: Shield },
         { id: 'notifications', label: 'Notifications', icon: Bell },
         { id: 'backup', label: 'Data & Backup', icon: Database },
@@ -391,10 +403,48 @@ const SettingsPage = () => {
                     )}
 
                     {/* Placeholder Tabs */}
-                    {(activeTab !== 'campus' && activeTab !== 'profile') && (
+                    {(activeTab !== 'campus' && activeTab !== 'profile' && activeTab !== 'preferences') && (
                         <div className="text-center py-32 text-gray-300">
                             {/* ... existing placeholders ... */}
                             <p className="font-bold text-lg text-gray-400">Configuration module coming soon</p>
+                        </div>
+                    )}
+
+                    {/* Preferences Tab */}
+                    {activeTab === 'preferences' && (
+                        <div className="space-y-8">
+                            <h2 className="text-xl font-black text-gray-900 border-b border-gray-100/50 pb-4">Preferences</h2>
+
+                            <div className="space-y-6">
+                                <div className="relative group">
+                                    <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-widest mb-1.5 ml-1 flex items-center gap-2">
+                                        <Calendar size={14} /> Academic Year
+                                    </label>
+                                    <p className="text-xs text-gray-400 ml-1 mb-3">Select the academic year to view data for across Insights, Finances, and other pages.</p>
+                                    <select
+                                        value={selectedAcademicYear}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            setSelectedAcademicYear(val);
+                                            localStorage.setItem('selectedAcademicYear', val);
+                                            window.dispatchEvent(new Event('academicYearChanged'));
+                                            toast.success(`Academic year set to ${val}`);
+                                        }}
+                                        className="w-full md:w-80 p-4 bg-gray-50/50 border border-transparent ring-1 ring-gray-100 rounded-2xl font-bold text-gray-800 focus:ring-2 focus:ring-blue-500/20 focus:bg-white outline-none transition-all appearance-none cursor-pointer"
+                                    >
+                                        {academicYears.map(yr => (
+                                            <option key={yr} value={yr}>{yr}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="bg-blue-50/60 border border-blue-100 rounded-2xl p-5">
+                                    <p className="text-sm font-bold text-blue-700 flex items-center gap-2">
+                                        <Calendar size={16} /> Currently Active: <span className="text-blue-900">{selectedAcademicYear}</span>
+                                    </p>
+                                    <p className="text-xs text-blue-500 mt-1">All pages will show data for this academic year. Mock/sample data always shows regardless of year.</p>
+                                </div>
+                            </div>
                         </div>
                     )}
 

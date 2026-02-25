@@ -125,9 +125,9 @@ const downloadChartAsPNG = (containerRef, filename = 'chart') => {
 
 // ─── KPI Card ───────────────────────────────────────────────────────
 const KPICard = ({ title, value, subtitle, icon: Icon, iconBg, iconColor, trend, loading }) => (
-    <div className="bg-white/80 backdrop-blur-xl p-5 rounded-2xl shadow-sm border border-white/60 relative overflow-hidden group hover:shadow-md transition-all">
-        <div className={`absolute right-0 top-0 p-4 ${iconBg} rounded-bl-3xl`}>
-            <Icon size={24} className={iconColor} />
+    <div className="bg-white/80 backdrop-blur-xl p-5 pr-14 rounded-2xl shadow-sm border border-white/60 relative overflow-hidden group hover:shadow-md transition-all">
+        <div className={`absolute right-0 top-0 p-3 ${iconBg} rounded-bl-2xl`}>
+            <Icon size={20} className={iconColor} />
         </div>
         <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{title}</p>
         {loading ? (
@@ -185,6 +185,16 @@ const Insights = () => {
     const [genderData, setGenderData] = useState(MOCK_GENDER);
     const [exporting, setExporting] = useState(false);
     const [dataSource, setDataSource] = useState('loading'); // 'live', 'mixed', 'mock'
+
+    // Academic Year
+    const getAcademicYear = () => localStorage.getItem('selectedAcademicYear') || `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`;
+    const [academicYear, setAcademicYear] = useState(getAcademicYear);
+
+    useEffect(() => {
+        const handler = () => setAcademicYear(getAcademicYear());
+        window.addEventListener('academicYearChanged', handler);
+        return () => window.removeEventListener('academicYearChanged', handler);
+    }, []);
 
     const attendanceChartRef = useRef(null);
     const feeChartRef = useRef(null);
@@ -430,11 +440,14 @@ const Insights = () => {
                     <h1 className="text-2xl font-black text-gray-900">Insights & Reports</h1>
                     <p className="text-gray-500 text-sm mt-1">Deep dive into academic and operational metrics.</p>
                 </div>
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex gap-2 flex-wrap items-center">
+                    <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-100 text-indigo-700">
+                        📅 {academicYear}
+                    </span>
                     {dataSource !== 'loading' && (
-                        <span className={`self-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${dataSource === 'live' ? 'bg-emerald-100 text-emerald-700' :
-                                dataSource === 'mixed' ? 'bg-blue-100 text-blue-700' :
-                                    'bg-amber-100 text-amber-700'
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${dataSource === 'live' ? 'bg-emerald-100 text-emerald-700' :
+                            dataSource === 'mixed' ? 'bg-blue-100 text-blue-700' :
+                                'bg-amber-100 text-amber-700'
                             }`}>
                             {dataSource === 'live' ? '● Live Data' : dataSource === 'mixed' ? '● Live + Sample' : '● Sample Data'}
                         </span>

@@ -35,15 +35,15 @@ const DashboardHome = () => {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setStats({
-                    studentCount: data.studentCount || MOCK_DASHBOARD_STATS.studentCount,
-                    facultyCount: data.facultyCount || MOCK_DASHBOARD_STATS.facultyCount,
+                    studentCount: Math.max(data.studentCount || 0, MOCK_DASHBOARD_STATS.studentCount),
+                    facultyCount: Math.max(data.facultyCount || 0, MOCK_DASHBOARD_STATS.facultyCount),
                     attendance: {
-                        percentage: data.attendance?.percentage || MOCK_DASHBOARD_STATS.attendance.percentage,
-                        present: data.attendance?.present || MOCK_DASHBOARD_STATS.attendance.present,
-                        total: data.attendance?.total || MOCK_DASHBOARD_STATS.attendance.total,
+                        percentage: Math.max(data.attendance?.percentage || 0, MOCK_DASHBOARD_STATS.attendance.percentage),
+                        present: Math.max(data.attendance?.present || 0, MOCK_DASHBOARD_STATS.attendance.present),
+                        total: Math.max(data.attendance?.total || 0, MOCK_DASHBOARD_STATS.attendance.total),
                     },
                     fees: {
-                        totalCollected: data.fees?.totalCollected || MOCK_DASHBOARD_STATS.fees.totalCollected,
+                        totalCollected: Math.max(data.fees?.totalCollected || 0, MOCK_DASHBOARD_STATS.fees.totalCollected),
                     },
                 });
             } catch (error) {

@@ -47,18 +47,15 @@ const Notifications = () => {
         setLoading(true);
         try {
             const res = await axios.get(`${API_URL}/notifications/my?page=${page}&limit=20`, { headers });
-            const apiNotifications = res.data.notifications || [];
-            if (apiNotifications.length > 0) {
-                setNotifications(apiNotifications);
-                setTotal(res.data.total || apiNotifications.length);
-            } else {
-                setNotifications(MOCK_NOTIFICATIONS);
-                setTotal(MOCK_NOTIFICATIONS.length);
-            }
+            const apiNotifications = (res.data.notifications || []).map(n => ({ ...n, isMock: false }));
+            const existingIds = new Set(apiNotifications.map(n => n.id));
+            const mockToAdd = MOCK_NOTIFICATIONS.filter(n => !existingIds.has(n.id)).map(n => ({ ...n, isMock: true }));
+            const merged = [...apiNotifications, ...mockToAdd];
+            setNotifications(merged);
+            setTotal(merged.length);
         } catch (err) {
             console.error(err);
-            // Fallback to mock notifications
-            setNotifications(MOCK_NOTIFICATIONS);
+            setNotifications(MOCK_NOTIFICATIONS.map(n => ({ ...n, isMock: true })));
             setTotal(MOCK_NOTIFICATIONS.length);
         } finally {
             setLoading(false);

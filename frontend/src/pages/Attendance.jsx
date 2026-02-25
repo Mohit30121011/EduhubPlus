@@ -84,11 +84,13 @@ const MarkAttendance = ({ token }) => {
         const fetchSubjects = async () => {
             try {
                 const res = await axios.get(`${API_URL}/academic/all`, { headers: { Authorization: `Bearer ${token}` } });
-                const apiSubjects = res.data.subjects || [];
-                setSubjects(apiSubjects.length > 0 ? apiSubjects : MOCK_SUBJECTS);
+                const apiSubjects = (res.data.subjects || []).map(s => ({ ...s, isMock: false }));
+                const existingIds = new Set(apiSubjects.map(s => s.id));
+                const mockToAdd = MOCK_SUBJECTS.filter(s => !existingIds.has(s.id)).map(s => ({ ...s, isMock: true }));
+                setSubjects([...apiSubjects, ...mockToAdd]);
             } catch (err) {
                 console.error('Error fetching subjects:', err);
-                setSubjects(MOCK_SUBJECTS);
+                setSubjects(MOCK_SUBJECTS.map(s => ({ ...s, isMock: true })));
             }
         };
         fetchSubjects();
@@ -100,7 +102,10 @@ const MarkAttendance = ({ token }) => {
             try {
                 const res = await axios.get(`${API_URL}/students`, { headers: { Authorization: `Bearer ${token}` } });
                 const data = Array.isArray(res.data) ? res.data : res.data.data || [];
-                const list = data.length > 0 ? data : MOCK_STUDENTS;
+                const apiStudents = data.map(s => ({ ...s, isMock: false }));
+                const existingIds = new Set(apiStudents.map(s => s.id));
+                const mockToAdd = MOCK_STUDENTS.filter(s => !existingIds.has(s.id)).map(s => ({ ...s, isMock: true }));
+                const list = [...apiStudents, ...mockToAdd];
                 setStudents(list);
                 // Initialize all as PRESENT
                 const init = {};
@@ -108,7 +113,7 @@ const MarkAttendance = ({ token }) => {
                 setAttendance(init);
             } catch (err) {
                 console.error('Error fetching students:', err);
-                setStudents(MOCK_STUDENTS);
+                setStudents(MOCK_STUDENTS.map(s => ({ ...s, isMock: true })));
                 const init = {};
                 MOCK_STUDENTS.forEach(s => { init[s.id] = 'PRESENT'; });
                 setAttendance(init);

@@ -1,15 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
     DollarSign, CreditCard, TrendingUp, TrendingDown, Wallet,
     Download, Search, FileText, AlertCircle, Plus, Trash2, Edit,
     X, Check, Users, ArrowUpRight, ArrowDownRight, Clock, Filter,
-    ChevronDown, Receipt, IndianRupee, Loader2, PieChart, Calendar
+    ChevronDown, Receipt, IndianRupee, Loader2, PieChart, Calendar, Image
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import jsPDF from 'jspdf';
+import { saveAs } from 'file-saver';
+import * as XLSX from 'xlsx';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -112,6 +115,46 @@ const FinanceCard = ({ title, amount, icon: Icon, iconBg, iconColor, sub, trend,
     </div>
 );
 
+// ─── Download a chart container as PNG (with text fix) ──────────────
+const downloadChartAsPNG = (containerRef, filename = 'chart') => {
+    if (!containerRef.current) return;
+    const svgEl = containerRef.current.querySelector('svg');
+    if (!svgEl) { toast.error('No chart found to export'); return; }
+
+    const svgClone = svgEl.cloneNode(true);
+    svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    svgClone.querySelectorAll('text').forEach(text => {
+        if (!text.getAttribute('fill')) text.setAttribute('fill', '#374151');
+        text.style.fontFamily = 'Inter, Arial, Helvetica, sans-serif';
+    });
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('width', svgEl.getAttribute('width') || svgEl.viewBox?.baseVal?.width || 600);
+    rect.setAttribute('height', svgEl.getAttribute('height') || svgEl.viewBox?.baseVal?.height || 400);
+    rect.setAttribute('fill', 'white');
+    svgClone.insertBefore(rect, svgClone.firstChild);
+
+    const svgData = new XMLSerializer().serializeToString(svgClone);
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+    const img = new window.Image();
+    img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const scale = 2;
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(scale, scale);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob((blob) => {
+            if (blob) { saveAs(blob, `${filename}.png`); toast.success(`${filename}.png downloaded!`); }
+            URL.revokeObjectURL(url);
+        }, 'image/png');
+    };
+    img.src = url;
+};
+
 // ─── ADMIN VIEW ─────────────────────────────────────────────────────
 const AdminFinanceView = ({ token }) => {
     const [summary, setSummary] = useState(MOCK_SUMMARY);
@@ -121,6 +164,10 @@ const AdminFinanceView = ({ token }) => {
     const [loading, setLoading] = useState(true);
     const [paymentSearch, setPaymentSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('ALL');
+    const [exporting, setExporting] = useState(false);
+
+    // Refs
+    const trendChartRef = useRef(null);
 
     // Modal states
     const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -262,8 +309,202 @@ const AdminFinanceView = ({ token }) => {
 
     const collectionPct = summary.totalExpected > 0 ? Math.round((summary.totalCollected / summary.totalExpected) * 100) : 0;
 
+    // ── Export All as PDF ────────────────────────────────────────────
+    const exportPDF = useCallback(async () => {
+        setExporting(true);
+        try {
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            let y = 15;
+
+            pdf.setFontSize(20);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('EduhubPlus - Financial Report', pageWidth / 2, y, { align: 'center' });
+            y += 8;
+            pdf.setFontSize(10);
+            pdf.setFont(undefined, 'normal');
+            pdf.setTextColor(120);
+            pdf.text(`Generated on ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}`, pageWidth / 2, y, { align: 'center' });
+            y += 14;
+            pdf.setTextColor(0);
+
+            // KPIs
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Financial Summary', 14, y); y += 8;
+            pdf.setFontSize(10);
+            pdf.setFont(undefined, 'normal');
+            const kpis = [
+                ['Total Collection', formatCurrency(summary.totalCollected)],
+                ['Pending Payments', formatCurrency(summary.pendingPayments)],
+                ['Total Expected', formatCurrency(summary.totalExpected)],
+                ['Collection Rate', `${collectionPct}%`],
+                ['Total Transactions', String(payments.length)],
+                ['Successful Payments', String(payments.filter(p => p.status === 'SUCCESS').length)],
+            ];
+            kpis.forEach(([label, value]) => { pdf.text(`  ${label}: ${value}`, 18, y); y += 6; });
+            y += 8;
+
+            // Fee Structures
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Fee Structures', 14, y); y += 7;
+            pdf.setFontSize(9);
+            pdf.setFont(undefined, 'normal');
+            structures.forEach(s => {
+                if (y > 270) { pdf.addPage(); y = 15; }
+                pdf.text(`  ${s.category} — ${formatCurrency(s.amount)} — ${s.Program?.name || 'General'} — Due: ${s.dueDate || 'N/A'}${s.isMock ? ' [SAMPLE]' : ''}`, 18, y);
+                y += 5;
+            });
+            y += 8;
+
+            // Chart image
+            if (trendChartRef.current) {
+                const svgEl = trendChartRef.current.querySelector('svg');
+                if (svgEl) {
+                    if (y > 190) { pdf.addPage(); y = 15; }
+                    pdf.setFontSize(13);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text('Monthly Collection Trend', 14, y); y += 6;
+
+                    const svgClone = svgEl.cloneNode(true);
+                    svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+                    svgClone.querySelectorAll('text').forEach(t => {
+                        if (!t.getAttribute('fill')) t.setAttribute('fill', '#374151');
+                        t.style.fontFamily = 'Arial, Helvetica, sans-serif';
+                    });
+                    const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    bg.setAttribute('width', svgEl.getAttribute('width') || '600');
+                    bg.setAttribute('height', svgEl.getAttribute('height') || '400');
+                    bg.setAttribute('fill', 'white');
+                    svgClone.insertBefore(bg, svgClone.firstChild);
+                    const svgData = new XMLSerializer().serializeToString(svgClone);
+                    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                    const url = URL.createObjectURL(svgBlob);
+
+                    await new Promise((resolve) => {
+                        const img = new window.Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const scale = 2;
+                            canvas.width = img.width * scale;
+                            canvas.height = img.height * scale;
+                            const ctx = canvas.getContext('2d');
+                            ctx.scale(scale, scale);
+                            ctx.fillStyle = '#ffffff';
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                            ctx.drawImage(img, 0, 0);
+                            const imgData = canvas.toDataURL('image/png');
+                            const imgWidth = pageWidth - 28;
+                            const imgHeight = (img.height / img.width) * imgWidth;
+                            pdf.addImage(imgData, 'PNG', 14, y, imgWidth, Math.min(imgHeight, 80));
+                            y += Math.min(imgHeight, 80) + 10;
+                            URL.revokeObjectURL(url);
+                            resolve();
+                        };
+                        img.onerror = () => { URL.revokeObjectURL(url); resolve(); };
+                        img.src = url;
+                    });
+                }
+            }
+
+            // Recent Payments
+            if (y > 200) { pdf.addPage(); y = 15; }
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Recent Payments', 14, y); y += 7;
+            pdf.setFontSize(9);
+            pdf.setFont(undefined, 'normal');
+            payments.slice(0, 20).forEach(p => {
+                if (y > 275) { pdf.addPage(); y = 15; }
+                pdf.text(`  ${p.Student?.firstName || ''} ${p.Student?.lastName || ''} — ${formatCurrency(p.amountPaid)} — ${p.paymentMethod} — ${p.status} — ${p.paymentDate || 'N/A'}`, 18, y);
+                y += 5;
+            });
+
+            pdf.save('EduhubPlus_Financial_Report.pdf');
+            toast.success('PDF report downloaded!');
+        } catch (error) {
+            console.error('PDF export error:', error);
+            toast.error('Failed to export PDF');
+        } finally {
+            setExporting(false);
+        }
+    }, [summary, payments, structures, collectionPct]);
+
+    // ── Export as Excel ──────────────────────────────────────────────
+    const exportExcel = useCallback(() => {
+        const wb = XLSX.utils.book_new();
+
+        // Summary Sheet
+        const summaryData = [
+            { Metric: 'Total Collection (INR)', Value: summary.totalCollected },
+            { Metric: 'Pending Payments (INR)', Value: summary.pendingPayments },
+            { Metric: 'Total Expected (INR)', Value: summary.totalExpected },
+            { Metric: 'Collection Rate (%)', Value: collectionPct },
+            { Metric: 'Total Transactions', Value: payments.length },
+            { Metric: 'Successful Payments', Value: payments.filter(p => p.status === 'SUCCESS').length },
+            { Metric: 'Failed Payments', Value: payments.filter(p => p.status === 'FAILED').length },
+            { Metric: 'Pending Payments Count', Value: payments.filter(p => p.status === 'PENDING').length },
+        ];
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryData), 'Summary');
+
+        // Monthly Trend
+        if (summary.monthlyTrend?.length > 0) {
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(
+                summary.monthlyTrend.map(d => ({ Month: d.month, 'Amount (INR)': d.amount }))
+            ), 'Monthly Trend');
+        }
+
+        // Fee Structures
+        const structureData = structures.map(s => ({
+            Category: s.category,
+            'Amount (INR)': s.amount,
+            Program: s.Program?.name || 'General',
+            'Academic Year': s.AcademicYear?.name || '2025-2026',
+            'Due Date': s.dueDate || 'N/A',
+            Source: s.isMock ? 'Sample' : 'Live',
+        }));
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(structureData), 'Fee Structures');
+
+        // Payments
+        const paymentData = payments.map(p => ({
+            'Student Name': `${p.Student?.firstName || ''} ${p.Student?.lastName || ''}`.trim(),
+            'Enrollment No': p.Student?.enrollmentNo || 'N/A',
+            'Amount (INR)': p.amountPaid,
+            'Payment Date': p.paymentDate || 'N/A',
+            Method: p.paymentMethod,
+            Status: p.status,
+            'Transaction ID': p.transactionId || 'N/A',
+            Category: p.FeeStructure?.category || 'General',
+            Source: p.isMock ? 'Sample' : 'Live',
+        }));
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(paymentData), 'Payments');
+
+        XLSX.writeFile(wb, 'EduhubPlus_Financial_Report.xlsx');
+        toast.success('Excel report downloaded!');
+    }, [summary, payments, structures, collectionPct]);
+
     return (
         <>
+            {/* Export Buttons */}
+            <div className="flex gap-2 flex-wrap justify-end -mt-2 mb-2">
+                <button
+                    onClick={exportExcel}
+                    disabled={loading}
+                    className="px-4 py-2 bg-white text-gray-700 border border-gray-200 rounded-xl text-sm font-bold hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 shadow-sm flex items-center gap-2 transition-all disabled:opacity-50"
+                >
+                    <FileText size={16} /> Excel
+                </button>
+                <button
+                    onClick={exportPDF}
+                    disabled={loading || exporting}
+                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl text-sm font-bold hover:opacity-90 shadow-lg shadow-blue-500/20 flex items-center gap-2 transition-all disabled:opacity-50"
+                >
+                    {exporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+                    {exporting ? 'Generating...' : 'Export PDF'}
+                </button>
+            </div>
+
             {/* Stats Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <FinanceCard title="Total Collection" amount={formatCurrency(summary.totalCollected)}
@@ -304,10 +545,19 @@ const AdminFinanceView = ({ token }) => {
 
             {/* Chart */}
             <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm p-6">
-                <h3 className="font-bold text-gray-800 text-sm mb-4 flex items-center gap-2">
-                    <TrendingUp size={16} className="text-emerald-500" /> Monthly Collection Trend
-                </h3>
-                <div className="h-64">
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-bold text-gray-800 text-sm flex items-center gap-2">
+                        <TrendingUp size={16} className="text-emerald-500" /> Monthly Collection Trend
+                    </h3>
+                    <button
+                        onClick={() => downloadChartAsPNG(trendChartRef, 'Finance_Monthly_Trend')}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all"
+                        title="Download as PNG"
+                    >
+                        <Image size={14} /> PNG
+                    </button>
+                </div>
+                <div className="h-64" ref={trendChartRef}>
                     {loading ? (
                         <div className="h-full bg-gray-50 rounded-xl animate-pulse" />
                     ) : (

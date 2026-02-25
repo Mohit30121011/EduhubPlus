@@ -1,5 +1,7 @@
+import { useState, useCallback } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import SplashScreen from './components/SplashScreen';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import DashboardHome from './pages/DashboardHome';
@@ -27,8 +29,12 @@ import Notifications from './pages/Notifications';
 
 
 function App() {
+    const [showSplash, setShowSplash] = useState(true);
+    const handleSplashComplete = useCallback(() => setShowSplash(false), []);
+
     return (
         <div className="font-sans antialiased text-gray-900 bg-gray-50 min-h-screen">
+            {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
             <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
             <Routes>
                 <Route path="/login" element={<Login />} />
@@ -80,3 +86,4 @@ function App() {
 }
 
 export default App;
+

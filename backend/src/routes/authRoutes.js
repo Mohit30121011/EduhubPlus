@@ -4,7 +4,7 @@ const { loginUser, registerUser, updateProfile, forgotPassword, resetPassword } 
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 router.post('/login', loginUser);
-router.post('/register', protect, authorize('SUPER_ADMIN', 'ADMIN'), registerUser);
+router.post('/register', registerUser);
 router.put('/profile', protect, updateProfile);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);

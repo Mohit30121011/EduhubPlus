@@ -9,7 +9,7 @@ router.post('/login', loginUser);
 router.post('/register', protect, authorize('SUPER_ADMIN', 'ADMIN'), registerUser);
 
 router.get('/seed-all', (req, res) => {
-    exec('npm run seed', (error, stdout, stderr) => {
+    exec('node src/scripts/seedAll.js', (error, stdout, stderr) => {
         if (error) {
             console.error(`exec error: ${error}`);
             return res.status(500).json({ error: error.message, stderr });

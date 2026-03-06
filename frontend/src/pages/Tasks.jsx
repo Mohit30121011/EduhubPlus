@@ -7,6 +7,8 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
+import { useSelector } from 'react-redux';
+
 // ─── MOCK DATA ──────────────────────────────────────────────────────
 const initialTasks = [
     { id: 1, title: 'Update Fee Structure', desc: 'Revise class 10 fees for next academic year.', status: 'To Do', priority: 'High', date: '2 Mar', assignee: 'Accounts' },
@@ -240,8 +242,69 @@ const CreateTaskModal = ({ show, onClose, onCreate }) => {
     );
 };
 
+// ─── STUDENT VIEW ───────────────────────────────────────────────────
+const StudentTasksView = () => {
+    const studentTasks = [
+        { id: 101, title: 'DBMS Lab Assignment #4', subject: 'Database Management Systems', dueDate: '2026-03-05', status: 'Pending', priority: 'High', grade: null },
+        { id: 102, title: 'OS Practical File Submission', subject: 'Operating Systems', dueDate: '2026-03-10', status: 'Pending', priority: 'Medium', grade: null },
+        { id: 103, title: 'Data Structures Mid-Term Project', subject: 'Data Structures & Algorithms', dueDate: '2026-03-15', status: 'Pending', priority: 'High', grade: null },
+        { id: 104, title: 'Network Topology Essay', subject: 'Computer Networks', dueDate: '2026-02-20', status: 'Submitted', priority: 'Low', grade: 'A' },
+        { id: 105, title: 'Web Development Quiz ReactJS', subject: 'Web Development', dueDate: '2026-02-15', status: 'Graded', priority: 'High', grade: '9.5/10' },
+    ];
+
+    return (
+        <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm p-5">
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Pending Assignments</p>
+                    <p className="text-4xl font-black text-amber-500 mt-2">{studentTasks.filter(t => t.status === 'Pending').length}</p>
+                </div>
+                <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm p-5">
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Submitted / Under Review</p>
+                    <p className="text-4xl font-black text-blue-500 mt-2">{studentTasks.filter(t => t.status === 'Submitted').length}</p>
+                </div>
+                <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm p-5">
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Graded</p>
+                    <p className="text-4xl font-black text-emerald-500 mt-2">{studentTasks.filter(t => t.status === 'Graded').length}</p>
+                </div>
+            </div>
+
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm overflow-hidden">
+                <div className="p-4 border-b border-gray-100 flex items-center gap-2">
+                    <Tag size={16} className="text-blue-500" />
+                    <h3 className="font-bold text-gray-800 text-sm">My Assignments & Tasks</h3>
+                </div>
+                <div className="divide-y divide-gray-50">
+                    {studentTasks.map(task => (
+                        <div key={task.id} className="p-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
+                            <div className="flex-1 min-w-0 pr-4">
+                                <h4 className="font-bold text-gray-900 text-sm">{task.title}</h4>
+                                <div className="flex items-center gap-3 mt-1">
+                                    <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">{task.subject}</span>
+                                    <span className="text-xs text-gray-500 flex items-center gap-1"><Calendar size={12}/> Due: {task.dueDate}</span>
+                                </div>
+                            </div>
+                            <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                                <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${
+                                    task.status === 'Pending' ? 'bg-amber-50 text-amber-600' : 
+                                    task.status === 'Submitted' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'
+                                }`}>
+                                    {task.status}
+                                </span>
+                                {task.grade && <span className="text-xs font-black text-emerald-600 mr-1">Grade: {task.grade}</span>}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
 // ─── MAIN COMPONENT ─────────────────────────────────────────────────
 const Tasks = () => {
+    const { user } = useSelector(state => state.auth);
+    const isStudent = user?.role === 'STUDENT';
     const [tasks, setTasks] = useState(initialTasks);
     const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -264,23 +327,31 @@ const Tasks = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Task Manager</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">{isStudent ? 'My Assignments' : 'Task Manager'}</h1>
                     <p className="text-gray-500 text-sm mt-1">
-                        Organize school operations and staff assignments.
-                        <span className="ml-2 text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
-                            {tasks.length} tasks
-                        </span>
+                        {isStudent ? 'Track your academic assignments and pending tasks.' : 'Organize school operations and staff assignments.'}
+                        {!isStudent && (
+                            <span className="ml-2 text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                                {tasks.length} tasks
+                            </span>
+                        )}
                     </p>
                 </div>
-                <button
-                    onClick={() => setShowCreateModal(true)}
-                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl text-sm font-bold hover:opacity-90 shadow-lg shadow-blue-500/20 flex items-center gap-2 transition-all"
-                >
-                    <Plus size={18} /> Create Task
-                </button>
+                {!isStudent && (
+                    <button
+                        onClick={() => setShowCreateModal(true)}
+                        className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl text-sm font-bold hover:opacity-90 shadow-lg shadow-blue-500/20 flex items-center gap-2 transition-all"
+                    >
+                        <Plus size={18} /> Create Task
+                    </button>
+                )}
             </div>
 
-            {/* Kanban Board */}
+            {isStudent ? (
+                <StudentTasksView />
+            ) : (
+                <>
+                    {/* Kanban Board */}
             <div className="flex-1 overflow-x-auto overflow-y-hidden">
                 <div className="flex gap-6 h-full min-w-[1000px] pb-4">
                     {columns.map(col => {
@@ -333,6 +404,8 @@ const Tasks = () => {
                 onClose={() => setShowCreateModal(false)}
                 onCreate={handleCreate}
             />
+            </>
+            )}
         </div>
     );
 };

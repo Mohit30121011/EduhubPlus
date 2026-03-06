@@ -7,6 +7,8 @@ import { useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 
+import { useSelector } from 'react-redux';
+
 // Mock Data for Classes
 const initialClasses = [
     { id: 1, name: 'Class 10', section: 'A', students: 42, teacher: 'Dr. Rajesh Kumar', stream: 'General' },
@@ -66,7 +68,140 @@ const StatCard = ({ title, count, icon: Icon, color }) => (
     </div>
 );
 
+// ─── STUDENT VIEW ─────────────────────────────────────────────────
+const StudentAcademicsView = () => {
+    const { user } = useSelector((state) => state.auth);
+    const token = user?.token || localStorage.getItem('token');
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+    const MOCK_SUBJECTS = [
+        { code: 'CS301', name: 'Data Structures & Algorithms', teacher: 'Dr. Smith' },
+        { code: 'CS302', name: 'Web Development', teacher: 'Prof. Doe' },
+        { code: 'CS303', name: 'Database Management Systems', teacher: 'Ms. Johnson' },
+        { code: 'CS304', name: 'Operating Systems', teacher: 'Dr. Lee' },
+        { code: 'CS305', name: 'Computer Networks', teacher: 'Prof. Martinez' },
+        { code: 'CS306', name: 'Software Engineering', teacher: 'Dr. Taylor' },
+    ];
+
+    const MOCK_TIMETABLE = [
+        { time: '10:00 AM', subject: 'Data Structures', room: 'Lab 3', teacher: 'Dr. Smith' },
+        { time: '11:00 AM', subject: 'Computer Networks', room: 'Room 201', teacher: 'Prof. Martinez' },
+        { time: '12:00 PM', subject: 'Web Development', room: 'Hall A', teacher: 'Prof. Doe' },
+        { time: '02:00 PM', subject: 'Database Systems', room: 'Lab 1', teacher: 'Ms. Johnson' },
+    ];
+
+    const [studentSubjects, setStudentSubjects] = useState(MOCK_SUBJECTS);
+    const [todayTimetable, setTodayTimetable] = useState(MOCK_TIMETABLE);
+    const [semester, setSemester] = useState(6);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const headers = { Authorization: `Bearer ${token}` };
+            try {
+                // Fetch subjects
+                const subRes = await fetch(`${API_URL}/students/me/subjects`, { headers });
+                if (subRes.ok) {
+                    const subData = await subRes.json();
+                    if (subData.subjects && subData.subjects.length > 0) {
+                        setStudentSubjects(subData.subjects.map(s => ({
+                            code: s.code || s.id,
+                            name: s.name,
+                            teacher: s.teacher || '—'
+                        })));
+                    }
+                    if (subData.semester) setSemester(subData.semester);
+                }
+
+                // Fetch timetable
+                const ttRes = await fetch(`${API_URL}/students/me/timetable`, { headers });
+                if (ttRes.ok) {
+                    const ttData = await ttRes.json();
+                    // Get today's day
+                    const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+                    const today = days[new Date().getDay()];
+                    const todaySlots = (ttData.timetable && ttData.timetable[today]) || [];
+                    if (todaySlots.length > 0) {
+                        setTodayTimetable(todaySlots.map(s => ({
+                            time: s.startTime || '—',
+                            subject: s.subject?.name || 'Unknown',
+                            room: s.classroom?.room || '—',
+                            teacher: s.faculty?.name || '—'
+                        })));
+                    }
+                }
+            } catch (err) {
+                console.error('Error fetching student academics:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [token]);
+
+    return (
+        <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* My Subjects */}
+                <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm overflow-hidden">
+                    <div className="p-4 border-b border-gray-100 flex items-center gap-2">
+                        <BookOpen size={18} className="text-emerald-500" />
+                        <h3 className="font-bold text-gray-900">My Subjects (Semester {semester})</h3>
+                    </div>
+                    <div className="divide-y divide-gray-50 max-h-[400px] overflow-y-auto">
+                        {studentSubjects.map(sub => (
+                            <div key={sub.code} className="p-4 flex items-center justify-between hover:bg-gray-50/50">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold font-mono text-xs">
+                                        {String(sub.code).substr(0,2)}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-gray-900 text-sm">{sub.name}</p>
+                                        <p className="text-xs text-gray-500 mt-0.5">{sub.teacher}</p>
+                                    </div>
+                                </div>
+                                <span className="font-mono text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-md">{sub.code}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Today's Timetable */}
+                <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm overflow-hidden">
+                    <div className="p-4 border-b border-gray-100 flex items-center gap-2">
+                        <Clock size={18} className="text-blue-500" />
+                        <h3 className="font-bold text-gray-900">Today's Class Schedule</h3>
+                    </div>
+                    <div className="p-4 space-y-3">
+                        {todayTimetable.map((slot, i) => (
+                            <div key={i} className="flex gap-4 items-start relative group">
+                                <div className="w-16 flex-shrink-0 text-right">
+                                    <p className="text-xs font-bold text-gray-900">{String(slot.time).split(' ')[0]}</p>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase">{String(slot.time).split(' ')[1] || ''}</p>
+                                </div>
+                                <div className="relative flex-1 bg-gray-50 border border-gray-100 rounded-xl p-3 group-hover:bg-blue-50 group-hover:border-blue-100 transition-colors">
+                                    <div className="absolute left-0 top-1/2 -ml-2.5 -translate-y-1/2 w-[5px] h-full bg-blue-500 rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    <p className="font-bold text-gray-900 text-sm group-hover:text-blue-700">{slot.subject}</p>
+                                    <div className="flex items-center gap-3 mt-1.5 text-xs font-medium text-gray-500">
+                                        <span className="flex items-center gap-1"><Users size={12}/>{slot.teacher}</span>
+                                        <span className="flex items-center gap-1"><Layers size={12}/>{slot.room}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                        {todayTimetable.length === 0 && (
+                            <div className="text-center py-8 text-gray-400 text-sm">No classes scheduled for today</div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const Academics = () => {
+    const { user } = useSelector((state) => state.auth);
+    const isStudent = user?.role === 'STUDENT';
     const [searchParams] = useSearchParams();
     const tabFromUrl = searchParams.get('tab');
     const [activeTab, setActiveTab] = useState(() => tabFromUrl || localStorage.getItem('academicsTab') || 'classes');
@@ -115,10 +250,10 @@ const Academics = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-black text-gray-900">Academics & Curriculum</h1>
-                    <p className="text-gray-500 text-sm mt-1">Manage classes, subjects, and timetables efficiently.</p>
+                    <h1 className="text-2xl font-black text-gray-900">{isStudent ? 'My Academics' : 'Academics & Curriculum'}</h1>
+                    <p className="text-gray-500 text-sm mt-1">{isStudent ? 'View your subjects and class schedule.' : 'Manage classes, subjects, and timetables efficiently.'}</p>
                 </div>
-                {activeTab !== 'timetables' && (
+                {!isStudent && activeTab !== 'timetables' && (
                     <motion.button
                         whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                         onClick={() => {
@@ -134,6 +269,10 @@ const Academics = () => {
                 )}
             </div>
 
+            {isStudent ? (
+                <StudentAcademicsView />
+            ) : (
+                <>
             {/* Quick Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <StatCard title="Total Classes" count={classes.length} icon={Layers} color="bg-indigo-500" />
@@ -482,6 +621,8 @@ const Academics = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+            </>
+            )}
         </div>
     );
 };

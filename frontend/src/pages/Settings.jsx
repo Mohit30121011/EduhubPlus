@@ -174,14 +174,29 @@ const SettingsPage = () => {
         }
     };
 
-    const tabs = [
-        { id: 'campus', label: 'Campus Info', icon: School },
+    const isStudent = user?.role === 'STUDENT';
+    
+    let tabs = [
         { id: 'profile', label: 'Profile Info', icon: User },
         { id: 'preferences', label: 'Preferences', icon: Calendar },
-        { id: 'roles', label: 'Roles & Permissions', icon: Shield },
-        { id: 'notifications', label: 'Notifications', icon: Bell },
-        { id: 'backup', label: 'Data & Backup', icon: Database },
     ];
+    
+    if (!isStudent) {
+        tabs = [
+            { id: 'campus', label: 'Campus Info', icon: School },
+            ...tabs,
+            { id: 'roles', label: 'Roles & Permissions', icon: Shield },
+            { id: 'notifications', label: 'Notifications', icon: Bell },
+            { id: 'backup', label: 'Data & Backup', icon: Database },
+        ];
+    }
+
+    // Ensure state defaults correctly if a student was left on a campus tab
+    useEffect(() => {
+        if (isStudent && !['profile', 'preferences'].includes(activeTab)) {
+            setActiveTab('profile');
+        }
+    }, [isStudent, activeTab]);
 
     return (
         <div className="max-w-5xl mx-auto pb-10 relative isolate">

@@ -23,6 +23,20 @@ const permissionRouteMap = {
 };
 
 const getNavItems = (userRole, userPermissions = []) => {
+    // STUDENT sees a tailored view
+    if (userRole === 'STUDENT') {
+        return [
+            { href: '/dashboard', icon: LayoutDashboard, label: 'Home', permissionId: 'dashboard', alwaysShow: true },
+            { href: '/dashboard/attendance', icon: ClipboardCheck, label: 'My Attendance', permissionId: 'attendance', alwaysShow: true },
+            { href: '/dashboard/academics', icon: BookOpen, label: 'My Subjects', permissionId: 'academics', alwaysShow: true },
+            { href: '/dashboard/finances', icon: CalendarCheck, label: 'Fees & Payments', permissionId: 'finances', alwaysShow: true },
+            { href: '/dashboard/tasks', icon: CalendarCheck, label: 'My Tasks', permissionId: 'tasks', alwaysShow: true },
+            { href: '/dashboard/content', icon: FileText, label: 'LMS / Library', permissionId: 'content', alwaysShow: true },
+            { href: '/dashboard/notifications', icon: Bell, label: 'Notifications', permissionId: 'notifications', alwaysShow: true },
+            { href: '/dashboard/settings', icon: Settings, label: 'My Profile', permissionId: 'settings', alwaysShow: true },
+        ];
+    }
+
     const allItems = [
         { href: '/dashboard', icon: LayoutDashboard, label: 'Home', permissionId: 'dashboard' },
         { href: '/dashboard/analytics', icon: TrendingUp, label: 'Dashboard', permissionId: 'dashboard' },
@@ -52,11 +66,20 @@ const getNavItems = (userRole, userPermissions = []) => {
     return filteredItems;
 };
 
-const quickLinks = [
-    { href: '/dashboard/students/add', label: 'Enroll Student' },
-    { href: '/dashboard/students', label: 'Student List' },
-    { href: '/dashboard/enquiries', label: 'Enquiry List' },
-];
+const getQuickLinks = (userRole) => {
+    if (userRole === 'STUDENT') {
+        return [
+            { href: '/dashboard/finances', label: 'Pay Fees' },
+            { href: '/dashboard/academics?tab=timetables', label: 'View Timetable' },
+            { href: '/dashboard/attendance', label: 'View Attendance' },
+        ];
+    }
+    return [
+        { href: '/dashboard/students/add', label: 'Enroll Student' },
+        { href: '/dashboard/students', label: 'Student List' },
+        { href: '/dashboard/enquiries', label: 'Enquiry List' },
+    ];
+};
 
 const Sidebar = ({ isOpen, onClose }) => {
     const location = useLocation();
@@ -113,7 +136,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                         Quick Links
                     </p>
                     <div className="space-y-1">
-                        {quickLinks.map((link) => {
+                        {getQuickLinks(user?.role).map((link) => {
                             const active = location.pathname === link.href;
                             return (
                                 <Link
